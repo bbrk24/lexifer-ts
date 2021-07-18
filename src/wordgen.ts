@@ -25,7 +25,12 @@ class ArbSorter {
 
     wordAsValues(word: string) {
         let w = this.split(word);
-        return w.map(char => this.ords[char]!);
+        let arrayedWord = w.map(char => this.ords[char]);
+        if (arrayedWord.includes(undefined)) {
+            throw new Error(`Word with unknown letter: '${word}'.\n`
+                + 'A filter or assimilation might have caused this.');
+        }
+        return <number[]>arrayedWord;
     }
 
     valuesAsWord(values: number[]) {

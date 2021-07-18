@@ -28,7 +28,12 @@ var ArbSorter = /** @class */ (function () {
     ArbSorter.prototype.wordAsValues = function (word) {
         var _this = this;
         var w = this.split(word);
-        return w.map(function (char) { return _this.ords[char]; });
+        var arrayedWord = w.map(function (char) { return _this.ords[char]; });
+        if (arrayedWord.includes(undefined)) {
+            throw new Error("Word with unknown letter: '" + word + "'.\n"
+                + 'A filter or assimilation might have caused this.');
+        }
+        return arrayedWord;
     };
     ArbSorter.prototype.valuesAsWord = function (values) {
         var _this = this;
