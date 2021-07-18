@@ -204,7 +204,7 @@ export class SoundSystem {
         this.useCoronalMetathesis = true;
     }
 
-    generate(n = 10, unsorted = false) {
+    generate(n: number, unsorted: boolean) {
         let words = new Set<string>();
         let ruleSelector = new WeightedSelector(this.ruleset);
         while (words.size < n) {

@@ -216,8 +216,6 @@ var SoundSystem = /** @class */ (function () {
         this.useCoronalMetathesis = true;
     };
     SoundSystem.prototype.generate = function (n, unsorted) {
-        if (n === void 0) { n = 10; }
-        if (unsorted === void 0) { unsorted = false; }
         var words = new Set();
         var ruleSelector = new distribution_1.default(this.ruleset);
         while (words.size < n) {

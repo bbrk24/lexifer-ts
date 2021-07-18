@@ -26,7 +26,7 @@ export declare class SoundSystem {
     useDigraphs(): void;
     withStdAssimilations(): void;
     withCoronalMetathesis(): void;
-    generate(n?: number, unsorted?: boolean): string[];
+    generate(n: number, unsorted: boolean): string[];
 }
 export declare const textify: (phsys: SoundSystem, sentences?: number) => string;
 export {};
