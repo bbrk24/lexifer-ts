@@ -241,7 +241,7 @@ var SoundSystem = /** @class */ (function () {
 exports.SoundSystem = SoundSystem;
 ;
 var textify = function (phsys, sentences) {
-    if (sentences === void 0) { sentences = 11; }
+    if (sentences === void 0) { sentences = 25; }
     var text = '';
     for (var i = 0; i < sentences; ++i) {
         var sent = Math.floor(Math.random() * 9) + 3;

@@ -226,7 +226,7 @@ export class SoundSystem {
     }
 };
 
-export const textify = (phsys: SoundSystem, sentences = 11) => {
+export const textify = (phsys: SoundSystem, sentences = 25) => {
     let text = '';
     for (let i = 0; i < sentences; ++i) {
         let sent = Math.floor(Math.random() * 9) + 3;
