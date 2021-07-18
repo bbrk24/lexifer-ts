@@ -4,9 +4,8 @@ exports.textify = exports.SoundSystem = void 0;
 var tslib_1 = require("tslib");
 var last_1 = tslib_1.__importDefault(require("lodash/last"));
 var distribution_1 = tslib_1.__importDefault(require("./distribution"));
+var textwrap_1 = tslib_1.__importDefault(require("./textwrap"));
 var sc = tslib_1.__importStar(require("./SmartClusters"));
-// taken from https://stackoverflow.com/questions/14484787/wrap-text-in-javascript#answer-51506718
-var wrap = function (s) { return s.replace(/(?![^\n]{1,70}$)([^\n]{1,70})\s/g, '$1\n'); };
 var RuleError = /** @class */ (function (_super) {
     tslib_1.__extends(RuleError, _super);
     function RuleError() {
@@ -263,7 +262,7 @@ var textify = function (phsys, sentences) {
             text += '? ';
         }
     }
-    text = wrap(text);
+    text = textwrap_1.default(text);
     return text;
 };
 exports.textify = textify;
