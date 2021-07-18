@@ -16,11 +16,11 @@ export declare class SoundSystem {
     useAssim: boolean;
     useCoronalMetathesis: boolean;
     sorter: ArbSorter | null;
+    private runRule;
+    private applyFilters;
     addPhUnit(name: string, selection: string): void;
     addRule(rule: string, weight: number): void;
-    runRule(rule: string): string;
     addFilter(pat: RegExp, repl: string): void;
-    applyFilters(word: string): string;
     addSortOrder(order: string): void;
     useIpa(): void;
     useDigraphs(): void;

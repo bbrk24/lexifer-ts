@@ -93,18 +93,7 @@ export class SoundSystem {
     useCoronalMetathesis = false;
     sorter: ArbSorter | null = null;
 
-    addPhUnit(name: string, selection: string) {
-        if (!selection.includes(':')) {
-            selection = naturalWeights(selection);
-        }
-        this.phonemeset[name] = new WeightedSelector(ruleToDict(selection));
-    }
-
-    addRule(rule: string, weight: number) {
-        this.ruleset[rule] = weight;
-    }
-
-    runRule(rule: string) {
+    private runRule(rule: string) {
         let n = rule.length;
         let s: string[] = [];
         for (let i = 0; i < n; ++i) {
@@ -155,15 +144,7 @@ export class SoundSystem {
         return s.join('');
     }
 
-    addFilter(pat: RegExp, repl: string) {
-        if (repl === '!') {
-            this.filters.push([pat, '']);
-        } else {
-            this.filters.push([pat, repl]);
-        }
-    }
-
-    applyFilters(word: string) {
+    private applyFilters(word: string) {
         if (this.sorter) {
             let w = this.sorter.split(word);
             if (this.useAssim) {
@@ -182,6 +163,25 @@ export class SoundSystem {
             }
         }
         return word;
+    }
+
+    addPhUnit(name: string, selection: string) {
+        if (!selection.includes(':')) {
+            selection = naturalWeights(selection);
+        }
+        this.phonemeset[name] = new WeightedSelector(ruleToDict(selection));
+    }
+
+    addRule(rule: string, weight: number) {
+        this.ruleset[rule] = weight;
+    }
+
+    addFilter(pat: RegExp, repl: string) {
+        if (repl === '!') {
+            this.filters.push([pat, '']);
+        } else {
+            this.filters.push([pat, repl]);
+        }
     }
 
     addSortOrder(order: string) {

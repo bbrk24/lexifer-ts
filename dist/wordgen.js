@@ -104,15 +104,6 @@ var SoundSystem = /** @class */ (function () {
         this.useCoronalMetathesis = false;
         this.sorter = null;
     }
-    SoundSystem.prototype.addPhUnit = function (name, selection) {
-        if (!selection.includes(':')) {
-            selection = naturalWeights(selection);
-        }
-        this.phonemeset[name] = new distribution_1.default(ruleToDict(selection));
-    };
-    SoundSystem.prototype.addRule = function (rule, weight) {
-        this.ruleset[rule] = weight;
-    };
     SoundSystem.prototype.runRule = function (rule) {
         var n = rule.length;
         var s = [];
@@ -162,14 +153,6 @@ var SoundSystem = /** @class */ (function () {
         }
         return s.join('');
     };
-    SoundSystem.prototype.addFilter = function (pat, repl) {
-        if (repl === '!') {
-            this.filters.push([pat, '']);
-        }
-        else {
-            this.filters.push([pat, repl]);
-        }
-    };
     SoundSystem.prototype.applyFilters = function (word) {
         var e_2, _a;
         if (this.sorter) {
@@ -199,6 +182,23 @@ var SoundSystem = /** @class */ (function () {
             finally { if (e_2) throw e_2.error; }
         }
         return word;
+    };
+    SoundSystem.prototype.addPhUnit = function (name, selection) {
+        if (!selection.includes(':')) {
+            selection = naturalWeights(selection);
+        }
+        this.phonemeset[name] = new distribution_1.default(ruleToDict(selection));
+    };
+    SoundSystem.prototype.addRule = function (rule, weight) {
+        this.ruleset[rule] = weight;
+    };
+    SoundSystem.prototype.addFilter = function (pat, repl) {
+        if (repl === '!') {
+            this.filters.push([pat, '']);
+        }
+        else {
+            this.filters.push([pat, repl]);
+        }
     };
     SoundSystem.prototype.addSortOrder = function (order) {
         this.sorter = new ArbSorter(order);
