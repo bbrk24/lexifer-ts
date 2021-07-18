@@ -3,5 +3,12 @@
     "version": "0.1.0",
     "private": true,
     "dependencies": {
+        "tslib": "^2.3.0"
+    },
+    "devDependencies": {
+        "typescript": "^4.3.5"
+    },
+    "peerDependencies": {
+        "typescript": "^4.3.5"
     }
 }
