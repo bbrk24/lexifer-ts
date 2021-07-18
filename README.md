@@ -1,0 +1,1 @@
+This is a TypeScript implementation of William Annis's [Lexifer](https://github.com/wmannis/lexifer). It is still incomplete.
