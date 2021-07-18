@@ -87,10 +87,11 @@ export class SoundSystem {
     private phonemeset: { [key: string]: WeightedSelector } = {};
     private ruleset: { [key: string]: number } = {};
     private filters: [RegExp, string][] = [];
-    private randpercent = 10;
-    private sorter: ArbSorter | null = null;
-    private useAssim = false;
-    private useCoronalMetathesis = false;
+
+    randpercent = 10;
+    useAssim = false;
+    useCoronalMetathesis = false;
+    sorter: ArbSorter | null = null;
 
     addPhUnit(name: string, selection: string) {
         if (!selection.includes(':')) {

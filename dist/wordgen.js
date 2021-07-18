@@ -100,9 +100,9 @@ var SoundSystem = /** @class */ (function () {
         this.ruleset = {};
         this.filters = [];
         this.randpercent = 10;
-        this.sorter = null;
         this.useAssim = false;
         this.useCoronalMetathesis = false;
+        this.sorter = null;
     }
     SoundSystem.prototype.addPhUnit = function (name, selection) {
         if (!selection.includes(':')) {
