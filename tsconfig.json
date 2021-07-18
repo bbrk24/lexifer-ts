@@ -19,6 +19,6 @@
         "esModuleInterop": true,
         "forceConsistentCasingInFileNames": true,
         "target": "ES5",
-        "lib": ["ES2017"]
+        "lib": ["ES2017", "ES2021.String"]
     }
 }
