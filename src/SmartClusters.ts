@@ -1,4 +1,4 @@
-const data = [
+const data: [string, string, string, string, string][] = [
     // Bilabial, labio-dental
     ['p', 'p', 'voiceless', 'bilabial', 'stop'],
     ['b', 'b', 'voiced', 'bilabial', 'stop'],
@@ -58,21 +58,19 @@ const data = [
     ['ɴ', 'nq', 'voiced', 'uvular', 'nasal']
 ];
 
-let phdb: string[][] = [];
+let phdb: [string, string, string, string][] = [];
 
 export const initialize = (notation = 'ipa') => {
     if (notation === 'ipa') {
         for (let row of data) {
-            row.splice(1, 1);
-            phdb.push(row);
+            phdb.push([row[0], row[2], row[3], row[4]]);
         }
     } else if (notation === 'digraph') {
         for (let row of data) {
-            row.splice(0, 1);
-            phdb.push(row);
+            phdb.push([row[1], row[2], row[3], row[4]]);
         }
     } else {
-        throw Error(`Unknown notation: ${notation}`);
+        throw new Error(`Unknown notation: ${notation}`);
     }
 };
 
@@ -114,9 +112,10 @@ const coronalMetathesis = (ph1: string, ph2: string) => {
     let data1 = phdb.filter(el => el[0] === ph1)[0];
     if (data1 && data1[2] === 'alveolar') {
         let data2 = phdb.filter(el => el[0] === ph2)[0];
-        if (data2
-            && ['velar', 'bilabial'].includes(data2[2]!)
-            && ['stop', 'nasal'].includes(data2[3]!)
+        if (
+            data2
+            && ['velar', 'bilabial'].includes(data2[2])
+            && ['stop', 'nasal'].includes(data2[3])
             && data2[3] === data1[3]
         ) {
             return [ph2, ph1];

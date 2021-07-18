@@ -1,8 +1,8 @@
 declare class WeightedSelector {
-    keys: string[];
-    weights: number[];
-    sum: number;
-    n: number;
+    private keys;
+    private weights;
+    private sum;
+    private n;
     constructor(dic: {
         [key: string]: number;
     });

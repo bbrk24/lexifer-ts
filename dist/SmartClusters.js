@@ -69,8 +69,7 @@ var initialize = function (notation) {
         try {
             for (var data_1 = tslib_1.__values(data), data_1_1 = data_1.next(); !data_1_1.done; data_1_1 = data_1.next()) {
                 var row = data_1_1.value;
-                row.splice(1, 1);
-                phdb.push(row);
+                phdb.push([row[0], row[2], row[3], row[4]]);
             }
         }
         catch (e_1_1) { e_1 = { error: e_1_1 }; }
@@ -85,8 +84,7 @@ var initialize = function (notation) {
         try {
             for (var data_2 = tslib_1.__values(data), data_2_1 = data_2.next(); !data_2_1.done; data_2_1 = data_2.next()) {
                 var row = data_2_1.value;
-                row.splice(0, 1);
-                phdb.push(row);
+                phdb.push([row[1], row[2], row[3], row[4]]);
             }
         }
         catch (e_2_1) { e_2 = { error: e_2_1 }; }
@@ -98,7 +96,7 @@ var initialize = function (notation) {
         }
     }
     else {
-        throw Error("Unknown notation: " + notation);
+        throw new Error("Unknown notation: " + notation);
     }
 };
 exports.initialize = initialize;
