@@ -1,0 +1,23 @@
+{
+    "include": [
+        "src/*"
+    ],
+    "compilerOptions": {
+        "allowUnreachableCode": false,
+        "allowUnusedLabels": false,
+        "noImplicitOverride": true,
+        "noImplicitReturns": true,
+        "noUncheckedIndexedAccess": true,
+        "strict": true,
+        "strictPropertyInitialization": false,
+        "module": "commonjs",
+        "declaration": true,
+        "downlevelIteration": true,
+        "importHelpers": true,
+        "noEmitOnError": true,
+        "outDir": "./dist",
+        "esModuleInterop": true,
+        "forceConsistentCasingInFileNames": true,
+        "target": "ES5"
+    }
+}
