@@ -7,6 +7,8 @@ class PhonologyDefinition {
     private macros: [RegExp, string][] = [];
     private letters: string[] = [];
     private phClasses: string[] = [];
+    
+    private stderr: (inp: string | Error) => void;
 
     // a bit of a hack since JS can't read files directly
     private defFileLineNum = 0;
@@ -14,9 +16,14 @@ class PhonologyDefinition {
 
     soundsys: SoundSystem;
 
-    constructor(soundsys: SoundSystem, defFile: string) {
+    constructor(
+        soundsys: SoundSystem,
+        defFile: string,
+        stderr: (inp: string | Error) => void
+    ) {
         this.soundsys = soundsys;
         this.defFileArr = defFile.split('\n');
+        this.stderr = stderr;
         this.parse();
         this.sanityCheck();
     }
@@ -51,7 +58,7 @@ class PhonologyDefinition {
             }
         }
         if ((this.soundsys.useAssim || this.soundsys.useCoronalMetathesis) && !this.soundsys.sorter) {
-            console.error('Without \'letters:\' cannot apply assimilations or coronal metathesis.')
+            this.stderr('Without \'letters:\' cannot apply assimilations or coronal metathesis.')
         }
     }
 
@@ -61,7 +68,7 @@ class PhonologyDefinition {
             let phonemes = new Set(this.phClasses);
             if (phonemes.size > letters.size) {
                 let diff = [...phonemes].filter(el => !letters.has(el));
-                console.error(`A phoneme class contains '${diff.join(' ')}'`
+                this.stderr(`A phoneme class contains '${diff.join(' ')}'`
                     + 'missing from \'letters\'.  Strange word shapes are '
                     + 'likely to result.')
             }

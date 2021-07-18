@@ -17,7 +17,7 @@ var ParseError = /** @class */ (function (_super) {
     return ParseError;
 }(Error));
 var PhonologyDefinition = /** @class */ (function () {
-    function PhonologyDefinition(soundsys, defFile) {
+    function PhonologyDefinition(soundsys, defFile, stderr) {
         this.macros = [];
         this.letters = [];
         this.phClasses = [];
@@ -25,6 +25,7 @@ var PhonologyDefinition = /** @class */ (function () {
         this.defFileLineNum = 0;
         this.soundsys = soundsys;
         this.defFileArr = defFile.split('\n');
+        this.stderr = stderr;
         this.parse();
         this.sanityCheck();
     }
@@ -64,7 +65,7 @@ var PhonologyDefinition = /** @class */ (function () {
             }
         }
         if ((this.soundsys.useAssim || this.soundsys.useCoronalMetathesis) && !this.soundsys.sorter) {
-            console.error('Without \'letters:\' cannot apply assimilations or coronal metathesis.');
+            this.stderr('Without \'letters:\' cannot apply assimilations or coronal metathesis.');
         }
     };
     PhonologyDefinition.prototype.sanityCheck = function () {
@@ -73,7 +74,7 @@ var PhonologyDefinition = /** @class */ (function () {
             var phonemes = new Set(this.phClasses);
             if (phonemes.size > letters_1.size) {
                 var diff = tslib_1.__spreadArray([], tslib_1.__read(phonemes)).filter(function (el) { return !letters_1.has(el); });
-                console.error("A phoneme class contains '" + diff.join(' ') + "'"
+                this.stderr("A phoneme class contains '" + diff.join(' ') + "'"
                     + 'missing from \'letters\'.  Strange word shapes are '
                     + 'likely to result.');
             }

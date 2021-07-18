@@ -3,10 +3,11 @@ declare class PhonologyDefinition {
     private macros;
     private letters;
     private phClasses;
+    private stderr;
     private defFileLineNum;
     private defFileArr;
     soundsys: SoundSystem;
-    constructor(soundsys: SoundSystem, defFile: string);
+    constructor(soundsys: SoundSystem, defFile: string, stderr: (inp: string | Error) => void);
     private parse;
     private sanityCheck;
     private parseOption;
