@@ -68,7 +68,7 @@ class PhonologyDefinition {
             let phonemes = new Set(this.phClasses);
             if (phonemes.size > letters.size) {
                 let diff = [...phonemes].filter(el => !letters.has(el));
-                this.stderr(`A phoneme class contains '${diff.join(' ')}'`
+                this.stderr(`A phoneme class contains '${diff.join(' ')}' `
                     + 'missing from \'letters\'.  Strange word shapes are '
                     + 'likely to result.')
             }
@@ -76,7 +76,7 @@ class PhonologyDefinition {
     }
 
     private parseOption(line: string) {
-        for (let option of line.split(/\s+/g)) {
+        for (let option of line.split(/\s+/gu)) {
             switch (option) {
                 case 'std-ipa-features':
                     this.soundsys.useIpa();
@@ -111,18 +111,18 @@ class PhonologyDefinition {
     private addFilter(pre: string, post: string) {
         pre = pre.trim();
         post = post.trim();
-        this.soundsys.addFilter(new RegExp(pre, 'g'), post);
+        this.soundsys.addFilter(new RegExp(pre, 'gu'), post);
     }
 
     private parseReject(line: string) {
-        for (let filt of line.split(/\s+/g)) {
-            this.soundsys.addFilter(new RegExp(filt, 'g'), 'REJECT');
+        for (let filt of line.split(/\s+/gu)) {
+            this.soundsys.addFilter(new RegExp(filt, 'gu'), 'REJECT');
         }
     }
 
     private parseWords(line: string) {
         line = this.expandMacros(line);
-        let splitLine = line.split(/\s+/g);
+        let splitLine = line.split(/\s+/gu);
         for (let i = 0; i < splitLine.length; ++i) {
             this.soundsys.addRule(splitLine[i]!, 10.0 / Math.pow((i + 1), 0.9))
         }
@@ -136,13 +136,13 @@ class PhonologyDefinition {
     }
 
     private parseLetters(line: string) {
-        this.letters = line.split(/\s+/g);
+        this.letters = line.split(/\s+/gu);
         this.soundsys.addSortOrder(line);
     }
 
     private parseClusterfield() {
         let c2list = this.defFileArr[this.defFileLineNum]!
-            .split(/\s+/g);
+            .split(/\s+/gu);
         c2list.shift();
         let n = c2list.length;
 
@@ -155,7 +155,7 @@ class PhonologyDefinition {
                 continue;
             }
 
-            let row = line.split(/\s+/g);
+            let row = line.split(/\s+/gu);
             let c1 = row.splice(0, 1);
 
             if (row.length === n) {
@@ -164,12 +164,12 @@ class PhonologyDefinition {
                         continue;
                     } else if (row[i] === '-') {
                         this.soundsys.addFilter(
-                            new RegExp(c1 + c2list[i]!, 'g'),
+                            new RegExp(c1 + c2list[i]!, 'gu'),
                             'REJECT'
                         );
                     } else {
                         this.soundsys.addFilter(
-                            new RegExp(c1 + c2list[i]!, 'g'),
+                            new RegExp(c1 + c2list[i]!, 'gu'),
                             row[i]!
                         );
                     }
@@ -188,11 +188,11 @@ class PhonologyDefinition {
         values = values!.trim();
         if (sclass[0] === '$') {
             this.macros.push([
-                new RegExp(`\\${sclass}`, 'g'),
+                new RegExp(`\\${sclass}`, 'gu'),
                 values
             ]);
         } else {
-            this.phClasses.concat(values.split(/\s+/g));
+            this.phClasses = this.phClasses.concat(values.split(/\s+/gu));
             this.soundsys.addPhUnit(sclass, values);
         }
     }

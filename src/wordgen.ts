@@ -11,9 +11,9 @@ class ArbSorter {
     private vals: string[];
 
     constructor(order: string) {
-        let graphs = order.split(/\s+/g);
+        let graphs = order.split(/\s+/gu);
         let splitOrder = graphs.sort((a, b) => b.length - a.length);
-        this.splitter = new RegExp(`(${splitOrder.join('|')}|.)`, 'g');
+        this.splitter = new RegExp(`(${splitOrder.join('|')}|.)`, 'gu');
         
         this.ords = {};
         this.vals = [];
@@ -56,7 +56,7 @@ const jitter = (v: number, percent = 10) => {
 }
 
 const naturalWeights = (phonemes: string) => {
-    let p = phonemes.split(/\s+/g);
+    let p = phonemes.split(/\s+/gu);
     let weighted: { [key: string]: number } = {};
     let n = p.length;
     for (let i = 0; i < n; ++i) {
@@ -71,7 +71,7 @@ const naturalWeights = (phonemes: string) => {
 };
 
 const ruleToDict = (rule: string) => {
-    let items = rule.split(/\s+/g);
+    let items = rule.trim().split(/\s+/gu);
     let d: { [key: string]: number } = {};
     for (let item of items) {
         if (!item.includes(':')) {
@@ -211,7 +211,7 @@ export class SoundSystem {
             let rule = ruleSelector.select();
             let word = this.applyFilters(this.runRule(rule));
             if (word != 'REJECT') {
-                words.add(rule);
+                words.add(word);
             }
         }
         let wordList = Array.from(words);
@@ -235,9 +235,7 @@ export const textify = (phsys: SoundSystem, sentences = 25) => {
             comma = Math.floor(Math.random() * (sent - 1));
         }
 
-        // JS has no function to capitalize just the first letter, hence the regex
-        text += phsys.generate(1, true)[0]!
-            .replace(/\b\w/g, l => l.toUpperCase());
+        text += phsys.generate(1, true)[0]!.replace(/./u, el => el.toUpperCase());
         
         for (let j = 0; j < sent; ++j) {
             text += ` ${phsys.generate(1, true)[0]}`;

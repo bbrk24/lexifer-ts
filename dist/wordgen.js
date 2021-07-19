@@ -15,9 +15,9 @@ var RuleError = /** @class */ (function (_super) {
 }(Error));
 var ArbSorter = /** @class */ (function () {
     function ArbSorter(order) {
-        var graphs = order.split(/\s+/g);
+        var graphs = order.split(/\s+/gu);
         var splitOrder = graphs.sort(function (a, b) { return b.length - a.length; });
-        this.splitter = new RegExp("(" + splitOrder.join('|') + "|.)", 'g');
+        this.splitter = new RegExp("(" + splitOrder.join('|') + "|.)", 'gu');
         this.ords = {};
         this.vals = [];
         for (var i in graphs) {
@@ -58,7 +58,7 @@ var jitter = function (v, percent) {
     return v + move * (Math.random() - 0.5);
 };
 var naturalWeights = function (phonemes) {
-    var p = phonemes.split(/\s+/g);
+    var p = phonemes.split(/\s+/gu);
     var weighted = {};
     var n = p.length;
     for (var i = 0; i < n; ++i) {
@@ -73,7 +73,7 @@ var naturalWeights = function (phonemes) {
 };
 var ruleToDict = function (rule) {
     var e_1, _a;
-    var items = rule.split(/\s+/g);
+    var items = rule.trim().split(/\s+/gu);
     var d = {};
     try {
         for (var items_1 = tslib_1.__values(items), items_1_1 = items_1.next(); !items_1_1.done; items_1_1 = items_1.next()) {
@@ -222,7 +222,7 @@ var SoundSystem = /** @class */ (function () {
             var rule = ruleSelector.select();
             var word = this.applyFilters(this.runRule(rule));
             if (word != 'REJECT') {
-                words.add(rule);
+                words.add(word);
             }
         }
         var wordList = Array.from(words);
@@ -249,9 +249,7 @@ var textify = function (phsys, sentences) {
         if (sent >= 7) {
             comma = Math.floor(Math.random() * (sent - 1));
         }
-        // JS has no function to capitalize just the first letter, hence the regex
-        text += phsys.generate(1, true)[0]
-            .replace(/\b\w/g, function (l) { return l.toUpperCase(); });
+        text += phsys.generate(1, true)[0].replace(/./u, function (el) { return el.toUpperCase(); });
         for (var j = 0; j < sent; ++j) {
             text += " " + phsys.generate(1, true)[0];
             if (j === comma) {

@@ -74,7 +74,7 @@ var PhonologyDefinition = /** @class */ (function () {
             var phonemes = new Set(this.phClasses);
             if (phonemes.size > letters_1.size) {
                 var diff = tslib_1.__spreadArray([], tslib_1.__read(phonemes)).filter(function (el) { return !letters_1.has(el); });
-                this.stderr("A phoneme class contains '" + diff.join(' ') + "'"
+                this.stderr("A phoneme class contains '" + diff.join(' ') + "' "
                     + 'missing from \'letters\'.  Strange word shapes are '
                     + 'likely to result.');
             }
@@ -83,7 +83,7 @@ var PhonologyDefinition = /** @class */ (function () {
     PhonologyDefinition.prototype.parseOption = function (line) {
         var e_1, _a;
         try {
-            for (var _b = tslib_1.__values(line.split(/\s+/g)), _c = _b.next(); !_c.done; _c = _b.next()) {
+            for (var _b = tslib_1.__values(line.split(/\s+/gu)), _c = _b.next(); !_c.done; _c = _b.next()) {
                 var option = _c.value;
                 switch (option) {
                     case 'std-ipa-features':
@@ -135,14 +135,14 @@ var PhonologyDefinition = /** @class */ (function () {
     PhonologyDefinition.prototype.addFilter = function (pre, post) {
         pre = pre.trim();
         post = post.trim();
-        this.soundsys.addFilter(new RegExp(pre, 'g'), post);
+        this.soundsys.addFilter(new RegExp(pre, 'gu'), post);
     };
     PhonologyDefinition.prototype.parseReject = function (line) {
         var e_3, _a;
         try {
-            for (var _b = tslib_1.__values(line.split(/\s+/g)), _c = _b.next(); !_c.done; _c = _b.next()) {
+            for (var _b = tslib_1.__values(line.split(/\s+/gu)), _c = _b.next(); !_c.done; _c = _b.next()) {
                 var filt = _c.value;
-                this.soundsys.addFilter(new RegExp(filt, 'g'), 'REJECT');
+                this.soundsys.addFilter(new RegExp(filt, 'gu'), 'REJECT');
             }
         }
         catch (e_3_1) { e_3 = { error: e_3_1 }; }
@@ -155,7 +155,7 @@ var PhonologyDefinition = /** @class */ (function () {
     };
     PhonologyDefinition.prototype.parseWords = function (line) {
         line = this.expandMacros(line);
-        var splitLine = line.split(/\s+/g);
+        var splitLine = line.split(/\s+/gu);
         for (var i = 0; i < splitLine.length; ++i) {
             this.soundsys.addRule(splitLine[i], 10.0 / Math.pow((i + 1), 0.9));
         }
@@ -178,12 +178,12 @@ var PhonologyDefinition = /** @class */ (function () {
         return word;
     };
     PhonologyDefinition.prototype.parseLetters = function (line) {
-        this.letters = line.split(/\s+/g);
+        this.letters = line.split(/\s+/gu);
         this.soundsys.addSortOrder(line);
     };
     PhonologyDefinition.prototype.parseClusterfield = function () {
         var c2list = this.defFileArr[this.defFileLineNum]
-            .split(/\s+/g);
+            .split(/\s+/gu);
         c2list.shift();
         var n = c2list.length;
         while (!['', '\n'].includes(this.defFileArr[this.defFileLineNum])) {
@@ -193,7 +193,7 @@ var PhonologyDefinition = /** @class */ (function () {
             if (line === '') {
                 continue;
             }
-            var row = line.split(/\s+/g);
+            var row = line.split(/\s+/gu);
             var c1 = row.splice(0, 1);
             if (row.length === n) {
                 for (var i = 0; i < n; ++i) {
@@ -201,10 +201,10 @@ var PhonologyDefinition = /** @class */ (function () {
                         continue;
                     }
                     else if (row[i] === '-') {
-                        this.soundsys.addFilter(new RegExp(c1 + c2list[i], 'g'), 'REJECT');
+                        this.soundsys.addFilter(new RegExp(c1 + c2list[i], 'gu'), 'REJECT');
                     }
                     else {
-                        this.soundsys.addFilter(new RegExp(c1 + c2list[i], 'g'), row[i]);
+                        this.soundsys.addFilter(new RegExp(c1 + c2list[i], 'gu'), row[i]);
                     }
                 }
             }
@@ -222,12 +222,12 @@ var PhonologyDefinition = /** @class */ (function () {
         values = values.trim();
         if (sclass[0] === '$') {
             this.macros.push([
-                new RegExp("\\" + sclass, 'g'),
+                new RegExp("\\" + sclass, 'gu'),
                 values
             ]);
         }
         else {
-            this.phClasses.concat(values.split(/\s+/g));
+            this.phClasses = this.phClasses.concat(values.split(/\s+/gu));
             this.soundsys.addPhUnit(sclass, values);
         }
     };
