@@ -10,8 +10,8 @@ const main = (
     stderr: (inp: string | Error) => void = console.error
 ) => {
     let ans = '';
-    let pd = new PhonologyDefinition(new SoundSystem(), file, stderr);
     try {
+        let pd = new PhonologyDefinition(new SoundSystem(), file, stderr);
         if (typeof num == 'number') {
             // wordlist mode
             let words = pd.generate(num, unsorted);

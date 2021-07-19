@@ -7,8 +7,8 @@ var wordgen_1 = require("./wordgen");
 var main = function (file, num, unsorted, onePerLine, stderr) {
     if (stderr === void 0) { stderr = console.error; }
     var ans = '';
-    var pd = new PhDefParser_1.default(new wordgen_1.SoundSystem(), file, stderr);
     try {
+        var pd = new PhDefParser_1.default(new wordgen_1.SoundSystem(), file, stderr);
         if (typeof num == 'number') {
             // wordlist mode
             var words = pd.generate(num, unsorted);
