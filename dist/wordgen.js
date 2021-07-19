@@ -16,7 +16,7 @@ var RuleError = /** @class */ (function (_super) {
 var ArbSorter = /** @class */ (function () {
     function ArbSorter(order) {
         var graphs = order.split(/\s+/gu);
-        var splitOrder = graphs.sort(function (a, b) { return b.length - a.length; });
+        var splitOrder = tslib_1.__spreadArray([], tslib_1.__read(graphs)).sort(function (a, b) { return b.length - a.length; });
         this.splitter = new RegExp("(" + splitOrder.join('|') + "|.)", 'gu');
         this.ords = {};
         this.vals = [];
@@ -47,7 +47,7 @@ var ArbSorter = /** @class */ (function () {
     ArbSorter.prototype.sort = function (l) {
         var _this = this;
         var l2 = l.map(function (el) { return _this.wordAsValues(el); });
-        l2.sort();
+        l2.sort(function (a, b) { return a[0] - b[0]; });
         return l2.map(function (el) { return _this.valuesAsWord(el); });
     };
     return ArbSorter;

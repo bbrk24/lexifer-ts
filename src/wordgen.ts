@@ -12,7 +12,7 @@ class ArbSorter {
 
     constructor(order: string) {
         let graphs = order.split(/\s+/gu);
-        let splitOrder = graphs.sort((a, b) => b.length - a.length);
+        let splitOrder = [...graphs].sort((a, b) => b.length - a.length);
         this.splitter = new RegExp(`(${splitOrder.join('|')}|.)`, 'gu');
         
         this.ords = {};
@@ -45,7 +45,7 @@ class ArbSorter {
 
     sort(l: string[]) {
         let l2 = l.map(el => this.wordAsValues(el));
-        l2.sort();
+        l2.sort((a, b) => a[0]! - b[0]!);
         return l2.map(el => this.valuesAsWord(el));
     }
 }
