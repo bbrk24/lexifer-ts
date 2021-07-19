@@ -21,6 +21,10 @@ class PhonologyDefinition {
         defFile: string,
         stderr: (inp: string | Error) => void
     ) {
+        if (defFile.trim() === '') {
+            throw new Error('Please include a definition.');
+        }
+
         this.soundsys = soundsys;
         this.defFileArr = defFile.split('\n');
         this.stderr = stderr;

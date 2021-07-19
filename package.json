@@ -1,6 +1,6 @@
 {
     "name": "lexifer",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "private": true,
     "dependencies": {
         "@types/lodash": "^4.14.171",

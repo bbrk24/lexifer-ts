@@ -23,6 +23,9 @@ var PhonologyDefinition = /** @class */ (function () {
         this.phClasses = [];
         // a bit of a hack since JS can't read files directly
         this.defFileLineNum = 0;
+        if (defFile.trim() === '') {
+            throw new Error('Please include a definition.');
+        }
         this.soundsys = soundsys;
         this.defFileArr = defFile.split('\n');
         this.stderr = stderr;
