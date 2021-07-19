@@ -158,8 +158,7 @@ var applyCoronalMetathesis = function (word) {
     var _a;
     var newArr = tslib_1.__spreadArray([], tslib_1.__read(word));
     for (var i = 0; i < word.length - 1; ++i) {
-        var temp = coronalMetathesis(word[i], word[i + 1]);
-        _a = tslib_1.__read([temp[0], temp[1]], 2), newArr[i] = _a[0], newArr[i + 1] = _a[1];
+        _a = tslib_1.__read(coronalMetathesis(word[i], word[i + 1]), 2), newArr[i] = _a[0], newArr[i + 1] = _a[1];
     }
     return newArr;
 };

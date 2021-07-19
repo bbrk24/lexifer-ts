@@ -108,7 +108,7 @@ const voiceAssimilate = (ph1: string, ph2: string) => {
     return ph1;
 };
 
-const coronalMetathesis = (ph1: string, ph2: string) => {
+const coronalMetathesis = (ph1: string, ph2: string): [string, string] => {
     let data1 = phdb.filter(el => el[0] === ph1)[0];
     if (data1 && data1[2] === 'alveolar') {
         let data2 = phdb.filter(el => el[0] === ph2)[0];
@@ -136,8 +136,7 @@ export const applyAssimilations = (word: string[]) => {
 export const applyCoronalMetathesis = (word: string[]) => {
     let newArr = [...word];
     for (let i = 0; i < word.length - 1; ++i) {
-        let temp = coronalMetathesis(word[i]!, word[i + 1]!);
-        [newArr[i], newArr[i + 1]] = [temp[0]!, temp[1]!];
+        [newArr[i], newArr[i + 1]] = coronalMetathesis(word[i]!, word[i + 1]!);
     }
     return newArr;
 };
