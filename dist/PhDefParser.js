@@ -185,13 +185,14 @@ var PhonologyDefinition = /** @class */ (function () {
         this.soundsys.addSortOrder(line);
     };
     PhonologyDefinition.prototype.parseClusterfield = function () {
+        var _a;
         var c2list = this.defFileArr[this.defFileLineNum]
             .split(/\s+/gu);
         c2list.shift();
         var n = c2list.length;
-        while (!['', '\n'].includes(this.defFileArr[this.defFileLineNum])) {
+        while (!['', '\n', undefined].includes(this.defFileArr[this.defFileLineNum])) {
             ++this.defFileLineNum;
-            var line = this.defFileArr[this.defFileLineNum];
+            var line = (_a = this.defFileArr[this.defFileLineNum]) !== null && _a !== void 0 ? _a : '';
             line = line.replace(/#.*/, '').trim();
             if (line === '') {
                 continue;

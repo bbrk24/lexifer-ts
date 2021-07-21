@@ -150,10 +150,10 @@ class PhonologyDefinition {
         c2list.shift();
         let n = c2list.length;
 
-        while (!['', '\n'].includes(this.defFileArr[this.defFileLineNum]!)) {
+        while (!['', '\n', undefined].includes(this.defFileArr[this.defFileLineNum]!)) {
             ++this.defFileLineNum;
 
-            let line = this.defFileArr[this.defFileLineNum]!;
+            let line = this.defFileArr[this.defFileLineNum] ?? '';
             line = line.replace(/#.*/, '').trim();
             if (line === '') {
                 continue;
