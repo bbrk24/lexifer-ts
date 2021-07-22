@@ -168,7 +168,7 @@ var PhonologyDefinition = /** @class */ (function () {
         try {
             for (var _b = tslib_1.__values(this.macros), _c = _b.next(); !_c.done; _c = _b.next()) {
                 var _d = tslib_1.__read(_c.value, 2), macro = _d[0], value = _d[1];
-                word = word.replaceAll(macro, value);
+                word = word.replace(macro, value);
             }
         }
         catch (e_4_1) { e_4 = { error: e_4_1 }; }

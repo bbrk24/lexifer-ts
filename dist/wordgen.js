@@ -168,7 +168,7 @@ var SoundSystem = /** @class */ (function () {
         try {
             for (var _b = tslib_1.__values(this.filters), _c = _b.next(); !_c.done; _c = _b.next()) {
                 var _d = tslib_1.__read(_c.value, 2), pat = _d[0], repl = _d[1];
-                word = word.replaceAll(pat, repl);
+                word = word.replace(pat, repl);
                 if (word.includes('REJECT')) {
                     return 'REJECT';
                 }

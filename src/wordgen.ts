@@ -157,7 +157,7 @@ export class SoundSystem {
         }
 
         for (let [pat, repl] of this.filters) {
-            word = word.replaceAll(pat, repl);
+            word = word.replace(pat, repl);
             if (word.includes('REJECT')) {
                 return 'REJECT';
             }

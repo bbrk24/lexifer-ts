@@ -134,7 +134,7 @@ class PhonologyDefinition {
 
     private expandMacros(word: string) {
         for (let [macro, value] of this.macros) {
-            word = word.replaceAll(macro, value);
+            word = word.replace(macro, value);
         }
         return word;
     }
