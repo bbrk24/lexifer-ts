@@ -2,7 +2,7 @@ import wrap from './textwrap';
 import PhonologyDefinition from './PhDefParser';
 import { SoundSystem } from './wordgen';
 
-const main = (
+export const main = (
     file: string,
     num?: number,
     unsorted?: boolean,
@@ -35,5 +35,3 @@ const main = (
     }
     return ans;
 };
-
-export default main;
