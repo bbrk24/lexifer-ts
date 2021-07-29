@@ -1,3 +1,4 @@
+declare function last<T>(array: T[]): T | undefined;
 declare const wrap: (s: string) => string;
 declare class WeightedSelector {
     private keys;
