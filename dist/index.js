@@ -1,19 +1,4 @@
 "use strict";
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        if (typeof b !== "function" && b !== null)
-            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
 var __values = (this && this.__values) || function(o) {
     var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
     if (m) return m.call(o);
@@ -228,13 +213,6 @@ var applyCoronalMetathesis = function (word) {
     return newArr;
 };
 var sc = { initialize: initialize, applyAssimilations: applyAssimilations, applyCoronalMetathesis: applyCoronalMetathesis };
-var RuleError = (function (_super) {
-    __extends(RuleError, _super);
-    function RuleError() {
-        return _super !== null && _super.apply(this, arguments) || this;
-    }
-    return RuleError;
-}(Error));
 var ArbSorter = (function () {
     function ArbSorter(order) {
         var graphs = order.split(/\s+/gu);
@@ -301,7 +279,7 @@ var ruleToDict = function (rule) {
         for (var items_1 = __values(items), items_1_1 = items_1.next(); !items_1_1.done; items_1_1 = items_1.next()) {
             var item = items_1_1.value;
             if (!item.includes(':')) {
-                throw new RuleError(item + " is not a valid phoneme and weight");
+                throw new Error(item + " is not a valid phoneme and weight");
             }
             var _b = __read(item.split(':'), 2), value = _b[0], weight = _b[1];
             d[value] = parseFloat(weight);
@@ -355,7 +333,7 @@ var SoundSystem = (function () {
                     prevc = rule[i - 1];
                 }
                 if (rule[i] !== prevc) {
-                    throw new RuleError('Misplaced \'!\' option: in '
+                    throw new Error('Misplaced \'!\' option: in '
                         + ("non-duplicate environment: " + rule));
                 }
                 if (rule[i] in this.phonemeset) {
@@ -487,20 +465,6 @@ var textify = function (phsys, sentences) {
     text = wrap(text);
     return text;
 };
-var UnknownOption = (function (_super) {
-    __extends(UnknownOption, _super);
-    function UnknownOption() {
-        return _super !== null && _super.apply(this, arguments) || this;
-    }
-    return UnknownOption;
-}(Error));
-var ParseError = (function (_super) {
-    __extends(ParseError, _super);
-    function ParseError() {
-        return _super !== null && _super.apply(this, arguments) || this;
-    }
-    return ParseError;
-}(Error));
 var PhonologyDefinition = (function () {
     function PhonologyDefinition(soundsys, defFile, stderr) {
         this.macros = [];
@@ -548,7 +512,7 @@ var PhonologyDefinition = (function () {
                 this.parseClass(line);
             }
             else {
-                throw new ParseError(line);
+                throw new Error("parsing error at '" + line + "'");
             }
         }
         if ((this.soundsys.useAssim || this.soundsys.useCoronalMetathesis) && !this.soundsys.sorter) {
@@ -586,7 +550,7 @@ var PhonologyDefinition = (function () {
                         this.soundsys.withCoronalMetathesis();
                         break;
                     default:
-                        throw new UnknownOption(option);
+                        throw new Error("unknown option '" + option + "'");
                 }
             }
         }
@@ -697,10 +661,10 @@ var PhonologyDefinition = (function () {
                 }
             }
             else if (row.length > n) {
-                throw new ParseError("Cluster field row too long: " + line);
+                throw new Error("Cluster field row too long: " + line);
             }
             else {
-                throw new ParseError("Cluster field row too short: " + line);
+                throw new Error("Cluster field row too short: " + line);
             }
         }
     };

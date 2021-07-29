@@ -1,6 +1,3 @@
-class UnknownOption extends Error { }
-class ParseError extends Error { }
-
 class PhonologyDefinition {
     private macros: [RegExp, string][] = [];
     private letters: string[] = [];
@@ -12,9 +9,10 @@ class PhonologyDefinition {
     private defFileLineNum = 0;
     private defFileArr: string[];
 
+    // @ts-ignore
     soundsys: SoundSystem;
 
-    constructor(
+    constructor( // @ts-ignore
         soundsys: SoundSystem,
         defFile: string,
         stderr: (inp: string | Error) => void
@@ -56,7 +54,7 @@ class PhonologyDefinition {
             } else if (line.includes('=')) {
                 this.parseClass(line);
             } else {
-                throw new ParseError(line);
+                throw new Error(`parsing error at '${line}'`);
             }
         }
         if ((this.soundsys.useAssim || this.soundsys.useCoronalMetathesis) && !this.soundsys.sorter) {
@@ -93,7 +91,7 @@ class PhonologyDefinition {
                     this.soundsys.withCoronalMetathesis();
                     break;
                 default:
-                    throw new UnknownOption(option);
+                    throw new Error(`unknown option '${option}'`);
             }
         }
     }
@@ -177,9 +175,9 @@ class PhonologyDefinition {
                     }
                 }
             } else if (row.length > n) {
-                throw new ParseError(`Cluster field row too long: ${line}`);
+                throw new Error(`Cluster field row too long: ${line}`);
             } else {
-                throw new ParseError(`Cluster field row too short: ${line}`);
+                throw new Error(`Cluster field row too short: ${line}`);
             }
         }
     }

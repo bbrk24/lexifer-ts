@@ -13,7 +13,7 @@ const main = (
             let words = pd.generate(num, unsorted);
             if (onePerLine) {
                 ans = words.join('\n');
-            } else {
+            } else { // @ts-ignore
                 ans = wrap(words.join(' '));
             }
         } else {

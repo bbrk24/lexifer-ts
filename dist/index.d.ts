@@ -23,8 +23,6 @@ declare const sc: {
     applyAssimilations: (word: string[]) => string[];
     applyCoronalMetathesis: (word: string[]) => string[];
 };
-declare class RuleError extends Error {
-}
 declare class ArbSorter {
     private splitter;
     private ords;
@@ -61,10 +59,6 @@ declare class SoundSystem {
     generate(n: number, unsorted: boolean): string[];
 }
 declare const textify: (phsys: SoundSystem, sentences?: number) => string;
-declare class UnknownOption extends Error {
-}
-declare class ParseError extends Error {
-}
 declare class PhonologyDefinition {
     private macros;
     private letters;

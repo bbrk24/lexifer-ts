@@ -1,8 +1,6 @@
 // @ts-ignore
 const sc = { initialize, applyAssimilations, applyCoronalMetathesis };
 
-class RuleError extends Error { }
-
 class ArbSorter {
     private splitter: RegExp;
     private ords: { [key: string]: number };
@@ -73,7 +71,7 @@ const ruleToDict = (rule: string) => {
     let d: { [key: string]: number } = {};
     for (let item of items) {
         if (!item.includes(':')) {
-            throw new RuleError(`${item} is not a valid phoneme and weight`);
+            throw new Error(`${item} is not a valid phoneme and weight`);
         }
         let [value, weight] = item.split(':');
         d[value!] = parseFloat(weight!);
@@ -123,7 +121,7 @@ class SoundSystem { // @ts-ignore
                 }
 
                 if (rule[i] !== prevc) {
-                    throw new RuleError('Misplaced \'!\' option: in '
+                    throw new Error('Misplaced \'!\' option: in '
                         + `non-duplicate environment: ${rule}`);
                 }
                 if (rule[i]! in this.phonemeset) {
