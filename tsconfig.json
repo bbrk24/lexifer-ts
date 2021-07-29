@@ -1,7 +1,5 @@
 {
-    "include": [
-        "src/*"
-    ],
+    "files": ["combined.ts"],
     "compilerOptions": {
         "allowUnreachableCode": false,
         "allowUnusedLabels": false,
@@ -18,6 +16,7 @@
         "esModuleInterop": true,
         "forceConsistentCasingInFileNames": true,
         "target": "ES5",
-        "lib": ["ES2015", "ES2016.Array.Include", "DOM"]
+        "lib": ["ES2015", "ES2016.Array.Include", "DOM"],
+        "removeComments": true
     }
 }

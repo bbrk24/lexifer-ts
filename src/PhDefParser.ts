@@ -1,5 +1,3 @@
-import { textify, SoundSystem } from './wordgen';
-
 class UnknownOption extends Error { }
 class ParseError extends Error { }
 
@@ -205,9 +203,7 @@ class PhonologyDefinition {
         return this.soundsys.generate(n, unsorted);
     }
 
-    paragraph(sentences?: number) {
+    paragraph(sentences?: number) {// @ts-ignore
         return textify(this.soundsys, sentences);
     }
 }
-
-export default PhonologyDefinition;

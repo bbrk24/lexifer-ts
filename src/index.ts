@@ -1,8 +1,4 @@
-import wrap from './textwrap';
-import PhonologyDefinition from './PhDefParser';
-import { SoundSystem } from './wordgen';
-
-export const main = (
+const main = (
     file: string,
     num?: number,
     unsorted?: boolean,
@@ -10,7 +6,7 @@ export const main = (
     stderr: (inp: string | Error) => void = console.error
 ) => {
     let ans = '';
-    try {
+    try { // @ts-ignore
         let pd = new PhonologyDefinition(new SoundSystem(), file, stderr);
         if (typeof num == 'number') {
             // wordlist mode

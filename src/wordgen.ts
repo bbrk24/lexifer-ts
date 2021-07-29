@@ -1,7 +1,5 @@
-import last from 'lodash/last';
-import WeightedSelector from './distribution';
-import wrap from './textwrap';
-import * as sc from './SmartClusters';
+// @ts-ignore
+const sc = { initialize, applyAssimilations, applyCoronalMetathesis };
 
 class RuleError extends Error { }
 
@@ -83,7 +81,7 @@ const ruleToDict = (rule: string) => {
     return d;
 };
 
-export class SoundSystem {
+class SoundSystem { // @ts-ignore
     private phonemeset: { [key: string]: WeightedSelector } = {};
     private ruleset: { [key: string]: number } = {};
     private filters: [RegExp, string][] = [];
@@ -129,7 +127,7 @@ export class SoundSystem {
                         + `non-duplicate environment: ${rule}`);
                 }
                 if (rule[i]! in this.phonemeset) {
-                    let nph = this.phonemeset[rule[i]!]!.select();
+                    let nph = this.phonemeset[rule[i]!]!.select(); // @ts-ignore
                     while (nph === last(s)) {
                         nph = this.phonemeset[rule[i]!]!.select();
                     }
@@ -168,7 +166,7 @@ export class SoundSystem {
     addPhUnit(name: string, selection: string) {
         if (!selection.includes(':')) {
             selection = naturalWeights(selection);
-        }
+        } // @ts-ignore
         this.phonemeset[name] = new WeightedSelector(ruleToDict(selection));
     }
 
@@ -205,7 +203,7 @@ export class SoundSystem {
     }
 
     generate(n: number, unsorted: boolean) {
-        let words = new Set<string>();
+        let words = new Set<string>(); // @ts-ignore
         let ruleSelector = new WeightedSelector(this.ruleset);
         while (words.size < n) {
             let rule = ruleSelector.select();
@@ -226,7 +224,7 @@ export class SoundSystem {
     }
 };
 
-export const textify = (phsys: SoundSystem, sentences = 25) => {
+const textify = (phsys: SoundSystem, sentences = 25) => {
     let text = '';
     for (let i = 0; i < sentences; ++i) {
         let sent = Math.floor(Math.random() * 9) + 3;
@@ -249,7 +247,7 @@ export const textify = (phsys: SoundSystem, sentences = 25) => {
         } else {
             text += '? ';
         }
-    }
+    } // @ts-ignore
     text = wrap(text);
     return text;
 };

@@ -60,7 +60,7 @@ const data: [string, string, string, string, string][] = [
 
 let phdb: [string, string, string, string][] = [];
 
-export const initialize = (notation = 'ipa') => {
+const initialize = (notation = 'ipa') => {
     if (notation === 'ipa') {
         for (let row of data) {
             phdb.push([row[0], row[2], row[3], row[4]]);
@@ -124,7 +124,7 @@ const coronalMetathesis = (ph1: string, ph2: string): [string, string] => {
     return [ph1, ph2];
 };
 
-export const applyAssimilations = (word: string[]) => {
+const applyAssimilations = (word: string[]) => {
     let newArr = [...word];
     for (let i = 0; i < word.length - 1; ++i) {
         newArr[i] = voiceAssimilate(word[i]!, word[i + 1]!);
@@ -133,7 +133,7 @@ export const applyAssimilations = (word: string[]) => {
     return newArr;
 };
 
-export const applyCoronalMetathesis = (word: string[]) => {
+const applyCoronalMetathesis = (word: string[]) => {
     let newArr = [...word];
     for (let i = 0; i < word.length - 1; ++i) {
         [newArr[i], newArr[i + 1]] = coronalMetathesis(word[i]!, word[i + 1]!);
