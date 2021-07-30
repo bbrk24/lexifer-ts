@@ -1,3 +1,5 @@
+import { SoundSystem, textify } from './wordgen';
+
 class PhonologyDefinition {
     private macros: [RegExp, string][] = [];
     private letters: string[] = [];
@@ -9,10 +11,9 @@ class PhonologyDefinition {
     private defFileLineNum = 0;
     private defFileArr: string[];
 
-    // @ts-ignore
     soundsys: SoundSystem;
 
-    constructor( // @ts-ignore
+    constructor(
         soundsys: SoundSystem,
         defFile: string,
         stderr: (inp: string | Error) => void
@@ -201,7 +202,9 @@ class PhonologyDefinition {
         return this.soundsys.generate(n, unsorted);
     }
 
-    paragraph(sentences?: number) {// @ts-ignore
+    paragraph(sentences?: number) {
         return textify(this.soundsys, sentences);
     }
 }
+
+export default PhonologyDefinition;

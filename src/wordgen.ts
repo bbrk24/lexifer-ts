@@ -1,5 +1,7 @@
-// @ts-ignore
-const sc = { initialize, applyAssimilations, applyCoronalMetathesis };
+import sc from './SmartClusters';
+import WeightedSelector from './distribution';
+import wrap from './textwrap';
+import last from './last';
 
 class ArbSorter {
     private splitter: RegExp;
@@ -79,7 +81,7 @@ const ruleToDict = (rule: string) => {
     return d;
 };
 
-class SoundSystem { // @ts-ignore
+class SoundSystem {
     private phonemeset: { [key: string]: WeightedSelector } = {};
     private ruleset: { [key: string]: number } = {};
     private filters: [RegExp, string][] = [];
@@ -125,7 +127,7 @@ class SoundSystem { // @ts-ignore
                         + `non-duplicate environment: ${rule}`);
                 }
                 if (rule[i]! in this.phonemeset) {
-                    let nph = this.phonemeset[rule[i]!]!.select(); // @ts-ignore
+                    let nph = this.phonemeset[rule[i]!]!.select();
                     while (nph === last(s)) {
                         nph = this.phonemeset[rule[i]!]!.select();
                     }
@@ -164,7 +166,7 @@ class SoundSystem { // @ts-ignore
     addPhUnit(name: string, selection: string) {
         if (!selection.includes(':')) {
             selection = naturalWeights(selection);
-        } // @ts-ignore
+        }
         this.phonemeset[name] = new WeightedSelector(ruleToDict(selection));
     }
 
@@ -201,7 +203,7 @@ class SoundSystem { // @ts-ignore
     }
 
     generate(n: number, unsorted: boolean) {
-        let words = new Set<string>(); // @ts-ignore
+        let words = new Set<string>();
         let ruleSelector = new WeightedSelector(this.ruleset);
         while (words.size < n) {
             let rule = ruleSelector.select();
@@ -245,7 +247,9 @@ const textify = (phsys: SoundSystem, sentences = 25) => {
         } else {
             text += '? ';
         }
-    } // @ts-ignore
+    }
     text = wrap(text);
     return text;
 };
+
+export { SoundSystem, textify };

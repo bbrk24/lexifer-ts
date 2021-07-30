@@ -1,3 +1,7 @@
+import wrap from './textwrap';
+import PhonologyDefinition from './PhDefParser';
+import { SoundSystem } from './wordgen';
+
 const main = (
     file: string,
     num?: number,
@@ -6,14 +10,14 @@ const main = (
     stderr: (inp: string | Error) => void = console.error
 ) => {
     let ans = '';
-    try { // @ts-ignore
+    try {
         let pd = new PhonologyDefinition(new SoundSystem(), file, stderr);
         if (typeof num == 'number') {
             // wordlist mode
             let words = pd.generate(num, unsorted);
             if (onePerLine) {
                 ans = words.join('\n');
-            } else { // @ts-ignore
+            } else {
                 ans = wrap(words.join(' '));
             }
         } else {

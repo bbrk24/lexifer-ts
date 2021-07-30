@@ -1,15 +1,4 @@
 "use strict";
-var __values = (this && this.__values) || function(o) {
-    var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
-    if (m) return m.call(o);
-    if (o && typeof o.length === "number") return {
-        next: function () {
-            if (o && i >= o.length) o = void 0;
-            return { value: o && o[i++], done: !o };
-        }
-    };
-    throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
-};
 var __read = (this && this.__read) || function (o, n) {
     var m = typeof Symbol === "function" && o[Symbol.iterator];
     if (!m) return o;
@@ -31,34 +20,244 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from) {
         to[j] = from[i];
     return to;
 };
-function last(array) {
-    var length = array == null ? 0 : array.length;
-    return length ? array[length - 1] : undefined;
-}
-var wrap = function (s) { return s.replace(/(?![^\n]{1,70}$)([^\n]{1,70})\s/gu, '$1\n'); };
-var WeightedSelector = (function () {
-    function WeightedSelector(dic) {
-        this.keys = [];
-        this.weights = [];
-        for (var key in dic) {
-            this.keys.push(key);
-            this.weights.push(dic[key]);
+var __values = (this && this.__values) || function(o) {
+    var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
+    if (m) return m.call(o);
+    if (o && typeof o.length === "number") return {
+        next: function () {
+            if (o && i >= o.length) o = void 0;
+            return { value: o && o[i++], done: !o };
         }
-        this.sum = this.weights.reduce(function (a, b) { return a + b; }, 0);
-        this.n = this.keys.length;
+    };
+    throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
+};
+var PhonologyDefinition = (function () {
+    function PhonologyDefinition(soundsys, defFile, stderr) {
+        this.macros = [];
+        this.letters = [];
+        this.phClasses = [];
+        this.defFileLineNum = 0;
+        if (defFile.trim() === '') {
+            throw new Error('Please include a definition.');
+        }
+        this.soundsys = soundsys;
+        this.defFileArr = defFile.split('\n');
+        this.stderr = stderr;
+        this.parse();
+        this.sanityCheck();
     }
-    WeightedSelector.prototype.select = function () {
-        var pick = Math.random() * this.sum;
-        var temp = 0;
-        for (var i = 0; i < this.n; ++i) {
-            temp += this.weights[i];
-            if (pick < temp) {
-                return this.keys[i];
+    PhonologyDefinition.prototype.parse = function () {
+        for (; this.defFileLineNum < this.defFileArr.length; ++this.defFileLineNum) {
+            var line = this.defFileArr[this.defFileLineNum];
+            line = line.replace(/#.*/, '').trim();
+            if (line === '') {
+                continue;
+            }
+            if (line.startsWith('with:')) {
+                this.parseOption(line.substring(5).trim());
+            }
+            else if (line.startsWith('random-rate:')) {
+                this.soundsys.randpercent = parseInt(line.substring(12));
+            }
+            else if (line.startsWith('filter:')) {
+                this.parseFilter(line.substring(7).trim());
+            }
+            else if (line.startsWith('reject:')) {
+                this.parseReject(line.substring(7).trim());
+            }
+            else if (line.startsWith('words:')) {
+                this.parseWords(line.substring(6).trim());
+            }
+            else if (line.startsWith('letters:')) {
+                this.parseLetters(line.substring(8).trim());
+            }
+            else if (line[0] === '%') {
+                this.parseClusterfield();
+            }
+            else if (line.includes('=')) {
+                this.parseClass(line);
+            }
+            else {
+                throw new Error("parsing error at '" + line + "'");
             }
         }
-        return 'woo!';
+        if ((this.soundsys.useAssim || this.soundsys.useCoronalMetathesis) && !this.soundsys.sorter) {
+            this.stderr('Without \'letters:\' cannot apply assimilations or coronal metathesis.');
+        }
     };
-    return WeightedSelector;
+    PhonologyDefinition.prototype.sanityCheck = function () {
+        if (this.letters.length) {
+            var letters_1 = new Set(this.letters);
+            var phonemes = new Set(this.phClasses);
+            if (phonemes.size > letters_1.size) {
+                var diff = __spreadArray([], __read(phonemes)).filter(function (el) { return !letters_1.has(el); });
+                this.stderr("A phoneme class contains '" + diff.join(' ') + "' "
+                    + 'missing from \'letters\'.  Strange word shapes are '
+                    + 'likely to result.');
+            }
+        }
+    };
+    PhonologyDefinition.prototype.parseOption = function (line) {
+        var e_1, _a;
+        try {
+            for (var _b = __values(line.split(/\s+/gu)), _c = _b.next(); !_c.done; _c = _b.next()) {
+                var option = _c.value;
+                switch (option) {
+                    case 'std-ipa-features':
+                        this.soundsys.useIpa();
+                        break;
+                    case 'std-digraph-features':
+                        this.soundsys.useDigraphs();
+                        break;
+                    case 'std-assimilations':
+                        this.soundsys.withStdAssimilations();
+                        break;
+                    case 'coronal-metathesis':
+                        this.soundsys.withCoronalMetathesis();
+                        break;
+                    default:
+                        throw new Error("unknown option '" + option + "'");
+                }
+            }
+        }
+        catch (e_1_1) { e_1 = { error: e_1_1 }; }
+        finally {
+            try {
+                if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
+            }
+            finally { if (e_1) throw e_1.error; }
+        }
+    };
+    PhonologyDefinition.prototype.parseFilter = function (line) {
+        var e_2, _a;
+        try {
+            for (var _b = __values(line.split(';')), _c = _b.next(); !_c.done; _c = _b.next()) {
+                var filt = _c.value;
+                filt = filt.trim();
+                if (filt === '') {
+                    continue;
+                }
+                var _d = __read(filt.split('>'), 2), pre = _d[0], post = _d[1];
+                this.addFilter(pre, post);
+            }
+        }
+        catch (e_2_1) { e_2 = { error: e_2_1 }; }
+        finally {
+            try {
+                if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
+            }
+            finally { if (e_2) throw e_2.error; }
+        }
+    };
+    PhonologyDefinition.prototype.addFilter = function (pre, post) {
+        pre = pre.trim();
+        post = post.trim();
+        this.soundsys.addFilter(new RegExp(pre, 'gu'), post);
+    };
+    PhonologyDefinition.prototype.parseReject = function (line) {
+        var e_3, _a;
+        try {
+            for (var _b = __values(line.split(/\s+/gu)), _c = _b.next(); !_c.done; _c = _b.next()) {
+                var filt = _c.value;
+                this.soundsys.addFilter(new RegExp(filt, 'gu'), 'REJECT');
+            }
+        }
+        catch (e_3_1) { e_3 = { error: e_3_1 }; }
+        finally {
+            try {
+                if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
+            }
+            finally { if (e_3) throw e_3.error; }
+        }
+    };
+    PhonologyDefinition.prototype.parseWords = function (line) {
+        line = this.expandMacros(line);
+        var splitLine = line.split(/\s+/gu);
+        for (var i = 0; i < splitLine.length; ++i) {
+            this.soundsys.addRule(splitLine[i], 10.0 / Math.pow((i + 1), 0.9));
+        }
+    };
+    PhonologyDefinition.prototype.expandMacros = function (word) {
+        var e_4, _a;
+        try {
+            for (var _b = __values(this.macros), _c = _b.next(); !_c.done; _c = _b.next()) {
+                var _d = __read(_c.value, 2), macro = _d[0], value = _d[1];
+                word = word.replace(macro, value);
+            }
+        }
+        catch (e_4_1) { e_4 = { error: e_4_1 }; }
+        finally {
+            try {
+                if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
+            }
+            finally { if (e_4) throw e_4.error; }
+        }
+        return word;
+    };
+    PhonologyDefinition.prototype.parseLetters = function (line) {
+        this.letters = line.split(/\s+/gu);
+        this.soundsys.addSortOrder(line);
+    };
+    PhonologyDefinition.prototype.parseClusterfield = function () {
+        var _a;
+        var c2list = this.defFileArr[this.defFileLineNum]
+            .split(/\s+/gu);
+        c2list.shift();
+        var n = c2list.length;
+        while (!['', '\n', undefined].includes(this.defFileArr[this.defFileLineNum])) {
+            ++this.defFileLineNum;
+            var line = (_a = this.defFileArr[this.defFileLineNum]) !== null && _a !== void 0 ? _a : '';
+            line = line.replace(/#.*/, '').trim();
+            if (line === '') {
+                continue;
+            }
+            var row = line.split(/\s+/gu);
+            var c1 = row.splice(0, 1);
+            if (row.length === n) {
+                for (var i = 0; i < n; ++i) {
+                    if (row[i] === '+') {
+                        continue;
+                    }
+                    else if (row[i] === '-') {
+                        this.soundsys.addFilter(new RegExp(c1 + c2list[i], 'gu'), 'REJECT');
+                    }
+                    else {
+                        this.soundsys.addFilter(new RegExp(c1 + c2list[i], 'gu'), row[i]);
+                    }
+                }
+            }
+            else if (row.length > n) {
+                throw new Error("Cluster field row too long: " + line);
+            }
+            else {
+                throw new Error("Cluster field row too short: " + line);
+            }
+        }
+    };
+    PhonologyDefinition.prototype.parseClass = function (line) {
+        var _a = __read(line.split('='), 2), sclass = _a[0], values = _a[1];
+        sclass = sclass.trim();
+        values = values.trim();
+        if (sclass[0] === '$') {
+            this.macros.push([
+                new RegExp("\\" + sclass, 'gu'),
+                values
+            ]);
+        }
+        else {
+            this.phClasses = this.phClasses.concat(values.split(/\s+/gu));
+            this.soundsys.addPhUnit(sclass, values);
+        }
+    };
+    PhonologyDefinition.prototype.generate = function (n, unsorted) {
+        if (n === void 0) { n = 1; }
+        if (unsorted === void 0) { unsorted = false; }
+        return this.soundsys.generate(n, unsorted);
+    };
+    PhonologyDefinition.prototype.paragraph = function (sentences) {
+        return textify(this.soundsys, sentences);
+    };
+    return PhonologyDefinition;
 }());
 var data = [
     ['p', 'p', 'voiceless', 'bilabial', 'stop'],
@@ -115,7 +314,7 @@ var data = [
 ];
 var phdb = [];
 var initialize = function (notation) {
-    var e_1, _a, e_2, _b;
+    var e_5, _a, e_6, _b;
     if (notation === void 0) { notation = 'ipa'; }
     if (notation === 'ipa') {
         try {
@@ -124,12 +323,12 @@ var initialize = function (notation) {
                 phdb.push([row[0], row[2], row[3], row[4]]);
             }
         }
-        catch (e_1_1) { e_1 = { error: e_1_1 }; }
+        catch (e_5_1) { e_5 = { error: e_5_1 }; }
         finally {
             try {
                 if (data_1_1 && !data_1_1.done && (_a = data_1.return)) _a.call(data_1);
             }
-            finally { if (e_1) throw e_1.error; }
+            finally { if (e_5) throw e_5.error; }
         }
     }
     else if (notation === 'digraph') {
@@ -139,12 +338,12 @@ var initialize = function (notation) {
                 phdb.push([row[1], row[2], row[3], row[4]]);
             }
         }
-        catch (e_2_1) { e_2 = { error: e_2_1 }; }
+        catch (e_6_1) { e_6 = { error: e_6_1 }; }
         finally {
             try {
                 if (data_2_1 && !data_2_1.done && (_b = data_2.return)) _b.call(data_2);
             }
-            finally { if (e_2) throw e_2.error; }
+            finally { if (e_6) throw e_6.error; }
         }
     }
     else {
@@ -213,6 +412,64 @@ var applyCoronalMetathesis = function (word) {
     return newArr;
 };
 var sc = { initialize: initialize, applyAssimilations: applyAssimilations, applyCoronalMetathesis: applyCoronalMetathesis };
+var WeightedSelector = (function () {
+    function WeightedSelector(dic) {
+        this.keys = [];
+        this.weights = [];
+        for (var key in dic) {
+            this.keys.push(key);
+            this.weights.push(dic[key]);
+        }
+        this.sum = this.weights.reduce(function (a, b) { return a + b; }, 0);
+        this.n = this.keys.length;
+    }
+    WeightedSelector.prototype.select = function () {
+        var pick = Math.random() * this.sum;
+        var temp = 0;
+        for (var i = 0; i < this.n; ++i) {
+            temp += this.weights[i];
+            if (pick < temp) {
+                return this.keys[i];
+            }
+        }
+        return 'woo!';
+    };
+    return WeightedSelector;
+}());
+var main = function (file, num, unsorted, onePerLine, stderr) {
+    if (stderr === void 0) { stderr = console.error; }
+    var ans = '';
+    try {
+        var pd = new PhonologyDefinition(new SoundSystem(), file, stderr);
+        if (typeof num == 'number') {
+            var words = pd.generate(num, unsorted);
+            if (onePerLine) {
+                ans = words.join('\n');
+            }
+            else {
+                ans = wrap(words.join(' '));
+            }
+        }
+        else {
+            if (unsorted) {
+                stderr('** \'Unsorted\' option ignored in paragraph mode.');
+            }
+            if (onePerLine) {
+                stderr('** \'One per line\' option ignored in paragraph mode.');
+            }
+            ans = pd.paragraph();
+        }
+    }
+    catch (e) {
+        stderr(e);
+    }
+    return ans;
+};
+function last(array) {
+    var length = array == null ? 0 : array.length;
+    return length ? array[length - 1] : undefined;
+}
+var wrap = function (s) { return s.replace(/(?![^\n]{1,70}$)([^\n]{1,70})\s/gu, '$1\n'); };
 var ArbSorter = (function () {
     function ArbSorter(order) {
         var graphs = order.split(/\s+/gu);
@@ -272,7 +529,7 @@ var naturalWeights = function (phonemes) {
     return temp;
 };
 var ruleToDict = function (rule) {
-    var e_3, _a;
+    var e_7, _a;
     var items = rule.trim().split(/\s+/gu);
     var d = {};
     try {
@@ -285,12 +542,12 @@ var ruleToDict = function (rule) {
             d[value] = parseFloat(weight);
         }
     }
-    catch (e_3_1) { e_3 = { error: e_3_1 }; }
+    catch (e_7_1) { e_7 = { error: e_7_1 }; }
     finally {
         try {
             if (items_1_1 && !items_1_1.done && (_a = items_1.return)) _a.call(items_1);
         }
-        finally { if (e_3) throw e_3.error; }
+        finally { if (e_7) throw e_7.error; }
     }
     return d;
 };
@@ -354,7 +611,7 @@ var SoundSystem = (function () {
         return s.join('');
     };
     SoundSystem.prototype.applyFilters = function (word) {
-        var e_4, _a;
+        var e_8, _a;
         if (this.sorter) {
             var w = this.sorter.split(word);
             if (this.useAssim) {
@@ -374,12 +631,12 @@ var SoundSystem = (function () {
                 }
             }
         }
-        catch (e_4_1) { e_4 = { error: e_4_1 }; }
+        catch (e_8_1) { e_8 = { error: e_8_1 }; }
         finally {
             try {
                 if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
             }
-            finally { if (e_4) throw e_4.error; }
+            finally { if (e_8) throw e_8.error; }
         }
         return word;
     };
@@ -464,261 +721,4 @@ var textify = function (phsys, sentences) {
     }
     text = wrap(text);
     return text;
-};
-var PhonologyDefinition = (function () {
-    function PhonologyDefinition(soundsys, defFile, stderr) {
-        this.macros = [];
-        this.letters = [];
-        this.phClasses = [];
-        this.defFileLineNum = 0;
-        if (defFile.trim() === '') {
-            throw new Error('Please include a definition.');
-        }
-        this.soundsys = soundsys;
-        this.defFileArr = defFile.split('\n');
-        this.stderr = stderr;
-        this.parse();
-        this.sanityCheck();
-    }
-    PhonologyDefinition.prototype.parse = function () {
-        for (; this.defFileLineNum < this.defFileArr.length; ++this.defFileLineNum) {
-            var line = this.defFileArr[this.defFileLineNum];
-            line = line.replace(/#.*/, '').trim();
-            if (line === '') {
-                continue;
-            }
-            if (line.startsWith('with:')) {
-                this.parseOption(line.substring(5).trim());
-            }
-            else if (line.startsWith('random-rate:')) {
-                this.soundsys.randpercent = parseInt(line.substring(12));
-            }
-            else if (line.startsWith('filter:')) {
-                this.parseFilter(line.substring(7).trim());
-            }
-            else if (line.startsWith('reject:')) {
-                this.parseReject(line.substring(7).trim());
-            }
-            else if (line.startsWith('words:')) {
-                this.parseWords(line.substring(6).trim());
-            }
-            else if (line.startsWith('letters:')) {
-                this.parseLetters(line.substring(8).trim());
-            }
-            else if (line[0] === '%') {
-                this.parseClusterfield();
-            }
-            else if (line.includes('=')) {
-                this.parseClass(line);
-            }
-            else {
-                throw new Error("parsing error at '" + line + "'");
-            }
-        }
-        if ((this.soundsys.useAssim || this.soundsys.useCoronalMetathesis) && !this.soundsys.sorter) {
-            this.stderr('Without \'letters:\' cannot apply assimilations or coronal metathesis.');
-        }
-    };
-    PhonologyDefinition.prototype.sanityCheck = function () {
-        if (this.letters.length) {
-            var letters_1 = new Set(this.letters);
-            var phonemes = new Set(this.phClasses);
-            if (phonemes.size > letters_1.size) {
-                var diff = __spreadArray([], __read(phonemes)).filter(function (el) { return !letters_1.has(el); });
-                this.stderr("A phoneme class contains '" + diff.join(' ') + "' "
-                    + 'missing from \'letters\'.  Strange word shapes are '
-                    + 'likely to result.');
-            }
-        }
-    };
-    PhonologyDefinition.prototype.parseOption = function (line) {
-        var e_5, _a;
-        try {
-            for (var _b = __values(line.split(/\s+/gu)), _c = _b.next(); !_c.done; _c = _b.next()) {
-                var option = _c.value;
-                switch (option) {
-                    case 'std-ipa-features':
-                        this.soundsys.useIpa();
-                        break;
-                    case 'std-digraph-features':
-                        this.soundsys.useDigraphs();
-                        break;
-                    case 'std-assimilations':
-                        this.soundsys.withStdAssimilations();
-                        break;
-                    case 'coronal-metathesis':
-                        this.soundsys.withCoronalMetathesis();
-                        break;
-                    default:
-                        throw new Error("unknown option '" + option + "'");
-                }
-            }
-        }
-        catch (e_5_1) { e_5 = { error: e_5_1 }; }
-        finally {
-            try {
-                if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
-            }
-            finally { if (e_5) throw e_5.error; }
-        }
-    };
-    PhonologyDefinition.prototype.parseFilter = function (line) {
-        var e_6, _a;
-        try {
-            for (var _b = __values(line.split(';')), _c = _b.next(); !_c.done; _c = _b.next()) {
-                var filt = _c.value;
-                filt = filt.trim();
-                if (filt === '') {
-                    continue;
-                }
-                var _d = __read(filt.split('>'), 2), pre = _d[0], post = _d[1];
-                this.addFilter(pre, post);
-            }
-        }
-        catch (e_6_1) { e_6 = { error: e_6_1 }; }
-        finally {
-            try {
-                if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
-            }
-            finally { if (e_6) throw e_6.error; }
-        }
-    };
-    PhonologyDefinition.prototype.addFilter = function (pre, post) {
-        pre = pre.trim();
-        post = post.trim();
-        this.soundsys.addFilter(new RegExp(pre, 'gu'), post);
-    };
-    PhonologyDefinition.prototype.parseReject = function (line) {
-        var e_7, _a;
-        try {
-            for (var _b = __values(line.split(/\s+/gu)), _c = _b.next(); !_c.done; _c = _b.next()) {
-                var filt = _c.value;
-                this.soundsys.addFilter(new RegExp(filt, 'gu'), 'REJECT');
-            }
-        }
-        catch (e_7_1) { e_7 = { error: e_7_1 }; }
-        finally {
-            try {
-                if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
-            }
-            finally { if (e_7) throw e_7.error; }
-        }
-    };
-    PhonologyDefinition.prototype.parseWords = function (line) {
-        line = this.expandMacros(line);
-        var splitLine = line.split(/\s+/gu);
-        for (var i = 0; i < splitLine.length; ++i) {
-            this.soundsys.addRule(splitLine[i], 10.0 / Math.pow((i + 1), 0.9));
-        }
-    };
-    PhonologyDefinition.prototype.expandMacros = function (word) {
-        var e_8, _a;
-        try {
-            for (var _b = __values(this.macros), _c = _b.next(); !_c.done; _c = _b.next()) {
-                var _d = __read(_c.value, 2), macro = _d[0], value = _d[1];
-                word = word.replace(macro, value);
-            }
-        }
-        catch (e_8_1) { e_8 = { error: e_8_1 }; }
-        finally {
-            try {
-                if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
-            }
-            finally { if (e_8) throw e_8.error; }
-        }
-        return word;
-    };
-    PhonologyDefinition.prototype.parseLetters = function (line) {
-        this.letters = line.split(/\s+/gu);
-        this.soundsys.addSortOrder(line);
-    };
-    PhonologyDefinition.prototype.parseClusterfield = function () {
-        var _a;
-        var c2list = this.defFileArr[this.defFileLineNum]
-            .split(/\s+/gu);
-        c2list.shift();
-        var n = c2list.length;
-        while (!['', '\n', undefined].includes(this.defFileArr[this.defFileLineNum])) {
-            ++this.defFileLineNum;
-            var line = (_a = this.defFileArr[this.defFileLineNum]) !== null && _a !== void 0 ? _a : '';
-            line = line.replace(/#.*/, '').trim();
-            if (line === '') {
-                continue;
-            }
-            var row = line.split(/\s+/gu);
-            var c1 = row.splice(0, 1);
-            if (row.length === n) {
-                for (var i = 0; i < n; ++i) {
-                    if (row[i] === '+') {
-                        continue;
-                    }
-                    else if (row[i] === '-') {
-                        this.soundsys.addFilter(new RegExp(c1 + c2list[i], 'gu'), 'REJECT');
-                    }
-                    else {
-                        this.soundsys.addFilter(new RegExp(c1 + c2list[i], 'gu'), row[i]);
-                    }
-                }
-            }
-            else if (row.length > n) {
-                throw new Error("Cluster field row too long: " + line);
-            }
-            else {
-                throw new Error("Cluster field row too short: " + line);
-            }
-        }
-    };
-    PhonologyDefinition.prototype.parseClass = function (line) {
-        var _a = __read(line.split('='), 2), sclass = _a[0], values = _a[1];
-        sclass = sclass.trim();
-        values = values.trim();
-        if (sclass[0] === '$') {
-            this.macros.push([
-                new RegExp("\\" + sclass, 'gu'),
-                values
-            ]);
-        }
-        else {
-            this.phClasses = this.phClasses.concat(values.split(/\s+/gu));
-            this.soundsys.addPhUnit(sclass, values);
-        }
-    };
-    PhonologyDefinition.prototype.generate = function (n, unsorted) {
-        if (n === void 0) { n = 1; }
-        if (unsorted === void 0) { unsorted = false; }
-        return this.soundsys.generate(n, unsorted);
-    };
-    PhonologyDefinition.prototype.paragraph = function (sentences) {
-        return textify(this.soundsys, sentences);
-    };
-    return PhonologyDefinition;
-}());
-var main = function (file, num, unsorted, onePerLine, stderr) {
-    if (stderr === void 0) { stderr = console.error; }
-    var ans = '';
-    try {
-        var pd = new PhonologyDefinition(new SoundSystem(), file, stderr);
-        if (typeof num == 'number') {
-            var words = pd.generate(num, unsorted);
-            if (onePerLine) {
-                ans = words.join('\n');
-            }
-            else {
-                ans = wrap(words.join(' '));
-            }
-        }
-        else {
-            if (unsorted) {
-                stderr('** \'Unsorted\' option ignored in paragraph mode.');
-            }
-            if (onePerLine) {
-                stderr('** \'One per line\' option ignored in paragraph mode.');
-            }
-            ans = pd.paragraph();
-        }
-    }
-    catch (e) {
-        stderr(e);
-    }
-    return ans;
 };

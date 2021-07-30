@@ -27,3 +27,5 @@ class WeightedSelector {
         return 'woo!';
     }
 }
+
+export default WeightedSelector;

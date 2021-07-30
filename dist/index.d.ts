@@ -1,5 +1,39 @@
-declare function last<T>(array: T[]): T | undefined;
-declare const wrap: (s: string) => string;
+declare class PhonologyDefinition {
+    private macros;
+    private letters;
+    private phClasses;
+    private stderr;
+    private defFileLineNum;
+    private defFileArr;
+    soundsys: SoundSystem;
+    constructor(soundsys: SoundSystem, defFile: string, stderr: (inp: string | Error) => void);
+    private parse;
+    private sanityCheck;
+    private parseOption;
+    private parseFilter;
+    private addFilter;
+    private parseReject;
+    private parseWords;
+    private expandMacros;
+    private parseLetters;
+    private parseClusterfield;
+    private parseClass;
+    generate(n?: number, unsorted?: boolean): string[];
+    paragraph(sentences?: number): string;
+}
+declare const data: [string, string, string, string, string][];
+declare let phdb: [string, string, string, string][];
+declare const initialize: (notation?: string) => void;
+declare const nasalAssimilate: (ph1: string, ph2: string) => string;
+declare const voiceAssimilate: (ph1: string, ph2: string) => string;
+declare const coronalMetathesis: (ph1: string, ph2: string) => [string, string];
+declare const applyAssimilations: (word: string[]) => string[];
+declare const applyCoronalMetathesis: (word: string[]) => string[];
+declare let sc: {
+    initialize: (notation?: string) => void;
+    applyAssimilations: (word: string[]) => string[];
+    applyCoronalMetathesis: (word: string[]) => string[];
+};
 declare class WeightedSelector {
     private keys;
     private weights;
@@ -10,19 +44,9 @@ declare class WeightedSelector {
     });
     select(): string;
 }
-declare const data: [string, string, string, string, string][];
-declare let phdb: [string, string, string, string][];
-declare const initialize: (notation?: string) => void;
-declare const nasalAssimilate: (ph1: string, ph2: string) => string;
-declare const voiceAssimilate: (ph1: string, ph2: string) => string;
-declare const coronalMetathesis: (ph1: string, ph2: string) => [string, string];
-declare const applyAssimilations: (word: string[]) => string[];
-declare const applyCoronalMetathesis: (word: string[]) => string[];
-declare const sc: {
-    initialize: (notation?: string) => void;
-    applyAssimilations: (word: string[]) => string[];
-    applyCoronalMetathesis: (word: string[]) => string[];
-};
+declare const main: (file: string, num?: number | undefined, unsorted?: boolean | undefined, onePerLine?: boolean | undefined, stderr?: (inp: string | Error) => void) => string;
+declare function last<T>(array: T[]): T | undefined;
+declare const wrap: (s: string) => string;
 declare class ArbSorter {
     private splitter;
     private ords;
@@ -59,27 +83,3 @@ declare class SoundSystem {
     generate(n: number, unsorted: boolean): string[];
 }
 declare const textify: (phsys: SoundSystem, sentences?: number) => string;
-declare class PhonologyDefinition {
-    private macros;
-    private letters;
-    private phClasses;
-    private stderr;
-    private defFileLineNum;
-    private defFileArr;
-    soundsys: SoundSystem;
-    constructor(soundsys: SoundSystem, defFile: string, stderr: (inp: string | Error) => void);
-    private parse;
-    private sanityCheck;
-    private parseOption;
-    private parseFilter;
-    private addFilter;
-    private parseReject;
-    private parseWords;
-    private expandMacros;
-    private parseLetters;
-    private parseClusterfield;
-    private parseClass;
-    generate(n?: number, unsorted?: boolean): string[];
-    paragraph(sentences?: number): string;
-}
-declare const main: (file: string, num?: number | undefined, unsorted?: boolean | undefined, onePerLine?: boolean | undefined, stderr?: (inp: string | Error) => void) => string;
