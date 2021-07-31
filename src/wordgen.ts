@@ -2,7 +2,7 @@ import { initialize } from './SmartClusters';
 import WeightedSelector from './distribution';
 import wrap from './textwrap';
 import last from './last';
-import { Word, WordSet } from './word';
+import Word from './word';
 
 class ArbSorter {
     private splitter: RegExp;
@@ -195,8 +195,9 @@ class SoundSystem {
         this.useCoronalMetathesis = true;
     }
 
-    generate(n: number, unsorted: boolean) {
-        let words = new WordSet();
+    generate(n: number, verbose: boolean, unsorted: boolean) {
+        let words = new Set<string>();
+        Word.verbose = verbose;
         Word.sorter = this.sorter;
         let ruleSelector = new WeightedSelector(this.ruleset);
         while (words.size < n) {
@@ -205,11 +206,11 @@ class SoundSystem {
             let word = new Word(form, rule);
             this.applyFilters(word);
             if (word.toString() !== 'REJECT') {
-                words.addWord(word);
+                words.add(word.toString());
             }
         }
-        let wordList = words.arr.map(el => el.toString());
-        if (!unsorted) {
+        let wordList = Array.from(words);
+        if (!(unsorted || verbose)) {
             if (this.sorter) {
                 wordList = this.sorter.sort(wordList);
             } else {
@@ -229,12 +230,12 @@ const textify = (phsys: SoundSystem, sentences = 25) => {
             comma = Math.floor(Math.random() * (sent - 1));
         }
 
-        text += phsys.generate(1, true)[0]!
+        text += phsys.generate(1, false, true)[0]!
             .toString()
             .replace(/./u, el => el.toUpperCase());
         
         for (let j = 0; j < sent; ++j) {
-            text += ` ${phsys.generate(1, true)[0]}`;
+            text += ` ${phsys.generate(1, false, true)[0]}`;
             if (j === comma) {
                 text += ',';
             }

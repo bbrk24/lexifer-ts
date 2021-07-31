@@ -1,4 +1,3 @@
-import { Word } from './word';
 import { SoundSystem, textify } from './wordgen';
 
 class PhonologyDefinition {
@@ -193,8 +192,8 @@ class PhonologyDefinition {
         }
     }
 
-    generate(n = 1, unsorted = false) {
-        return this.soundsys.generate(n, unsorted);
+    generate(n = 1, verbose = false, unsorted = false) {
+        return this.soundsys.generate(n, verbose, unsorted);
     }
 
     paragraph(sentences?: number) {

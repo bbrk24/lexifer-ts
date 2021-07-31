@@ -18,7 +18,7 @@ declare class PhonologyDefinition {
     private parseLetters;
     private parseClusterfield;
     private parseClass;
-    generate(n?: number, unsorted?: boolean): string[];
+    generate(n?: number, verbose?: boolean, unsorted?: boolean): string[];
     paragraph(sentences?: number): string;
 }
 declare const data: [string, string, string, string, string][];
@@ -54,12 +54,6 @@ declare class Word {
     applyCoronalMetathesis(): void;
     toString(): string;
 }
-declare class WordSet {
-    readonly arr: Word[];
-    get size(): number;
-    constructor(words?: Word[]);
-    addWord(word: Word): void;
-}
 declare class ArbSorter {
     private splitter;
     private ords;
@@ -93,6 +87,6 @@ declare class SoundSystem {
     useDigraphs(): void;
     withStdAssimilations(): void;
     withCoronalMetathesis(): void;
-    generate(n: number, unsorted: boolean): string[];
+    generate(n: number, verbose: boolean, unsorted: boolean): string[];
 }
 declare const textify: (phsys: SoundSystem, sentences?: number) => string;

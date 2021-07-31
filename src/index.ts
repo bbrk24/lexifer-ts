@@ -1,7 +1,6 @@
 import wrap from './textwrap';
 import PhonologyDefinition from './PhDefParser';
 import { SoundSystem } from './wordgen';
-import { Word } from './word';
 
 const main = (
     file: string,
@@ -18,7 +17,6 @@ const main = (
             // wordlist mode
             
             if (verbose) {
-                Word.verbose = true;
                 if (!unsorted) {
                     stderr("** 'Unsorted' option always enabled in verbose mode.");
                     unsorted = true;
@@ -28,7 +26,7 @@ const main = (
                 }
             }
 
-            let words = pd.generate(num, unsorted);
+            let words = pd.generate(num, verbose, unsorted);
             if (onePerLine || verbose) {
                 ans = words.join('\n');
             } else {

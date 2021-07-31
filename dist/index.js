@@ -249,10 +249,11 @@ var PhonologyDefinition = (function () {
             this.soundsys.addPhUnit(sclass, values);
         }
     };
-    PhonologyDefinition.prototype.generate = function (n, unsorted) {
+    PhonologyDefinition.prototype.generate = function (n, verbose, unsorted) {
         if (n === void 0) { n = 1; }
+        if (verbose === void 0) { verbose = false; }
         if (unsorted === void 0) { unsorted = false; }
-        return this.soundsys.generate(n, unsorted);
+        return this.soundsys.generate(n, verbose, unsorted);
     };
     PhonologyDefinition.prototype.paragraph = function (sentences) {
         return textify(this.soundsys, sentences);
@@ -443,7 +444,6 @@ var main = function (file, num, verbose, unsorted, onePerLine, stderr) {
         var pd = new PhonologyDefinition(new SoundSystem(), file, stderr);
         if (typeof num == 'number') {
             if (verbose) {
-                Word.verbose = true;
                 if (!unsorted) {
                     stderr("** 'Unsorted' option always enabled in verbose mode.");
                     unsorted = true;
@@ -452,7 +452,7 @@ var main = function (file, num, verbose, unsorted, onePerLine, stderr) {
                     stderr("** 'One per line' option ignored in verbose mode.");
                 }
             }
-            var words = pd.generate(num, unsorted);
+            var words = pd.generate(num, verbose, unsorted);
             if (onePerLine || verbose) {
                 ans = words.join('\n');
             }
@@ -554,27 +554,6 @@ var Word = (function () {
     Word.verbose = false;
     Word.sorter = null;
     return Word;
-}());
-var WordSet = (function () {
-    function WordSet(words) {
-        var _this = this;
-        if (words === void 0) { words = []; }
-        this.arr = [];
-        words.forEach(function (el) { return _this.addWord(el); });
-    }
-    Object.defineProperty(WordSet.prototype, "size", {
-        get: function () {
-            return this.arr.length;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    WordSet.prototype.addWord = function (word) {
-        if (this.arr.every(function (el) { return el.toString() != word.toString(); })) {
-            this.arr.push(word);
-        }
-    };
-    return WordSet;
 }());
 var ArbSorter = (function () {
     function ArbSorter(order) {
@@ -758,8 +737,9 @@ var SoundSystem = (function () {
     SoundSystem.prototype.withCoronalMetathesis = function () {
         this.useCoronalMetathesis = true;
     };
-    SoundSystem.prototype.generate = function (n, unsorted) {
-        var words = new WordSet();
+    SoundSystem.prototype.generate = function (n, verbose, unsorted) {
+        var words = new Set();
+        Word.verbose = verbose;
         Word.sorter = this.sorter;
         var ruleSelector = new WeightedSelector(this.ruleset);
         while (words.size < n) {
@@ -768,11 +748,11 @@ var SoundSystem = (function () {
             var word = new Word(form, rule);
             this.applyFilters(word);
             if (word.toString() !== 'REJECT') {
-                words.addWord(word);
+                words.add(word.toString());
             }
         }
-        var wordList = words.arr.map(function (el) { return el.toString(); });
-        if (!unsorted) {
+        var wordList = Array.from(words);
+        if (!(unsorted || verbose)) {
             if (this.sorter) {
                 wordList = this.sorter.sort(wordList);
             }
@@ -794,11 +774,11 @@ var textify = function (phsys, sentences) {
         if (sent >= 7) {
             comma = Math.floor(Math.random() * (sent - 1));
         }
-        text += phsys.generate(1, true)[0]
+        text += phsys.generate(1, false, true)[0]
             .toString()
             .replace(/./u, function (el) { return el.toUpperCase(); });
         for (var j = 0; j < sent; ++j) {
-            text += " " + phsys.generate(1, true)[0];
+            text += " " + phsys.generate(1, false, true)[0];
             if (j === comma) {
                 text += ',';
             }

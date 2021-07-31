@@ -83,23 +83,4 @@ class Word {
     }
 }
 
-class WordSet {
-    readonly arr: Word[];
-
-    get size() {
-        return this.arr.length;
-    }
-
-    constructor(words: Word[] = []) {
-        this.arr = [];
-        words.forEach(el => this.addWord(el));
-    }
-
-    addWord(word: Word) {
-        if (this.arr.every(el => el.toString() != word.toString())) {
-            this.arr.push(word);
-        }
-    }
-}
-
-export { Word, WordSet };
+export default Word;
