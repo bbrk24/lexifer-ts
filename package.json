@@ -1,6 +1,6 @@
 {
     "name": "lexifer",
-    "version": "1.1.0-alpha.6",
+    "version": "1.1.0-alpha.7",
     "private": true,
     "scripts": {
         "build": "cat src/*.ts > combined.ts && sed -i '/export/d' combined.ts && sed -i '/import/d' combined.ts && tsc",

@@ -18,7 +18,7 @@ class Word {
         this.filters = [rule];
     }
 
-    applyFilter(pat: string, repl: string) {
+    private applyFilter(pat: string, repl: string) {
         let regex = new RegExp(pat, 'gu');
 
         let newWord = last(this.forms)!;
@@ -27,9 +27,18 @@ class Word {
             newWord = 'REJECT';
         }
 
-        if (newWord != last(this.forms)) {
+        if (newWord !== last(this.forms)) {
             this.forms.push(newWord);
             this.filters.push(`${pat} > ${repl || '!'}`);
+        }
+    }
+
+    applyFilters(filters: [string, string][]) {
+        for (let filt of filters) {
+            this.applyFilter(...filt);
+            if (last(this.forms) === 'REJECT') {
+                return;
+            }
         }
     }
 
@@ -42,7 +51,7 @@ class Word {
             )
                 .join('');
             
-            if (newWord != last(this.forms)) {
+            if (newWord !== last(this.forms)) {
                 this.forms.push(newWord);
                 this.filters.push('std-assimilations');
             }
@@ -58,7 +67,7 @@ class Word {
             )
                 .join('');
 
-            if (newWord != last(this.forms)) {
+            if (newWord !== last(this.forms)) {
                 this.forms.push(newWord);
                 this.filters.push('coronal-metathesis');
             }

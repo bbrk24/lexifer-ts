@@ -151,9 +151,7 @@ class SoundSystem {
             word.applyCoronalMetathesis();
         }
 
-        this.filters.forEach(el => 
-            word.applyFilter(...el)
-        );
+        word.applyFilters(this.filters);
 
         return word;
     }
@@ -206,7 +204,7 @@ class SoundSystem {
             let form = this.runRule(rule);
             let word = new Word(form, rule);
             this.applyFilters(word);
-            if (word.toString() != 'REJECT') {
+            if (word.toString() !== 'REJECT') {
                 words.addWord(word);
             }
         }

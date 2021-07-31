@@ -502,16 +502,35 @@ var Word = (function () {
         if (newWord.includes('REJECT')) {
             newWord = 'REJECT';
         }
-        if (newWord != last(this.forms)) {
+        if (newWord !== last(this.forms)) {
             this.forms.push(newWord);
             this.filters.push(pat + " > " + (repl || '!'));
+        }
+    };
+    Word.prototype.applyFilters = function (filters) {
+        var e_7, _a;
+        try {
+            for (var filters_1 = __values(filters), filters_1_1 = filters_1.next(); !filters_1_1.done; filters_1_1 = filters_1.next()) {
+                var filt = filters_1_1.value;
+                this.applyFilter.apply(this, __spreadArray([], __read(filt)));
+                if (last(this.forms) === 'REJECT') {
+                    return;
+                }
+            }
+        }
+        catch (e_7_1) { e_7 = { error: e_7_1 }; }
+        finally {
+            try {
+                if (filters_1_1 && !filters_1_1.done && (_a = filters_1.return)) _a.call(filters_1);
+            }
+            finally { if (e_7) throw e_7.error; }
         }
     };
     Word.prototype.applyAssimilations = function () {
         if (Word.sorter) {
             var newWord = applyAssimilations(Word.sorter.split(last(this.forms)))
                 .join('');
-            if (newWord != last(this.forms)) {
+            if (newWord !== last(this.forms)) {
                 this.forms.push(newWord);
                 this.filters.push('std-assimilations');
             }
@@ -521,7 +540,7 @@ var Word = (function () {
         if (Word.sorter) {
             var newWord = applyCoronalMetathesis(Word.sorter.split(last(this.forms)))
                 .join('');
-            if (newWord != last(this.forms)) {
+            if (newWord !== last(this.forms)) {
                 this.forms.push(newWord);
                 this.filters.push('coronal-metathesis');
             }
@@ -623,7 +642,7 @@ var naturalWeights = function (phonemes) {
     return temp;
 };
 var ruleToDict = function (rule) {
-    var e_7, _a;
+    var e_8, _a;
     var items = rule.trim().split(/\s+/gu);
     var d = {};
     try {
@@ -636,12 +655,12 @@ var ruleToDict = function (rule) {
             d[value] = parseFloat(weight);
         }
     }
-    catch (e_7_1) { e_7 = { error: e_7_1 }; }
+    catch (e_8_1) { e_8 = { error: e_8_1 }; }
     finally {
         try {
             if (items_1_1 && !items_1_1.done && (_a = items_1.return)) _a.call(items_1);
         }
-        finally { if (e_7) throw e_7.error; }
+        finally { if (e_8) throw e_8.error; }
     }
     return d;
 };
@@ -711,9 +730,7 @@ var SoundSystem = (function () {
         if (this.useCoronalMetathesis) {
             word.applyCoronalMetathesis();
         }
-        this.filters.forEach(function (el) {
-            return word.applyFilter.apply(word, __spreadArray([], __read(el)));
-        });
+        word.applyFilters(this.filters);
         return word;
     };
     SoundSystem.prototype.addPhUnit = function (name, selection) {
@@ -757,7 +774,7 @@ var SoundSystem = (function () {
             var form = this.runRule(rule);
             var word = new Word(form, rule);
             this.applyFilters(word);
-            if (word.toString() != 'REJECT') {
+            if (word.toString() !== 'REJECT') {
                 words.addWord(word);
             }
         }

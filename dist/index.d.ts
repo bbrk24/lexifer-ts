@@ -49,7 +49,8 @@ declare class Word {
     private filters;
     get lastForm(): string | undefined;
     constructor(form: string, rule: string);
-    applyFilter(pat: string, repl: string): void;
+    private applyFilter;
+    applyFilters(filters: [string, string][]): void;
     applyAssimilations(): void;
     applyCoronalMetathesis(): void;
     toString(): string;
