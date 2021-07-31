@@ -141,5 +141,4 @@ const applyCoronalMetathesis = (word: string[]) => {
     return newArr;
 };
 
-let sc = { initialize, applyAssimilations, applyCoronalMetathesis }
-export default sc;
+export { initialize, applyAssimilations, applyCoronalMetathesis };

@@ -1,7 +1,8 @@
-import sc from './SmartClusters';
+import { initialize } from './SmartClusters';
 import WeightedSelector from './distribution';
 import wrap from './textwrap';
 import last from './last';
+import { Word, WordSet } from './word';
 
 class ArbSorter {
     private splitter: RegExp;
@@ -84,7 +85,7 @@ const ruleToDict = (rule: string) => {
 class SoundSystem {
     private phonemeset: { [key: string]: WeightedSelector } = {};
     private ruleset: { [key: string]: number } = {};
-    private filters: [RegExp, string][] = [];
+    private filters: [string, string][] = [];
 
     randpercent = 10;
     useAssim = false;
@@ -123,8 +124,8 @@ class SoundSystem {
                 }
 
                 if (rule[i] !== prevc) {
-                    throw new Error('Misplaced \'!\' option: in '
-                        + `non-duplicate environment: ${rule}`);
+                    throw new Error("Misplaced '!' option: in non-duplicate"
+                        + ` environment: ${rule}`);
                 }
                 if (rule[i]! in this.phonemeset) {
                     let nph = this.phonemeset[rule[i]!]!.select();
@@ -142,24 +143,18 @@ class SoundSystem {
         return s.join('');
     }
 
-    private applyFilters(word: string) {
-        if (this.sorter) {
-            let w = this.sorter.split(word);
-            if (this.useAssim) {
-                w = sc.applyAssimilations(w);
-            }
-            if (this.useCoronalMetathesis) {
-                w = sc.applyCoronalMetathesis(w);
-            }
-            word = w.join('');
+    private applyFilters(word: Word) {
+        if (this.useAssim) {
+            word.applyAssimilations();
+        }
+        if (this.useCoronalMetathesis) {
+            word.applyCoronalMetathesis();
         }
 
-        for (let [pat, repl] of this.filters) {
-            word = word.replace(pat, repl);
-            if (word.includes('REJECT')) {
-                return 'REJECT';
-            }
-        }
+        this.filters.forEach(el => 
+            word.applyFilter(...el)
+        );
+
         return word;
     }
 
@@ -174,7 +169,7 @@ class SoundSystem {
         this.ruleset[rule] = weight;
     }
 
-    addFilter(pat: RegExp, repl: string) {
+    addFilter(pat: string, repl: string) {
         if (repl === '!') {
             this.filters.push([pat, '']);
         } else {
@@ -187,11 +182,11 @@ class SoundSystem {
     }
 
     useIpa() {
-        sc.initialize();
+        initialize();
     }
 
     useDigraphs() {
-        sc.initialize('digraph');
+        initialize('digraph');
     }
 
     withStdAssimilations() {
@@ -203,16 +198,19 @@ class SoundSystem {
     }
 
     generate(n: number, unsorted: boolean) {
-        let words = new Set<string>();
+        let words = new WordSet();
+        Word.sorter = this.sorter;
         let ruleSelector = new WeightedSelector(this.ruleset);
         while (words.size < n) {
             let rule = ruleSelector.select();
-            let word = this.applyFilters(this.runRule(rule));
-            if (word != 'REJECT') {
-                words.add(word);
+            let form = this.runRule(rule);
+            let word = new Word(form, rule);
+            this.applyFilters(word);
+            if (word.toString() != 'REJECT') {
+                words.addWord(word);
             }
         }
-        let wordList = Array.from(words);
+        let wordList = words.arr.map(el => el.toString());
         if (!unsorted) {
             if (this.sorter) {
                 wordList = this.sorter.sort(wordList);
@@ -233,7 +231,9 @@ const textify = (phsys: SoundSystem, sentences = 25) => {
             comma = Math.floor(Math.random() * (sent - 1));
         }
 
-        text += phsys.generate(1, true)[0]!.replace(/./u, el => el.toUpperCase());
+        text += phsys.generate(1, true)[0]!
+            .toString()
+            .replace(/./u, el => el.toUpperCase());
         
         for (let j = 0; j < sent; ++j) {
             text += ` ${phsys.generate(1, true)[0]}`;
@@ -252,4 +252,4 @@ const textify = (phsys: SoundSystem, sentences = 25) => {
     return text;
 };
 
-export { SoundSystem, textify };
+export { SoundSystem, textify, ArbSorter };

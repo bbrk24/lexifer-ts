@@ -29,11 +29,6 @@ declare const voiceAssimilate: (ph1: string, ph2: string) => string;
 declare const coronalMetathesis: (ph1: string, ph2: string) => [string, string];
 declare const applyAssimilations: (word: string[]) => string[];
 declare const applyCoronalMetathesis: (word: string[]) => string[];
-declare let sc: {
-    initialize: (notation?: string) => void;
-    applyAssimilations: (word: string[]) => string[];
-    applyCoronalMetathesis: (word: string[]) => string[];
-};
 declare class WeightedSelector {
     private keys;
     private weights;
@@ -44,9 +39,27 @@ declare class WeightedSelector {
     });
     select(): string;
 }
-declare const main: (file: string, num?: number | undefined, unsorted?: boolean | undefined, onePerLine?: boolean | undefined, stderr?: (inp: string | Error) => void) => string;
+declare const main: (file: string, num?: number | undefined, verbose?: boolean, unsorted?: boolean | undefined, onePerLine?: boolean | undefined, stderr?: (inp: string | Error) => void) => string;
 declare function last<T>(array: T[]): T | undefined;
 declare const wrap: (s: string) => string;
+declare class Word {
+    static verbose: boolean;
+    static sorter: ArbSorter | null;
+    private forms;
+    private filters;
+    get lastForm(): string | undefined;
+    constructor(form: string, rule: string);
+    applyFilter(pat: string, repl: string): void;
+    applyAssimilations(): void;
+    applyCoronalMetathesis(): void;
+    toString(): string;
+}
+declare class WordSet {
+    readonly arr: Word[];
+    get size(): number;
+    constructor(words?: Word[]);
+    addWord(word: Word): void;
+}
 declare class ArbSorter {
     private splitter;
     private ords;
@@ -74,7 +87,7 @@ declare class SoundSystem {
     private applyFilters;
     addPhUnit(name: string, selection: string): void;
     addRule(rule: string, weight: number): void;
-    addFilter(pat: RegExp, repl: string): void;
+    addFilter(pat: string, repl: string): void;
     addSortOrder(order: string): void;
     useIpa(): void;
     useDigraphs(): void;

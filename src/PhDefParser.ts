@@ -1,3 +1,4 @@
+import { Word } from './word';
 import { SoundSystem, textify } from './wordgen';
 
 class PhonologyDefinition {
@@ -59,7 +60,7 @@ class PhonologyDefinition {
             }
         }
         if ((this.soundsys.useAssim || this.soundsys.useCoronalMetathesis) && !this.soundsys.sorter) {
-            this.stderr('Without \'letters:\' cannot apply assimilations or coronal metathesis.')
+            this.stderr("Without 'letters:' cannot apply assimilations or coronal metathesis.");
         }
     }
 
@@ -70,8 +71,8 @@ class PhonologyDefinition {
             if (phonemes.size > letters.size) {
                 let diff = [...phonemes].filter(el => !letters.has(el));
                 this.stderr(`A phoneme class contains '${diff.join(' ')}' `
-                    + 'missing from \'letters\'.  Strange word shapes are '
-                    + 'likely to result.')
+                    + "missing from 'letters'.  Strange word shapes are likely"
+                    + ' to result.')
             }
         }
     }
@@ -112,12 +113,12 @@ class PhonologyDefinition {
     private addFilter(pre: string, post: string) {
         pre = pre.trim();
         post = post.trim();
-        this.soundsys.addFilter(new RegExp(pre, 'gu'), post);
+        this.soundsys.addFilter(pre, post);
     }
 
     private parseReject(line: string) {
         for (let filt of line.split(/\s+/gu)) {
-            this.soundsys.addFilter(new RegExp(filt, 'gu'), 'REJECT');
+            this.soundsys.addFilter(filt, 'REJECT');
         }
     }
 
@@ -164,15 +165,9 @@ class PhonologyDefinition {
                     if (row[i] === '+') {
                         continue;
                     } else if (row[i] === '-') {
-                        this.soundsys.addFilter(
-                            new RegExp(c1 + c2list[i]!, 'gu'),
-                            'REJECT'
-                        );
+                        this.soundsys.addFilter(c1 + c2list[i]!, 'REJECT');
                     } else {
-                        this.soundsys.addFilter(
-                            new RegExp(c1 + c2list[i]!, 'gu'),
-                            row[i]!
-                        );
+                        this.soundsys.addFilter(c1 + c2list[i]!, row[i]!);
                     }
                 }
             } else if (row.length > n) {

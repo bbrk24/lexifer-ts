@@ -82,7 +82,7 @@ var PhonologyDefinition = (function () {
             }
         }
         if ((this.soundsys.useAssim || this.soundsys.useCoronalMetathesis) && !this.soundsys.sorter) {
-            this.stderr('Without \'letters:\' cannot apply assimilations or coronal metathesis.');
+            this.stderr("Without 'letters:' cannot apply assimilations or coronal metathesis.");
         }
     };
     PhonologyDefinition.prototype.sanityCheck = function () {
@@ -92,8 +92,8 @@ var PhonologyDefinition = (function () {
             if (phonemes.size > letters_1.size) {
                 var diff = __spreadArray([], __read(phonemes)).filter(function (el) { return !letters_1.has(el); });
                 this.stderr("A phoneme class contains '" + diff.join(' ') + "' "
-                    + 'missing from \'letters\'.  Strange word shapes are '
-                    + 'likely to result.');
+                    + "missing from 'letters'.  Strange word shapes are likely"
+                    + ' to result.');
             }
         }
     };
@@ -152,14 +152,14 @@ var PhonologyDefinition = (function () {
     PhonologyDefinition.prototype.addFilter = function (pre, post) {
         pre = pre.trim();
         post = post.trim();
-        this.soundsys.addFilter(new RegExp(pre, 'gu'), post);
+        this.soundsys.addFilter(pre, post);
     };
     PhonologyDefinition.prototype.parseReject = function (line) {
         var e_3, _a;
         try {
             for (var _b = __values(line.split(/\s+/gu)), _c = _b.next(); !_c.done; _c = _b.next()) {
                 var filt = _c.value;
-                this.soundsys.addFilter(new RegExp(filt, 'gu'), 'REJECT');
+                this.soundsys.addFilter(filt, 'REJECT');
             }
         }
         catch (e_3_1) { e_3 = { error: e_3_1 }; }
@@ -219,10 +219,10 @@ var PhonologyDefinition = (function () {
                         continue;
                     }
                     else if (row[i] === '-') {
-                        this.soundsys.addFilter(new RegExp(c1 + c2list[i], 'gu'), 'REJECT');
+                        this.soundsys.addFilter(c1 + c2list[i], 'REJECT');
                     }
                     else {
-                        this.soundsys.addFilter(new RegExp(c1 + c2list[i], 'gu'), row[i]);
+                        this.soundsys.addFilter(c1 + c2list[i], row[i]);
                     }
                 }
             }
@@ -411,7 +411,6 @@ var applyCoronalMetathesis = function (word) {
     }
     return newArr;
 };
-var sc = { initialize: initialize, applyAssimilations: applyAssimilations, applyCoronalMetathesis: applyCoronalMetathesis };
 var WeightedSelector = (function () {
     function WeightedSelector(dic) {
         this.keys = [];
@@ -436,14 +435,25 @@ var WeightedSelector = (function () {
     };
     return WeightedSelector;
 }());
-var main = function (file, num, unsorted, onePerLine, stderr) {
+var main = function (file, num, verbose, unsorted, onePerLine, stderr) {
+    if (verbose === void 0) { verbose = false; }
     if (stderr === void 0) { stderr = console.error; }
     var ans = '';
     try {
         var pd = new PhonologyDefinition(new SoundSystem(), file, stderr);
         if (typeof num == 'number') {
+            if (verbose) {
+                Word.verbose = true;
+                if (!unsorted) {
+                    stderr("** 'Unsorted' option always enabled in verbose mode.");
+                    unsorted = true;
+                }
+                if (onePerLine) {
+                    stderr("** 'One per line' option ignored in verbose mode.");
+                }
+            }
             var words = pd.generate(num, unsorted);
-            if (onePerLine) {
+            if (onePerLine || verbose) {
                 ans = words.join('\n');
             }
             else {
@@ -451,11 +461,14 @@ var main = function (file, num, unsorted, onePerLine, stderr) {
             }
         }
         else {
+            if (verbose) {
+                stderr("** 'Verbose' option ignored in paragraph mode.");
+            }
             if (unsorted) {
-                stderr('** \'Unsorted\' option ignored in paragraph mode.');
+                stderr("** 'Unsorted' option ignored in paragraph mode.");
             }
             if (onePerLine) {
-                stderr('** \'One per line\' option ignored in paragraph mode.');
+                stderr("** 'One per line' option ignored in paragraph mode.");
             }
             ans = pd.paragraph();
         }
@@ -470,6 +483,87 @@ function last(array) {
     return length ? array[length - 1] : undefined;
 }
 var wrap = function (s) { return s.replace(/(?![^\n]{1,70}$)([^\n]{1,70})\s/gu, '$1\n'); };
+var Word = (function () {
+    function Word(form, rule) {
+        this.forms = [form];
+        this.filters = [rule];
+    }
+    Object.defineProperty(Word.prototype, "lastForm", {
+        get: function () {
+            return last(this.forms);
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Word.prototype.applyFilter = function (pat, repl) {
+        var regex = new RegExp(pat, 'gu');
+        var newWord = last(this.forms);
+        newWord = newWord.replace(regex, repl);
+        if (newWord.includes('REJECT')) {
+            newWord = 'REJECT';
+        }
+        if (newWord != last(this.forms)) {
+            this.forms.push(newWord);
+            this.filters.push(pat + " > " + (repl || '!'));
+        }
+    };
+    Word.prototype.applyAssimilations = function () {
+        if (Word.sorter) {
+            var newWord = applyAssimilations(Word.sorter.split(last(this.forms)))
+                .join('');
+            if (newWord != last(this.forms)) {
+                this.forms.push(newWord);
+                this.filters.push('std-assimilations');
+            }
+        }
+    };
+    Word.prototype.applyCoronalMetathesis = function () {
+        if (Word.sorter) {
+            var newWord = applyCoronalMetathesis(Word.sorter.split(last(this.forms)))
+                .join('');
+            if (newWord != last(this.forms)) {
+                this.forms.push(newWord);
+                this.filters.push('coronal-metathesis');
+            }
+        }
+    };
+    Word.prototype.toString = function () {
+        if (Word.verbose) {
+            var ans = '';
+            for (var i = this.forms.length - 1; i >= 0; --i) {
+                ans += this.forms[i] + " -- " + this.filters[i] + "\n";
+            }
+            return ans;
+        }
+        else {
+            return last(this.forms);
+        }
+    };
+    Word.verbose = false;
+    Word.sorter = null;
+    return Word;
+}());
+var WordSet = (function () {
+    function WordSet(words) {
+        var _this = this;
+        if (words === void 0) { words = []; }
+        this.arr = [];
+        words.forEach(function (el) { return _this.addWord(el); });
+    }
+    Object.defineProperty(WordSet.prototype, "size", {
+        get: function () {
+            return this.arr.length;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    WordSet.prototype.addWord = function (word) {
+        if (this.arr.every(function (el) { return el.toString() != word.toString(); })) {
+            this.arr.push(word);
+        }
+    };
+    return WordSet;
+}());
 var ArbSorter = (function () {
     function ArbSorter(order) {
         var graphs = order.split(/\s+/gu);
@@ -590,8 +684,8 @@ var SoundSystem = (function () {
                     prevc = rule[i - 1];
                 }
                 if (rule[i] !== prevc) {
-                    throw new Error('Misplaced \'!\' option: in '
-                        + ("non-duplicate environment: " + rule));
+                    throw new Error("Misplaced '!' option: in non-duplicate"
+                        + (" environment: " + rule));
                 }
                 if (rule[i] in this.phonemeset) {
                     var nph = this.phonemeset[rule[i]].select();
@@ -611,33 +705,15 @@ var SoundSystem = (function () {
         return s.join('');
     };
     SoundSystem.prototype.applyFilters = function (word) {
-        var e_8, _a;
-        if (this.sorter) {
-            var w = this.sorter.split(word);
-            if (this.useAssim) {
-                w = sc.applyAssimilations(w);
-            }
-            if (this.useCoronalMetathesis) {
-                w = sc.applyCoronalMetathesis(w);
-            }
-            word = w.join('');
+        if (this.useAssim) {
+            word.applyAssimilations();
         }
-        try {
-            for (var _b = __values(this.filters), _c = _b.next(); !_c.done; _c = _b.next()) {
-                var _d = __read(_c.value, 2), pat = _d[0], repl = _d[1];
-                word = word.replace(pat, repl);
-                if (word.includes('REJECT')) {
-                    return 'REJECT';
-                }
-            }
+        if (this.useCoronalMetathesis) {
+            word.applyCoronalMetathesis();
         }
-        catch (e_8_1) { e_8 = { error: e_8_1 }; }
-        finally {
-            try {
-                if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
-            }
-            finally { if (e_8) throw e_8.error; }
-        }
+        this.filters.forEach(function (el) {
+            return word.applyFilter.apply(word, __spreadArray([], __read(el)));
+        });
         return word;
     };
     SoundSystem.prototype.addPhUnit = function (name, selection) {
@@ -661,10 +737,10 @@ var SoundSystem = (function () {
         this.sorter = new ArbSorter(order);
     };
     SoundSystem.prototype.useIpa = function () {
-        sc.initialize();
+        initialize();
     };
     SoundSystem.prototype.useDigraphs = function () {
-        sc.initialize('digraph');
+        initialize('digraph');
     };
     SoundSystem.prototype.withStdAssimilations = function () {
         this.useAssim = true;
@@ -673,16 +749,19 @@ var SoundSystem = (function () {
         this.useCoronalMetathesis = true;
     };
     SoundSystem.prototype.generate = function (n, unsorted) {
-        var words = new Set();
+        var words = new WordSet();
+        Word.sorter = this.sorter;
         var ruleSelector = new WeightedSelector(this.ruleset);
         while (words.size < n) {
             var rule = ruleSelector.select();
-            var word = this.applyFilters(this.runRule(rule));
-            if (word != 'REJECT') {
-                words.add(word);
+            var form = this.runRule(rule);
+            var word = new Word(form, rule);
+            this.applyFilters(word);
+            if (word.toString() != 'REJECT') {
+                words.addWord(word);
             }
         }
-        var wordList = Array.from(words);
+        var wordList = words.arr.map(function (el) { return el.toString(); });
         if (!unsorted) {
             if (this.sorter) {
                 wordList = this.sorter.sort(wordList);
@@ -705,7 +784,9 @@ var textify = function (phsys, sentences) {
         if (sent >= 7) {
             comma = Math.floor(Math.random() * (sent - 1));
         }
-        text += phsys.generate(1, true)[0].replace(/./u, function (el) { return el.toUpperCase(); });
+        text += phsys.generate(1, true)[0]
+            .toString()
+            .replace(/./u, function (el) { return el.toUpperCase(); });
         for (var j = 0; j < sent; ++j) {
             text += " " + phsys.generate(1, true)[0];
             if (j === comma) {
