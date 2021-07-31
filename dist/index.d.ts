@@ -47,7 +47,6 @@ declare class Word {
     static sorter: ArbSorter | null;
     private forms;
     private filters;
-    get lastForm(): string | undefined;
     constructor(form: string, rule: string);
     private applyFilter;
     applyFilters(filters: [string, string][]): void;

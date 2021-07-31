@@ -488,13 +488,6 @@ var Word = (function () {
         this.forms = [form];
         this.filters = [rule];
     }
-    Object.defineProperty(Word.prototype, "lastForm", {
-        get: function () {
-            return last(this.forms);
-        },
-        enumerable: false,
-        configurable: true
-    });
     Word.prototype.applyFilter = function (pat, repl) {
         var regex = new RegExp(pat, 'gu');
         var newWord = last(this.forms);
@@ -550,7 +543,7 @@ var Word = (function () {
         if (Word.verbose) {
             var ans = '';
             for (var i = this.forms.length - 1; i >= 0; --i) {
-                ans += this.forms[i] + " -- " + this.filters[i] + "\n";
+                ans += this.forms[i] + " \u2013 " + this.filters[i] + "\n";
             }
             return ans;
         }

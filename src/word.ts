@@ -9,10 +9,6 @@ class Word {
     private forms: string[];
     private filters: string[];
 
-    get lastForm() {
-        return last(this.forms);
-    }
-
     constructor(form: string, rule: string) {
         this.forms = [form];
         this.filters = [rule];
@@ -78,7 +74,7 @@ class Word {
         if (Word.verbose) {
             let ans = '';
             for (let i = this.forms.length - 1; i >= 0; --i) {
-                ans += `${this.forms[i]} -- ${this.filters[i]}\n`;
+                ans += `${this.forms[i]} – ${this.filters[i]}\n`;
             }
             return ans;
         } else {
