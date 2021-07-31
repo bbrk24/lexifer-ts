@@ -73,8 +73,8 @@ class Word {
     toString() {
         if (Word.verbose) {
             let ans = '';
-            for (let i = this.forms.length - 1; i >= 0; --i) {
-                ans += `${this.forms[i]} – ${this.filters[i]}\n`;
+            for (let i = 0; i < this.forms.length; ++i) {
+                ans += `${this.filters[i]} – ${this.forms[i]}\n`;
             }
             return ans;
         } else {

@@ -542,8 +542,8 @@ var Word = (function () {
     Word.prototype.toString = function () {
         if (Word.verbose) {
             var ans = '';
-            for (var i = this.forms.length - 1; i >= 0; --i) {
-                ans += this.forms[i] + " \u2013 " + this.filters[i] + "\n";
+            for (var i = 0; i < this.forms.length; ++i) {
+                ans += this.filters[i] + " \u2013 " + this.forms[i] + "\n";
             }
             return ans;
         }
