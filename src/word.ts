@@ -5,30 +5,30 @@ import { ArbSorter } from './wordgen';
 class Word {
     static verbose = false;
     static sorter: ArbSorter | null = null;
-
+    
     private forms: string[];
     private filters: string[];
-
+    
     constructor(form: string, rule: string) {
         this.forms = [form];
         this.filters = [rule];
     }
-
+    
     private applyFilter(pat: string, repl: string) {
         let regex = new RegExp(pat, 'gu');
-
+        
         let newWord = last(this.forms)!;
         newWord = newWord.replace(regex, repl);
         if (newWord.includes('REJECT')) {
             newWord = 'REJECT';
         }
-
+        
         if (newWord !== last(this.forms)) {
             this.forms.push(newWord);
             this.filters.push(`${pat} > ${repl || '!'}`);
         }
     }
-
+    
     applyFilters(filters: [string, string][]) {
         for (let filt of filters) {
             this.applyFilter(...filt);
@@ -37,7 +37,7 @@ class Word {
             }
         }
     }
-
+    
     applyAssimilations() {
         if (Word.sorter) {
             let newWord = applyAssimilations(
@@ -53,7 +53,7 @@ class Word {
             }
         }
     }
-
+    
     applyCoronalMetathesis() {
         if (Word.sorter) {
             let newWord = applyCoronalMetathesis(
@@ -69,7 +69,7 @@ class Word {
             }
         }
     }
-
+    
     toString() {
         if (Word.verbose) {
             let ans = '';

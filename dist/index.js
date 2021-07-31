@@ -81,8 +81,10 @@ var PhonologyDefinition = (function () {
                 throw new Error("parsing error at '" + line + "'");
             }
         }
-        if ((this.soundsys.useAssim || this.soundsys.useCoronalMetathesis) && !this.soundsys.sorter) {
-            this.stderr("Without 'letters:' cannot apply assimilations or coronal metathesis.");
+        if ((this.soundsys.useAssim || this.soundsys.useCoronalMetathesis)
+            && !this.soundsys.sorter) {
+            this.stderr("Without 'letters:' cannot apply assimilations or "
+                + 'coronal metathesis.');
         }
     };
     PhonologyDefinition.prototype.sanityCheck = function () {
@@ -445,11 +447,13 @@ var main = function (file, num, verbose, unsorted, onePerLine, stderr) {
         if (typeof num == 'number') {
             if (verbose) {
                 if (!unsorted) {
-                    stderr("** 'Unsorted' option always enabled in verbose mode.");
+                    stderr("** 'Unsorted' option always enabled in verbose "
+                        + 'mode.');
                     unsorted = true;
                 }
                 if (onePerLine) {
-                    stderr("** 'One per line' option ignored in verbose mode.");
+                    stderr("** 'One per line' option ignored in verbose "
+                        + 'mode.');
                 }
             }
             var words = pd.generate(num, verbose, unsorted);
@@ -790,6 +794,6 @@ var textify = function (phsys, sentences) {
             text += '? ';
         }
     }
-    text = wrap(text);
+    text = wrap(text.trim());
     return text;
 };

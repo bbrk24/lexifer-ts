@@ -18,14 +18,16 @@ const main = (
             
             if (verbose) {
                 if (!unsorted) {
-                    stderr("** 'Unsorted' option always enabled in verbose mode.");
+                    stderr("** 'Unsorted' option always enabled in verbose "
+                        + 'mode.');
                     unsorted = true;
                 }
                 if (onePerLine) {
-                    stderr("** 'One per line' option ignored in verbose mode.");
+                    stderr("** 'One per line' option ignored in verbose "
+                        + 'mode.');
                 }
             }
-
+            
             let words = pd.generate(num, verbose, unsorted);
             if (onePerLine || verbose) {
                 ans = words.join('\n');

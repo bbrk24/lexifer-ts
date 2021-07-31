@@ -8,7 +8,7 @@ class ArbSorter {
     private splitter: RegExp;
     private ords: { [key: string]: number };
     private vals: string[];
-
+    
     constructor(order: string) {
         let graphs = order.split(/\s+/gu);
         let splitOrder = [...graphs].sort((a, b) => b.length - a.length);
@@ -21,7 +21,7 @@ class ArbSorter {
             this.vals.push(graphs[i]!);
         }
     }
-
+    
     wordAsValues(word: string) {
         let w = this.split(word);
         let arrayedWord = w.map(char => this.ords[char]);
@@ -31,17 +31,17 @@ class ArbSorter {
         }
         return <number[]>arrayedWord;
     }
-
+    
     valuesAsWord(values: number[]) {
         return values.map(v => this.vals[v])
             .join('');
     }
-
+    
     split(word: string) {
         return word.split(this.splitter)
             .filter((_, i) => i % 2);
     }
-
+    
     sort(l: string[]) {
         let l2 = l.map(el => this.wordAsValues(el));
         l2.sort((a, b) => a[0]! - b[0]!);
@@ -86,12 +86,12 @@ class SoundSystem {
     private phonemeset: { [key: string]: WeightedSelector } = {};
     private ruleset: { [key: string]: number } = {};
     private filters: [string, string][] = [];
-
+    
     randpercent = 10;
     useAssim = false;
     useCoronalMetathesis = false;
     sorter: ArbSorter | null = null;
-
+    
     private runRule(rule: string) {
         let n = rule.length;
         let s: string[] = [];
@@ -99,7 +99,7 @@ class SoundSystem {
             if ('?!'.includes(rule[i]!)) {
                 continue;
             }
-
+            
             if (
                 i < n - 1
                 && rule[i + 1] === '?'
@@ -122,7 +122,7 @@ class SoundSystem {
                 } else {
                     prevc = rule[i - 1]!;
                 }
-
+                
                 if (rule[i] !== prevc) {
                     throw new Error("Misplaced '!' option: in non-duplicate"
                         + ` environment: ${rule}`);
@@ -142,7 +142,7 @@ class SoundSystem {
         }
         return s.join('');
     }
-
+    
     private applyFilters(word: Word) {
         if (this.useAssim) {
             word.applyAssimilations();
@@ -150,23 +150,23 @@ class SoundSystem {
         if (this.useCoronalMetathesis) {
             word.applyCoronalMetathesis();
         }
-
+        
         word.applyFilters(this.filters);
-
+        
         return word;
     }
-
+    
     addPhUnit(name: string, selection: string) {
         if (!selection.includes(':')) {
             selection = naturalWeights(selection);
         }
         this.phonemeset[name] = new WeightedSelector(ruleToDict(selection));
     }
-
+    
     addRule(rule: string, weight: number) {
         this.ruleset[rule] = weight;
     }
-
+    
     addFilter(pat: string, repl: string) {
         if (repl === '!') {
             this.filters.push([pat, '']);
@@ -174,27 +174,27 @@ class SoundSystem {
             this.filters.push([pat, repl]);
         }
     }
-
+    
     addSortOrder(order: string) {
         this.sorter = new ArbSorter(order);
     }
-
+    
     useIpa() {
         initialize();
     }
-
+    
     useDigraphs() {
         initialize('digraph');
     }
-
+    
     withStdAssimilations() {
         this.useAssim = true;
     }
-
+    
     withCoronalMetathesis() {
         this.useCoronalMetathesis = true;
     }
-
+    
     generate(n: number, verbose: boolean, unsorted: boolean) {
         let words = new Set<string>();
         Word.verbose = verbose;
@@ -229,7 +229,7 @@ const textify = (phsys: SoundSystem, sentences = 25) => {
         if (sent >= 7) {
             comma = Math.floor(Math.random() * (sent - 1));
         }
-
+        
         text += phsys.generate(1, false, true)[0]!
             .toString()
             .replace(/./u, el => el.toUpperCase());
@@ -240,14 +240,14 @@ const textify = (phsys: SoundSystem, sentences = 25) => {
                 text += ',';
             }
         }
-
+        
         if (Math.random() <= 0.85) {
             text += '. ';
         } else {
             text += '? ';
         }
     }
-    text = wrap(text);
+    text = wrap(text.trim());
     return text;
 };
 

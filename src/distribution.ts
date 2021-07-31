@@ -14,7 +14,7 @@ class WeightedSelector {
         this.sum = this.weights.reduce((a, b) => a + b, 0);
         this.n = this.keys.length;
     }
-
+    
     select() {
         let pick = Math.random() * this.sum;
         let temp = 0;

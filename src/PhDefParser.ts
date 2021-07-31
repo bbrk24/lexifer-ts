@@ -6,13 +6,13 @@ class PhonologyDefinition {
     private phClasses: string[] = [];
     
     private stderr: (inp: string | Error) => void;
-
+    
     // a bit of a hack since JS can't read files directly
     private defFileLineNum = 0;
     private defFileArr: string[];
-
+    
     soundsys: SoundSystem;
-
+    
     constructor(
         soundsys: SoundSystem,
         defFile: string,
@@ -28,16 +28,19 @@ class PhonologyDefinition {
         this.parse();
         this.sanityCheck();
     }
-
+    
     private parse() {
-        for (; this.defFileLineNum < this.defFileArr.length; ++this.defFileLineNum) {
+        for (;
+            this.defFileLineNum < this.defFileArr.length;
+            ++this.defFileLineNum
+        ) {
             let line = this.defFileArr[this.defFileLineNum]!;
-
+            
             line = line.replace(/#.*/, '').trim();
             if (line === '') {
                 continue;
             }
-
+            
             if (line.startsWith('with:')) {
                 this.parseOption(line.substring(5).trim());
             } else if (line.startsWith('random-rate:')) {
@@ -58,11 +61,14 @@ class PhonologyDefinition {
                 throw new Error(`parsing error at '${line}'`);
             }
         }
-        if ((this.soundsys.useAssim || this.soundsys.useCoronalMetathesis) && !this.soundsys.sorter) {
-            this.stderr("Without 'letters:' cannot apply assimilations or coronal metathesis.");
+        if ((this.soundsys.useAssim || this.soundsys.useCoronalMetathesis)
+            && !this.soundsys.sorter
+        ) {
+            this.stderr("Without 'letters:' cannot apply assimilations or "
+                + 'coronal metathesis.');
         }
     }
-
+    
     private sanityCheck() {
         if (this.letters.length) {
             let letters = new Set(this.letters);
@@ -75,7 +81,7 @@ class PhonologyDefinition {
             }
         }
     }
-
+    
     private parseOption(line: string) {
         for (let option of line.split(/\s+/gu)) {
             switch (option) {
@@ -96,69 +102,74 @@ class PhonologyDefinition {
             }
         }
     }
-
+    
     private parseFilter(line: string) {
         for (let filt of line.split(';')) {
             filt = filt.trim();
             if (filt === '') {
                 continue;
             }
-
+            
             let [pre, post] = filt.split('>');
             this.addFilter(pre!, post!);
         }
     }
-
+    
     private addFilter(pre: string, post: string) {
         pre = pre.trim();
         post = post.trim();
         this.soundsys.addFilter(pre, post);
     }
-
+    
     private parseReject(line: string) {
         for (let filt of line.split(/\s+/gu)) {
             this.soundsys.addFilter(filt, 'REJECT');
         }
     }
-
+    
     private parseWords(line: string) {
         line = this.expandMacros(line);
         let splitLine = line.split(/\s+/gu);
         for (let i = 0; i < splitLine.length; ++i) {
-            this.soundsys.addRule(splitLine[i]!, 10.0 / Math.pow((i + 1), 0.9))
+            this.soundsys.addRule(
+                splitLine[i]!,
+                10.0 / Math.pow((i + 1), 0.9)
+            );
         }
     }
-
+    
     private expandMacros(word: string) {
         for (let [macro, value] of this.macros) {
             word = word.replace(macro, value);
         }
         return word;
     }
-
+    
     private parseLetters(line: string) {
         this.letters = line.split(/\s+/gu);
         this.soundsys.addSortOrder(line);
     }
-
+    
     private parseClusterfield() {
         let c2list = this.defFileArr[this.defFileLineNum]!
             .split(/\s+/gu);
         c2list.shift();
         let n = c2list.length;
-
-        while (!['', '\n', undefined].includes(this.defFileArr[this.defFileLineNum]!)) {
+        
+        while (!['', '\n', undefined].includes(
+            this.defFileArr[this.defFileLineNum]!
+        )) {
             ++this.defFileLineNum;
-
+            
             let line = this.defFileArr[this.defFileLineNum] ?? '';
             line = line.replace(/#.*/, '').trim();
             if (line === '') {
                 continue;
             }
-
+            
             let row = line.split(/\s+/gu);
             let c1 = row.splice(0, 1);
-
+            
             if (row.length === n) {
                 for (let i = 0; i < n; ++i) {
                     if (row[i] === '+') {
@@ -176,7 +187,7 @@ class PhonologyDefinition {
             }
         }
     }
-
+    
     private parseClass(line: string) {
         let [sclass, values] = line.split('=');
         sclass = sclass!.trim();
@@ -191,11 +202,11 @@ class PhonologyDefinition {
             this.soundsys.addPhUnit(sclass, values);
         }
     }
-
+    
     generate(n = 1, verbose = false, unsorted = false) {
         return this.soundsys.generate(n, verbose, unsorted);
     }
-
+    
     paragraph(sentences?: number) {
         return textify(this.soundsys, sentences);
     }
