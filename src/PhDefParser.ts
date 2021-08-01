@@ -229,8 +229,22 @@ class PhonologyDefinition {
         }
         
         let splitLine = line.split(/\s+/gu);
+        let weighted = line.includes(':');
+        
         for (let cat of splitLine) {
-            this.categories.push(cat);
+            if (weighted) {
+                let [name, weight] = cat.split(':');
+                let weightNum = parseFloat(weight ?? 'NaN')
+                if (isNaN(weightNum)) {
+                    throw new Error(`${cat} is not a valid category and weight.`);
+                }
+                
+                this.categories.push(name!);
+                this.soundsys.addCategory(name!, weightNum);
+            } else {
+                this.categories.push(cat);
+                this.soundsys.addCategory(cat, 1);
+            }
         }
     }
     

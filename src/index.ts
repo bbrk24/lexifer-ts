@@ -28,7 +28,7 @@ const main = (
                 }
             }
             
-            ans = pd.generate(num, verbose, unsorted, onePerLine);
+            ans = wrap(pd.generate(num, verbose, unsorted, onePerLine));
         } else {
             // paragraph mode
             if (verbose) {

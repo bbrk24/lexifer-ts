@@ -287,10 +287,23 @@ var PhonologyDefinition = (function () {
                 + 'only use one.');
         }
         var splitLine = line.split(/\s+/gu);
+        var weighted = line.includes(':');
         try {
             for (var splitLine_1 = __values(splitLine), splitLine_1_1 = splitLine_1.next(); !splitLine_1_1.done; splitLine_1_1 = splitLine_1.next()) {
                 var cat = splitLine_1_1.value;
-                this.categories.push(cat);
+                if (weighted) {
+                    var _b = __read(cat.split(':'), 2), name_1 = _b[0], weight = _b[1];
+                    var weightNum = parseFloat(weight !== null && weight !== void 0 ? weight : 'NaN');
+                    if (isNaN(weightNum)) {
+                        throw new Error(cat + " is not a valid category and weight.");
+                    }
+                    this.categories.push(name_1);
+                    this.soundsys.addCategory(name_1, weightNum);
+                }
+                else {
+                    this.categories.push(cat);
+                    this.soundsys.addCategory(cat, 1);
+                }
             }
         }
         catch (e_5_1) { e_5 = { error: e_5_1 }; }
@@ -496,8 +509,11 @@ var WeightedSelector = (function () {
         this.keys = [];
         this.weights = [];
         for (var key in dic) {
-            this.keys.push(key);
-            this.weights.push(dic[key]);
+            var weight = dic[key];
+            if (typeof weight == 'number') {
+                this.keys.push(key);
+                this.weights.push(weight);
+            }
         }
         this.sum = this.weights.reduce(function (a, b) { return a + b; }, 0);
         this.n = this.keys.length;
@@ -511,7 +527,7 @@ var WeightedSelector = (function () {
                 return this.keys[i];
             }
         }
-        return 'woo!';
+        throw new Error("Failed to choose options from '" + this.keys.join("', '") + "'");
     };
     return WeightedSelector;
 }());
@@ -533,7 +549,7 @@ var main = function (file, num, verbose, unsorted, onePerLine, stderr) {
                         + 'mode.');
                 }
             }
-            ans = pd.generate(num, verbose, unsorted, onePerLine);
+            ans = wrap(pd.generate(num, verbose, unsorted, onePerLine));
         }
         else {
             if (verbose) {
@@ -787,9 +803,16 @@ var SoundSystem = (function () {
         this.phonemeset[name] = new WeightedSelector(ruleToDict(selection));
     };
     SoundSystem.prototype.addRule = function (rule, weight, cat) {
-        var _a;
         if (cat === void 0) { cat = 'words:'; }
-        this.ruleset[cat] = __assign(__assign({}, this.ruleset[cat]), (_a = {}, _a[rule] = weight, _a));
+        if (this.ruleset[cat]) {
+            this.ruleset[cat][rule] = weight;
+        }
+        else {
+            throw new Error("Uninitialized category '" + cat + "' referenced");
+        }
+    };
+    SoundSystem.prototype.addCategory = function (name, weight) {
+        this.ruleset[name] = { _weight: weight };
     };
     SoundSystem.prototype.addFilter = function (pat, repl) {
         if (repl === '!') {
@@ -815,12 +838,17 @@ var SoundSystem = (function () {
         this.useCoronalMetathesis = true;
     };
     SoundSystem.prototype.generate = function (n, verbose, unsorted, category) {
+        var _a;
         var words = new Set();
         Word.verbose = verbose;
         Word.sorter = this.sorter;
         var ruleSelector;
         if (this.ruleset[category]) {
-            ruleSelector = new WeightedSelector(this.ruleset[category]);
+            var dict = __assign(__assign({}, this.ruleset[category]), { _weight: undefined });
+            if (Object.keys(dict).length === 1) {
+                dict = __assign((_a = {}, _a[category] = 0, _a), dict);
+            }
+            ruleSelector = new WeightedSelector(dict);
         }
         else {
             throw new Error("Unknown category '" + category + "'.");
@@ -848,6 +876,14 @@ var SoundSystem = (function () {
         }
         return wordList;
     };
+    SoundSystem.prototype.randomCategory = function () {
+        var weightedCats = {};
+        for (var cat in this.ruleset) {
+            weightedCats[cat] = this.ruleset[cat]._weight;
+        }
+        var catSelector = new WeightedSelector(weightedCats);
+        return catSelector.select();
+    };
     return SoundSystem;
 }());
 ;
@@ -860,11 +896,11 @@ var textify = function (phsys, sentences) {
         if (sent >= 7) {
             comma = Math.floor(Math.random() * (sent - 1));
         }
-        text += phsys.generate(1, false, true, randomKey(phsys.ruleset))[0]
+        text += phsys.generate(1, false, true, phsys.randomCategory())[0]
             .toString()
             .replace(/./u, function (el) { return el.toUpperCase(); });
         for (var j = 0; j < sent; ++j) {
-            text += " " + phsys.generate(1, false, true, randomKey(phsys.ruleset))[0];
+            text += " " + phsys.generate(1, false, true, phsys.randomCategory())[0];
             if (j === comma) {
                 text += ',';
             }
@@ -878,9 +914,4 @@ var textify = function (phsys, sentences) {
     }
     text = wrap(text.trim());
     return text;
-};
-var randomKey = function (obj) {
-    var keys = Object.keys(obj);
-    var choice = Math.floor(keys.length * Math.random());
-    return keys[choice];
 };

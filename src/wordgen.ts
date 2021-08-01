@@ -82,6 +82,11 @@ const ruleToDict = (rule: string) => {
     return d;
 };
 
+interface Rule {
+    _weight: number,
+    [key: string]: number
+}
+
 class SoundSystem {
     private phonemeset: { [key: string]: WeightedSelector } = {};
     private filters: [string, string][] = [];
@@ -89,7 +94,7 @@ class SoundSystem {
     randpercent = 10;
     useAssim = false;
     useCoronalMetathesis = false;
-    ruleset: { [key: string]: { [key: string]: number } } = {};
+    ruleset: { [key: string]: Rule } = {};
     sorter: ArbSorter | null = null;
     
     private runRule(rule: string) {
@@ -164,7 +169,15 @@ class SoundSystem {
     }
     
     addRule(rule: string, weight: number, cat: string = 'words:') {
-        this.ruleset[cat] = { ...this.ruleset[cat], [rule]: weight};
+        if (this.ruleset[cat]) {
+            this.ruleset[cat]![rule] = weight;
+        } else {
+            throw new Error(`Uninitialized category '${cat}' referenced`)
+        }
+    }
+    
+    addCategory(name: string, weight: number) {
+        this.ruleset[name] = { _weight: weight };
     }
     
     addFilter(pat: string, repl: string) {
@@ -207,7 +220,11 @@ class SoundSystem {
         let ruleSelector: WeightedSelector;
         
         if (this.ruleset[category]) {
-            ruleSelector = new WeightedSelector(this.ruleset[category]!);
+            let dict = { ...this.ruleset[category]!, _weight: undefined };
+            if (Object.keys(dict).length === 1) {
+                dict = { [category]: 0, ...dict };
+            }
+            ruleSelector = new WeightedSelector(dict);
         } else {
             throw new Error(`Unknown category '${category}'.`);
         }
@@ -239,6 +256,15 @@ class SoundSystem {
         }
         return wordList;
     }
+    
+    randomCategory() {
+        let weightedCats: { [key: string]: number } = {};
+        for (let cat in this.ruleset) {
+            weightedCats[cat] = this.ruleset[cat]!._weight;
+        }
+        let catSelector = new WeightedSelector(weightedCats);
+        return catSelector.select();
+    }
 };
 
 const textify = (phsys: SoundSystem, sentences = 25) => {
@@ -254,7 +280,7 @@ const textify = (phsys: SoundSystem, sentences = 25) => {
             1,
             false,
             true,
-            randomKey(phsys.ruleset)
+            phsys.randomCategory()
         )[0]!
             .toString()
             .replace(/./u, el => el.toUpperCase());
@@ -264,7 +290,7 @@ const textify = (phsys: SoundSystem, sentences = 25) => {
                 1,
                 false,
                 true,
-                randomKey(phsys.ruleset)
+                phsys.randomCategory()
             )[0]}`;
             if (j === comma) {
                 text += ',';
@@ -279,12 +305,6 @@ const textify = (phsys: SoundSystem, sentences = 25) => {
     }
     text = wrap(text.trim());
     return text;
-};
-
-const randomKey = (obj: { [key: string]: any }) => {
-    let keys = Object.keys(obj);
-    let choice = Math.floor(keys.length * Math.random());
-    return keys[choice]!;
 };
 
 export { SoundSystem, textify, ArbSorter };

@@ -38,7 +38,7 @@ declare class WeightedSelector {
     private sum;
     private n;
     constructor(dic: {
-        [key: string]: number;
+        [key: string]: number | undefined;
     });
     select(): string;
 }
@@ -72,6 +72,10 @@ declare const naturalWeights: (phonemes: string) => string;
 declare const ruleToDict: (rule: string) => {
     [key: string]: number;
 };
+interface Rule {
+    _weight: number;
+    [key: string]: number;
+}
 declare class SoundSystem {
     private phonemeset;
     private filters;
@@ -79,15 +83,14 @@ declare class SoundSystem {
     useAssim: boolean;
     useCoronalMetathesis: boolean;
     ruleset: {
-        [key: string]: {
-            [key: string]: number;
-        };
+        [key: string]: Rule;
     };
     sorter: ArbSorter | null;
     private runRule;
     private applyFilters;
     addPhUnit(name: string, selection: string): void;
     addRule(rule: string, weight: number, cat?: string): void;
+    addCategory(name: string, weight: number): void;
     addFilter(pat: string, repl: string): void;
     addSortOrder(order: string): void;
     useIpa(): void;
@@ -95,8 +98,6 @@ declare class SoundSystem {
     withStdAssimilations(): void;
     withCoronalMetathesis(): void;
     generate(n: number, verbose: boolean, unsorted: boolean, category: string): string[];
+    randomCategory(): string;
 }
 declare const textify: (phsys: SoundSystem, sentences?: number) => string;
-declare const randomKey: (obj: {
-    [key: string]: any;
-}) => string;
