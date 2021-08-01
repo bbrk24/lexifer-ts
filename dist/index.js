@@ -255,7 +255,12 @@ var PhonologyDefinition = (function () {
         if (n === void 0) { n = 1; }
         if (verbose === void 0) { verbose = false; }
         if (unsorted === void 0) { unsorted = false; }
-        return this.soundsys.generate(n, verbose, unsorted);
+        var words = this.soundsys.generate(n, verbose, unsorted);
+        if (words.length < n) {
+            this.stderr(new Error("Could only generate " + words.length + " words "
+                + ("(" + n + " requested)")));
+        }
+        return words;
     };
     PhonologyDefinition.prototype.paragraph = function (sentences) {
         return textify(this.soundsys, sentences);
@@ -265,8 +270,8 @@ var PhonologyDefinition = (function () {
 var data = [
     ['p', 'p', 'voiceless', 'bilabial', 'stop'],
     ['b', 'b', 'voiced', 'bilabial', 'stop'],
-    ['ɸ', 'ph', 'voiceless', 'bilabial', 'fricative'],
-    ['β', 'bh', 'voiced', 'bilabial', 'fricative'],
+    ["\u0278", 'ph', 'voiceless', 'bilabial', 'fricative'],
+    ["\u03B2", 'bh', 'voiced', 'bilabial', 'fricative'],
     ['f', 'f', 'voiceless', 'labiodental', 'fricative'],
     ['v', 'v', 'voiced', 'labiodental', 'fricative'],
     ['m', 'm', 'voiced', 'bilabial', 'nasal'],
@@ -275,45 +280,45 @@ var data = [
     ['d', 'd', 'voiced', 'alveolar', 'stop'],
     ['s', 's', 'voiceless', 'alveolar', 'sibilant'],
     ['z', 'z', 'voiced', 'alveolar', 'sibilant'],
-    ['θ', 'th', 'voiceless', 'alveolar', 'fricative'],
+    ["\u03B8", 'th', 'voiceless', 'alveolar', 'fricative'],
     ['ð', 'dh', 'voiced', 'alveolar', 'fricative'],
-    ['ɬ', 'lh', 'voiceless', 'alveolar', 'lateral fricative'],
-    ['ɮ', 'ldh', 'voiced', 'alveolar', 'lateral fricative'],
-    ['tɬ', 'tl', 'voiceless', 'alveolar', 'lateral affricate'],
-    ['dɮ', 'dl', 'voiced', 'alveolar', 'lateral affricate'],
+    ["\u026C", 'lh', 'voiceless', 'alveolar', 'lateral fricative'],
+    ["\u026E", 'ldh', 'voiced', 'alveolar', 'lateral fricative'],
+    ["t\u026C", 'tl', 'voiceless', 'alveolar', 'lateral affricate'],
+    ["d\u026E", 'dl', 'voiced', 'alveolar', 'lateral affricate'],
     ['ts', 'ts', 'voiceless', 'alveolar', 'affricate'],
     ['dz', 'dz', 'voiced', 'alveolar', 'affricate'],
-    ['ʃ', 'sh', 'voiceless', 'postalveolar', 'sibilant'],
-    ['ʒ', 'zh', 'voiced', 'postalveolar', 'sibilant'],
-    ['tʃ', 'ch', 'voiceless', 'postalveolar', 'affricate'],
-    ['dʒ', 'j', 'voiced', 'postalveolar', 'affricate'],
+    ["\u0283", 'sh', 'voiceless', 'postalveolar', 'sibilant'],
+    ["\u0292", 'zh', 'voiced', 'postalveolar', 'sibilant'],
+    ["t\u0283", 'ch', 'voiceless', 'postalveolar', 'affricate'],
+    ["d\u0292", 'j', 'voiced', 'postalveolar', 'affricate'],
     ['n', 'n', 'voiced', 'alveolar', 'nasal'],
-    ['ʈ', 'rt', 'voiceless', 'retroflex', 'stop'],
-    ['ɖ', 'rd', 'voiced', 'retroflex', 'stop'],
-    ['ʂ', 'sr', 'voiceless', 'retroflex', 'sibilant'],
-    ['ʐ', 'zr', 'voiced', 'retroflex', 'sibilant'],
-    ['ʈʂ', 'rts', 'voiceless', 'retroflex', 'affricate'],
-    ['ɖʐ', 'rdz', 'voiced', 'retroflex', 'affricate'],
-    ['ɳ', 'rn', 'voiced', 'retroflex', 'nasal'],
+    ["\u0288", 'rt', 'voiceless', 'retroflex', 'stop'],
+    ["\u0256", 'rd', 'voiced', 'retroflex', 'stop'],
+    ["\u0282", 'sr', 'voiceless', 'retroflex', 'sibilant'],
+    ["\u0290", 'zr', 'voiced', 'retroflex', 'sibilant'],
+    ["\u0288\u0282", 'rts', 'voiceless', 'retroflex', 'affricate'],
+    ["\u0256\u0290", 'rdz', 'voiced', 'retroflex', 'affricate'],
+    ["\u0273", 'rn', 'voiced', 'retroflex', 'nasal'],
     ['c', 'ky', 'voiceless', 'palatal', 'stop'],
-    ['ɟ', 'gy', 'voiced', 'palatal', 'stop'],
-    ['ɕ', 'sy', 'voiceless', 'palatal', 'sibilant'],
-    ['ʑ', 'zy', 'voiced', 'palatal', 'sibilant'],
+    ["\u025F", 'gy', 'voiced', 'palatal', 'stop'],
+    ["\u0255", 'sy', 'voiceless', 'palatal', 'sibilant'],
+    ["\u0291", 'zy', 'voiced', 'palatal', 'sibilant'],
     ['ç', 'hy', 'voiceless', 'palatal', 'fricative'],
-    ['ʝ', 'yy', 'voiced', 'palatal', 'fricative'],
-    ['tɕ', 'cy', 'voiceless', 'palatal', 'affricate'],
-    ['dʑ', 'jy', 'voiced', 'palatal', 'affricate'],
-    ['ɲ', 'ny', 'voiced', 'palatal', 'nasal'],
+    ["\u029D", 'yy', 'voiced', 'palatal', 'fricative'],
+    ["t\u0255", 'cy', 'voiceless', 'palatal', 'affricate'],
+    ["d\u0291", 'jy', 'voiced', 'palatal', 'affricate'],
+    ["\u0272", 'ny', 'voiced', 'palatal', 'nasal'],
     ['k', 'k', 'voiceless', 'velar', 'stop'],
     ['g', 'g', 'voiced', 'velar', 'stop'],
     ['x', 'kh', 'voiceless', 'velar', 'fricative'],
-    ['ɣ', 'gh', 'voiced', 'velar', 'fricative'],
-    ['ŋ', 'ng', 'voiced', 'velar', 'nasal'],
+    ["\u0263", 'gh', 'voiced', 'velar', 'fricative'],
+    ["\u014B", 'ng', 'voiced', 'velar', 'nasal'],
     ['q', 'q', 'voiceless', 'uvular', 'stop'],
-    ['ɢ', 'gq', 'voiced', 'uvular', 'stop'],
-    ['χ', 'qh', 'voiceless', 'uvular', 'fricative'],
-    ['ʁ', 'gqh', 'voiced', 'uvular', 'fricative'],
-    ['ɴ', 'nq', 'voiced', 'uvular', 'nasal']
+    ["\u0262", 'gq', 'voiced', 'uvular', 'stop'],
+    ["\u03C7", 'qh', 'voiceless', 'uvular', 'fricative'],
+    ["\u0281", 'gqh', 'voiced', 'uvular', 'fricative'],
+    ["\u0274", 'nq', 'voiced', 'uvular', 'nasal']
 ];
 var phdb = [];
 var initialize = function (notation) {
@@ -746,13 +751,16 @@ var SoundSystem = (function () {
         Word.verbose = verbose;
         Word.sorter = this.sorter;
         var ruleSelector = new WeightedSelector(this.ruleset);
-        while (words.size < n) {
+        for (var i = 0; i < n * 2 + 1; ++i) {
             var rule = ruleSelector.select();
             var form = this.runRule(rule);
             var word = new Word(form, rule);
             this.applyFilters(word);
             if (word.toString() !== 'REJECT') {
                 words.add(word.toString());
+                if (words.size === n) {
+                    break;
+                }
             }
         }
         var wordList = Array.from(words);

@@ -204,7 +204,12 @@ class PhonologyDefinition {
     }
     
     generate(n = 1, verbose = false, unsorted = false) {
-        return this.soundsys.generate(n, verbose, unsorted);
+        let words = this.soundsys.generate(n, verbose, unsorted);
+        if (words.length < n) {
+            this.stderr(new Error(`Could only generate ${words.length} words `
+                + `(${n} requested)`));
+        }
+        return words;
     }
     
     paragraph(sentences?: number) {

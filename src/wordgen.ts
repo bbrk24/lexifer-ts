@@ -200,15 +200,22 @@ class SoundSystem {
         Word.verbose = verbose;
         Word.sorter = this.sorter;
         let ruleSelector = new WeightedSelector(this.ruleset);
-        while (words.size < n) {
+        // If they request more words than are possible, we don't want to lock
+        // up. Instead, try up to twice as many times (plus one just in case),
+        // and then cut off after that.
+        for (let i = 0; i < n * 2 + 1; ++i) {
             let rule = ruleSelector.select();
             let form = this.runRule(rule);
             let word = new Word(form, rule);
             this.applyFilters(word);
             if (word.toString() !== 'REJECT') {
                 words.add(word.toString());
+                if (words.size === n) {
+                    break;
+                }
             }
         }
+
         let wordList = Array.from(words);
         if (!(unsorted || verbose)) {
             if (this.sorter) {
