@@ -2,6 +2,7 @@ declare class PhonologyDefinition {
     private macros;
     private letters;
     private phClasses;
+    private categories;
     private stderr;
     private defFileLineNum;
     private defFileArr;
@@ -14,11 +15,13 @@ declare class PhonologyDefinition {
     private addFilter;
     private parseReject;
     private parseWords;
+    private addRules;
     private expandMacros;
     private parseLetters;
     private parseClusterfield;
     private parseClass;
-    generate(n?: number, verbose?: boolean, unsorted?: boolean): string[];
+    private parseCategories;
+    generate(n?: number, verbose?: boolean, unsorted?: boolean, onePerLine?: boolean): string;
     paragraph(sentences?: number): string;
 }
 declare const data: [string, string, string, string, string][];
@@ -71,22 +74,29 @@ declare const ruleToDict: (rule: string) => {
 };
 declare class SoundSystem {
     private phonemeset;
-    private ruleset;
     private filters;
     randpercent: number;
     useAssim: boolean;
     useCoronalMetathesis: boolean;
+    ruleset: {
+        [key: string]: {
+            [key: string]: number;
+        };
+    };
     sorter: ArbSorter | null;
     private runRule;
     private applyFilters;
     addPhUnit(name: string, selection: string): void;
-    addRule(rule: string, weight: number): void;
+    addRule(rule: string, weight: number, cat?: string): void;
     addFilter(pat: string, repl: string): void;
     addSortOrder(order: string): void;
     useIpa(): void;
     useDigraphs(): void;
     withStdAssimilations(): void;
     withCoronalMetathesis(): void;
-    generate(n: number, verbose: boolean, unsorted: boolean): string[];
+    generate(n: number, verbose: boolean, unsorted: boolean, category: string): string[];
 }
 declare const textify: (phsys: SoundSystem, sentences?: number) => string;
+declare const randomKey: (obj: {
+    [key: string]: any;
+}) => string;

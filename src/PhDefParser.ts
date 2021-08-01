@@ -4,6 +4,7 @@ class PhonologyDefinition {
     private macros: [RegExp, string][] = [];
     private letters: string[] = [];
     private phClasses: string[] = [];
+    private categories: string[] = [];
     
     private stderr: (inp: string | Error) => void;
     
@@ -53,6 +54,8 @@ class PhonologyDefinition {
                 this.parseWords(line.substring(6).trim());
             } else if (line.startsWith('letters:')) {
                 this.parseLetters(line.substring(8).trim());
+            } else if (line.startsWith('categories:')) {
+                this.parseCategories(line.substring(11).trim());
             } else if (line[0] === '%') {
                 this.parseClusterfield();
             } else if (line.includes('=')) {
@@ -128,12 +131,24 @@ class PhonologyDefinition {
     }
     
     private parseWords(line: string) {
+        if (this.categories.length > 0 && this.categories[0] !== 'words:') {
+            throw new Error("Both 'words:' and 'categories:' found. Please "
+                + 'only use one.');
+        }
+        this.categories = ['words:'];
+        
+        this.addRules(line);
+    }
+    
+    private addRules(line: string, cat?: string) {
         line = this.expandMacros(line);
-        let splitLine = line.split(/\s+/gu);
-        for (let i = 0; i < splitLine.length; ++i) {
+        let rules = line.split(/\s+/gu);
+        
+        for (let i = 0; i < rules.length; ++i) {
             this.soundsys.addRule(
-                splitLine[i]!,
-                10.0 / Math.pow((i + 1), 0.9)
+                rules[i]!,
+                10.0 / Math.pow((i + 1), 0.9),
+                cat
             );
         }
     }
@@ -197,19 +212,48 @@ class PhonologyDefinition {
                 new RegExp(`\\${sclass}`, 'gu'),
                 values
             ]);
-        } else {
+        } else if (sclass.length === 1) {
             this.phClasses = this.phClasses.concat(values.split(/\s+/gu));
             this.soundsys.addPhUnit(sclass, values);
+        } else if (this.categories.includes(sclass)) {
+            this.addRules(values, sclass);
+        } else {
+            throw new Error(`Unknown category '${sclass}'.`);
         }
     }
     
-    generate(n = 1, verbose = false, unsorted = false) {
-        let words = this.soundsys.generate(n, verbose, unsorted);
-        if (words.length < n) {
-            this.stderr(new Error(`Could only generate ${words.length} words `
-                + `(${n} requested)`));
+    private parseCategories(line: string) {
+        if (this.categories.includes('words:')) {
+            throw new Error("Both 'words:' and 'categories:' found. Please "
+                + 'only use one.');
         }
-        return words;
+        
+        let splitLine = line.split(/\s+/gu);
+        for (let cat of splitLine) {
+            this.categories.push(cat);
+        }
+    }
+    
+    generate(n = 1, verbose = false, unsorted = false, onePerLine = false) {
+        let words = '';
+        let wordList: string[] = [];
+        
+        for (let cat of this.categories) {
+            wordList = this.soundsys.generate(n, verbose, unsorted, cat);
+            if (wordList.length < n) {
+                this.stderr(`Could only generate ${wordList.length} word`
+                    + `${wordList.length === 1 ? '' : 's'} `
+                    + (cat === 'words:' ? '' : `of category '${cat}' `)
+                    + `(${n} requested)`);
+            }
+            
+            if (cat !== 'words:') {
+                words += `\n\n${cat}:\n`
+            }
+            words += wordList.join(onePerLine || verbose ? '\n' : ' ');
+        }
+        
+        return words.trim();
     }
     
     paragraph(sentences?: number) {

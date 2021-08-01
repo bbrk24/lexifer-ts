@@ -28,12 +28,7 @@ const main = (
                 }
             }
             
-            let words = pd.generate(num, verbose, unsorted);
-            if (onePerLine || verbose) {
-                ans = words.join('\n');
-            } else {
-                ans = wrap(words.join(' '));
-            }
+            ans = pd.generate(num, verbose, unsorted, onePerLine);
         } else {
             // paragraph mode
             if (verbose) {

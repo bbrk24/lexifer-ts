@@ -84,12 +84,12 @@ const ruleToDict = (rule: string) => {
 
 class SoundSystem {
     private phonemeset: { [key: string]: WeightedSelector } = {};
-    private ruleset: { [key: string]: number } = {};
     private filters: [string, string][] = [];
     
     randpercent = 10;
     useAssim = false;
     useCoronalMetathesis = false;
+    ruleset: { [key: string]: { [key: string]: number } } = {};
     sorter: ArbSorter | null = null;
     
     private runRule(rule: string) {
@@ -163,8 +163,8 @@ class SoundSystem {
         this.phonemeset[name] = new WeightedSelector(ruleToDict(selection));
     }
     
-    addRule(rule: string, weight: number) {
-        this.ruleset[rule] = weight;
+    addRule(rule: string, weight: number, cat: string = 'words:') {
+        this.ruleset[cat] = { ...this.ruleset[cat], [rule]: weight};
     }
     
     addFilter(pat: string, repl: string) {
@@ -195,14 +195,27 @@ class SoundSystem {
         this.useCoronalMetathesis = true;
     }
     
-    generate(n: number, verbose: boolean, unsorted: boolean) {
+    generate(
+        n: number,
+        verbose: boolean,
+        unsorted: boolean,
+        category: string
+    ) {
         let words = new Set<string>();
         Word.verbose = verbose;
         Word.sorter = this.sorter;
-        let ruleSelector = new WeightedSelector(this.ruleset);
+        let ruleSelector: WeightedSelector;
+        
+        if (this.ruleset[category]) {
+            ruleSelector = new WeightedSelector(this.ruleset[category]!);
+        } else {
+            throw new Error(`Unknown category '${category}'.`);
+        }
+        
         // If they request more words than are possible, we don't want to lock
         // up. Instead, try up to twice as many times (plus one just in case),
         // and then cut off after that.
+        // This doesn't guarantee that it's impossible to generate more.
         for (let i = 0; i < n * 2 + 1; ++i) {
             let rule = ruleSelector.select();
             let form = this.runRule(rule);
@@ -237,12 +250,22 @@ const textify = (phsys: SoundSystem, sentences = 25) => {
             comma = Math.floor(Math.random() * (sent - 1));
         }
         
-        text += phsys.generate(1, false, true)[0]!
+        text += phsys.generate(
+            1,
+            false,
+            true,
+            randomKey(phsys.ruleset)
+        )[0]!
             .toString()
             .replace(/./u, el => el.toUpperCase());
         
         for (let j = 0; j < sent; ++j) {
-            text += ` ${phsys.generate(1, false, true)[0]}`;
+            text += ` ${phsys.generate(
+                1,
+                false,
+                true,
+                randomKey(phsys.ruleset)
+            )[0]}`;
             if (j === comma) {
                 text += ',';
             }
@@ -256,6 +279,12 @@ const textify = (phsys: SoundSystem, sentences = 25) => {
     }
     text = wrap(text.trim());
     return text;
+};
+
+const randomKey = (obj: { [key: string]: any }) => {
+    let keys = Object.keys(obj);
+    let choice = Math.floor(keys.length * Math.random());
+    return keys[choice]!;
 };
 
 export { SoundSystem, textify, ArbSorter };

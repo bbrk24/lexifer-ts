@@ -1,4 +1,15 @@
 "use strict";
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
 var __read = (this && this.__read) || function (o, n) {
     var m = typeof Symbol === "function" && o[Symbol.iterator];
     if (!m) return o;
@@ -36,6 +47,7 @@ var PhonologyDefinition = (function () {
         this.macros = [];
         this.letters = [];
         this.phClasses = [];
+        this.categories = [];
         this.defFileLineNum = 0;
         if (defFile.trim() === '') {
             throw new Error('Please include a definition.');
@@ -70,6 +82,9 @@ var PhonologyDefinition = (function () {
             }
             else if (line.startsWith('letters:')) {
                 this.parseLetters(line.substring(8).trim());
+            }
+            else if (line.startsWith('categories:')) {
+                this.parseCategories(line.substring(11).trim());
             }
             else if (line[0] === '%') {
                 this.parseClusterfield();
@@ -173,10 +188,18 @@ var PhonologyDefinition = (function () {
         }
     };
     PhonologyDefinition.prototype.parseWords = function (line) {
+        if (this.categories.length > 0 && this.categories[0] !== 'words:') {
+            throw new Error("Both 'words:' and 'categories:' found. Please "
+                + 'only use one.');
+        }
+        this.categories = ['words:'];
+        this.addRules(line);
+    };
+    PhonologyDefinition.prototype.addRules = function (line, cat) {
         line = this.expandMacros(line);
-        var splitLine = line.split(/\s+/gu);
-        for (var i = 0; i < splitLine.length; ++i) {
-            this.soundsys.addRule(splitLine[i], 10.0 / Math.pow((i + 1), 0.9));
+        var rules = line.split(/\s+/gu);
+        for (var i = 0; i < rules.length; ++i) {
+            this.soundsys.addRule(rules[i], 10.0 / Math.pow((i + 1), 0.9), cat);
         }
     };
     PhonologyDefinition.prototype.expandMacros = function (word) {
@@ -246,21 +269,70 @@ var PhonologyDefinition = (function () {
                 values
             ]);
         }
-        else {
+        else if (sclass.length === 1) {
             this.phClasses = this.phClasses.concat(values.split(/\s+/gu));
             this.soundsys.addPhUnit(sclass, values);
         }
+        else if (this.categories.includes(sclass)) {
+            this.addRules(values, sclass);
+        }
+        else {
+            throw new Error("Unknown category '" + sclass + "'.");
+        }
     };
-    PhonologyDefinition.prototype.generate = function (n, verbose, unsorted) {
+    PhonologyDefinition.prototype.parseCategories = function (line) {
+        var e_5, _a;
+        if (this.categories.includes('words:')) {
+            throw new Error("Both 'words:' and 'categories:' found. Please "
+                + 'only use one.');
+        }
+        var splitLine = line.split(/\s+/gu);
+        try {
+            for (var splitLine_1 = __values(splitLine), splitLine_1_1 = splitLine_1.next(); !splitLine_1_1.done; splitLine_1_1 = splitLine_1.next()) {
+                var cat = splitLine_1_1.value;
+                this.categories.push(cat);
+            }
+        }
+        catch (e_5_1) { e_5 = { error: e_5_1 }; }
+        finally {
+            try {
+                if (splitLine_1_1 && !splitLine_1_1.done && (_a = splitLine_1.return)) _a.call(splitLine_1);
+            }
+            finally { if (e_5) throw e_5.error; }
+        }
+    };
+    PhonologyDefinition.prototype.generate = function (n, verbose, unsorted, onePerLine) {
+        var e_6, _a;
         if (n === void 0) { n = 1; }
         if (verbose === void 0) { verbose = false; }
         if (unsorted === void 0) { unsorted = false; }
-        var words = this.soundsys.generate(n, verbose, unsorted);
-        if (words.length < n) {
-            this.stderr(new Error("Could only generate " + words.length + " words "
-                + ("(" + n + " requested)")));
+        if (onePerLine === void 0) { onePerLine = false; }
+        var words = '';
+        var wordList = [];
+        try {
+            for (var _b = __values(this.categories), _c = _b.next(); !_c.done; _c = _b.next()) {
+                var cat = _c.value;
+                wordList = this.soundsys.generate(n, verbose, unsorted, cat);
+                if (wordList.length < n) {
+                    this.stderr("Could only generate " + wordList.length + " word"
+                        + ((wordList.length === 1 ? '' : 's') + " ")
+                        + (cat === 'words:' ? '' : "of category '" + cat + "' ")
+                        + ("(" + n + " requested)"));
+                }
+                if (cat !== 'words:') {
+                    words += "\n\n" + cat + ":\n";
+                }
+                words += wordList.join(onePerLine || verbose ? '\n' : ' ');
+            }
         }
-        return words;
+        catch (e_6_1) { e_6 = { error: e_6_1 }; }
+        finally {
+            try {
+                if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
+            }
+            finally { if (e_6) throw e_6.error; }
+        }
+        return words.trim();
     };
     PhonologyDefinition.prototype.paragraph = function (sentences) {
         return textify(this.soundsys, sentences);
@@ -322,7 +394,7 @@ var data = [
 ];
 var phdb = [];
 var initialize = function (notation) {
-    var e_5, _a, e_6, _b;
+    var e_7, _a, e_8, _b;
     if (notation === void 0) { notation = 'ipa'; }
     if (notation === 'ipa') {
         try {
@@ -331,12 +403,12 @@ var initialize = function (notation) {
                 phdb.push([row[0], row[2], row[3], row[4]]);
             }
         }
-        catch (e_5_1) { e_5 = { error: e_5_1 }; }
+        catch (e_7_1) { e_7 = { error: e_7_1 }; }
         finally {
             try {
                 if (data_1_1 && !data_1_1.done && (_a = data_1.return)) _a.call(data_1);
             }
-            finally { if (e_5) throw e_5.error; }
+            finally { if (e_7) throw e_7.error; }
         }
     }
     else if (notation === 'digraph') {
@@ -346,12 +418,12 @@ var initialize = function (notation) {
                 phdb.push([row[1], row[2], row[3], row[4]]);
             }
         }
-        catch (e_6_1) { e_6 = { error: e_6_1 }; }
+        catch (e_8_1) { e_8 = { error: e_8_1 }; }
         finally {
             try {
                 if (data_2_1 && !data_2_1.done && (_b = data_2.return)) _b.call(data_2);
             }
-            finally { if (e_6) throw e_6.error; }
+            finally { if (e_8) throw e_8.error; }
         }
     }
     else {
@@ -461,13 +533,7 @@ var main = function (file, num, verbose, unsorted, onePerLine, stderr) {
                         + 'mode.');
                 }
             }
-            var words = pd.generate(num, verbose, unsorted);
-            if (onePerLine || verbose) {
-                ans = words.join('\n');
-            }
-            else {
-                ans = wrap(words.join(' '));
-            }
+            ans = pd.generate(num, verbose, unsorted, onePerLine);
         }
         else {
             if (verbose) {
@@ -510,7 +576,7 @@ var Word = (function () {
         }
     };
     Word.prototype.applyFilters = function (filters) {
-        var e_7, _a;
+        var e_9, _a;
         try {
             for (var filters_1 = __values(filters), filters_1_1 = filters_1.next(); !filters_1_1.done; filters_1_1 = filters_1.next()) {
                 var filt = filters_1_1.value;
@@ -520,12 +586,12 @@ var Word = (function () {
                 }
             }
         }
-        catch (e_7_1) { e_7 = { error: e_7_1 }; }
+        catch (e_9_1) { e_9 = { error: e_9_1 }; }
         finally {
             try {
                 if (filters_1_1 && !filters_1_1.done && (_a = filters_1.return)) _a.call(filters_1);
             }
-            finally { if (e_7) throw e_7.error; }
+            finally { if (e_9) throw e_9.error; }
         }
     };
     Word.prototype.applyAssimilations = function () {
@@ -623,7 +689,7 @@ var naturalWeights = function (phonemes) {
     return temp;
 };
 var ruleToDict = function (rule) {
-    var e_8, _a;
+    var e_10, _a;
     var items = rule.trim().split(/\s+/gu);
     var d = {};
     try {
@@ -636,23 +702,23 @@ var ruleToDict = function (rule) {
             d[value] = parseFloat(weight);
         }
     }
-    catch (e_8_1) { e_8 = { error: e_8_1 }; }
+    catch (e_10_1) { e_10 = { error: e_10_1 }; }
     finally {
         try {
             if (items_1_1 && !items_1_1.done && (_a = items_1.return)) _a.call(items_1);
         }
-        finally { if (e_8) throw e_8.error; }
+        finally { if (e_10) throw e_10.error; }
     }
     return d;
 };
 var SoundSystem = (function () {
     function SoundSystem() {
         this.phonemeset = {};
-        this.ruleset = {};
         this.filters = [];
         this.randpercent = 10;
         this.useAssim = false;
         this.useCoronalMetathesis = false;
+        this.ruleset = {};
         this.sorter = null;
     }
     SoundSystem.prototype.runRule = function (rule) {
@@ -720,8 +786,10 @@ var SoundSystem = (function () {
         }
         this.phonemeset[name] = new WeightedSelector(ruleToDict(selection));
     };
-    SoundSystem.prototype.addRule = function (rule, weight) {
-        this.ruleset[rule] = weight;
+    SoundSystem.prototype.addRule = function (rule, weight, cat) {
+        var _a;
+        if (cat === void 0) { cat = 'words:'; }
+        this.ruleset[cat] = __assign(__assign({}, this.ruleset[cat]), (_a = {}, _a[rule] = weight, _a));
     };
     SoundSystem.prototype.addFilter = function (pat, repl) {
         if (repl === '!') {
@@ -746,11 +814,17 @@ var SoundSystem = (function () {
     SoundSystem.prototype.withCoronalMetathesis = function () {
         this.useCoronalMetathesis = true;
     };
-    SoundSystem.prototype.generate = function (n, verbose, unsorted) {
+    SoundSystem.prototype.generate = function (n, verbose, unsorted, category) {
         var words = new Set();
         Word.verbose = verbose;
         Word.sorter = this.sorter;
-        var ruleSelector = new WeightedSelector(this.ruleset);
+        var ruleSelector;
+        if (this.ruleset[category]) {
+            ruleSelector = new WeightedSelector(this.ruleset[category]);
+        }
+        else {
+            throw new Error("Unknown category '" + category + "'.");
+        }
         for (var i = 0; i < n * 2 + 1; ++i) {
             var rule = ruleSelector.select();
             var form = this.runRule(rule);
@@ -786,11 +860,11 @@ var textify = function (phsys, sentences) {
         if (sent >= 7) {
             comma = Math.floor(Math.random() * (sent - 1));
         }
-        text += phsys.generate(1, false, true)[0]
+        text += phsys.generate(1, false, true, randomKey(phsys.ruleset))[0]
             .toString()
             .replace(/./u, function (el) { return el.toUpperCase(); });
         for (var j = 0; j < sent; ++j) {
-            text += " " + phsys.generate(1, false, true)[0];
+            text += " " + phsys.generate(1, false, true, randomKey(phsys.ruleset))[0];
             if (j === comma) {
                 text += ',';
             }
@@ -804,4 +878,9 @@ var textify = function (phsys, sentences) {
     }
     text = wrap(text.trim());
     return text;
+};
+var randomKey = function (obj) {
+    var keys = Object.keys(obj);
+    var choice = Math.floor(keys.length * Math.random());
+    return keys[choice];
 };
