@@ -196,10 +196,27 @@ var PhonologyDefinition = (function () {
         this.addRules(line);
     };
     PhonologyDefinition.prototype.addRules = function (line, cat) {
-        line = this.expandMacros(line);
+        var _a;
         var rules = line.split(/\s+/gu);
+        var weighted = line.includes(':');
         for (var i = 0; i < rules.length; ++i) {
-            this.soundsys.addRule(rules[i], 10.0 / Math.pow((i + 1), 0.9), cat);
+            var rule = void 0;
+            var weight = void 0;
+            if (weighted) {
+                var weightStr = void 0;
+                _a = __read(rules[i].split(':'), 2), rule = _a[0], weightStr = _a[1];
+                weight = parseFloat(weightStr !== null && weightStr !== void 0 ? weightStr : 'NaN');
+                if (isNaN(weight)) {
+                    throw new Error("'" + rules[i] + "' is not a valud pattern and"
+                        + 'weight');
+                }
+            }
+            else {
+                rule = rules[i];
+                weight = 10.0 / Math.pow((i + 1), 0.9);
+            }
+            rule = this.expandMacros(rule);
+            this.soundsys.addRule(rule, weight, cat);
         }
     };
     PhonologyDefinition.prototype.expandMacros = function (word) {

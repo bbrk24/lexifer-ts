@@ -22,7 +22,7 @@ class PhonologyDefinition {
         if (defFile.trim() === '') {
             throw new Error('Please include a definition.');
         }
-
+        
         this.soundsys = soundsys;
         this.defFileArr = defFile.split('\n');
         this.stderr = stderr;
@@ -141,15 +141,30 @@ class PhonologyDefinition {
     }
     
     private addRules(line: string, cat?: string) {
-        line = this.expandMacros(line);
         let rules = line.split(/\s+/gu);
+        let weighted = line.includes(':');
         
         for (let i = 0; i < rules.length; ++i) {
-            this.soundsys.addRule(
-                rules[i]!,
-                10.0 / Math.pow((i + 1), 0.9),
-                cat
-            );
+            let rule: string;
+            let weight: number;
+            
+            if (weighted) {
+                let weightStr: string | undefined;
+                [rule, weightStr] = <[string, string | undefined]>
+                    rules[i]!.split(':');
+                weight = parseFloat(weightStr ?? 'NaN');
+                if (isNaN(weight)) {
+                    throw new Error(`'${rules[i]}' is not a valud pattern and`
+                        + 'weight');
+                }
+            } else {
+                rule = rules[i]!;
+                weight = 10.0 / Math.pow((i + 1), 0.9);
+            }
+            
+            rule = this.expandMacros(rule);
+            
+            this.soundsys.addRule(rule, weight, cat);
         }
     }
     
