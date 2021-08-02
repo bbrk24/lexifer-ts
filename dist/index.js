@@ -61,7 +61,7 @@ var PhonologyDefinition = (function () {
     PhonologyDefinition.prototype.parse = function () {
         for (; this.defFileLineNum < this.defFileArr.length; ++this.defFileLineNum) {
             var line = this.defFileArr[this.defFileLineNum];
-            line = line.replace(/#.*/, '').trim();
+            line = line.replace(/#.*/u, '').trim();
             if (line === '') {
                 continue;
             }
@@ -191,6 +191,9 @@ var PhonologyDefinition = (function () {
         if (this.categories.length > 0 && this.categories[0] !== 'words:') {
             throw new Error("both 'words:' and 'categories:' found. Please "
                 + 'only use one.');
+        }
+        else if (this.categories.length === 0) {
+            this.soundsys.addCategory('words:', 1);
         }
         this.categories = ['words:'];
         this.addRules(line);
@@ -460,38 +463,6 @@ var initialize = function (notation) {
         throw new Error("Unknown notation: " + notation);
     }
 };
-var nasalAssimilate = function (ph1, ph2) {
-    var data1 = phdb.filter(function (el) { return el[0] === ph1; })[0];
-    if (data1 && data1[3] === 'nasal') {
-        var data2_1 = phdb.filter(function (el) { return el[0] === ph2; })[0];
-        if (data2_1) {
-            var result = phdb.filter(function (el) {
-                return el[2] === data2_1[2] && el[3] === 'nasal';
-            })[0];
-            if (result && result[0]) {
-                return result[0];
-            }
-        }
-    }
-    return ph1;
-};
-var voiceAssimilate = function (ph1, ph2) {
-    var data2 = phdb.filter(function (el) { return el[0] === ph2; })[0];
-    if (data2 && data2[3] !== 'nasal') {
-        var data1_1 = phdb.filter(function (el) { return el[0] === ph1; })[0];
-        if (data1_1) {
-            var result = phdb.filter(function (el) {
-                return el[1] === data2[1]
-                    && el[2] === data1_1[2]
-                    && el[3] === data1_1[3];
-            })[0];
-            if (result && result[0]) {
-                return result[0];
-            }
-        }
-    }
-    return ph1;
-};
 var coronalMetathesis = function (ph1, ph2) {
     var data1 = phdb.filter(function (el) { return el[0] === ph1; })[0];
     if (data1 && data1[2] === 'alveolar') {
@@ -506,6 +477,38 @@ var coronalMetathesis = function (ph1, ph2) {
     return [ph1, ph2];
 };
 var applyAssimilations = function (word) {
+    var nasalAssimilate = function (ph1, ph2) {
+        var data1 = phdb.filter(function (el) { return el[0] === ph1; })[0];
+        if (data1 && data1[3] === 'nasal') {
+            var data2_1 = phdb.filter(function (el) { return el[0] === ph2; })[0];
+            if (data2_1) {
+                var result = phdb.filter(function (el) {
+                    return el[2] === data2_1[2] && el[3] === 'nasal';
+                })[0];
+                if (result && result[0]) {
+                    return result[0];
+                }
+            }
+        }
+        return ph1;
+    };
+    var voiceAssimilate = function (ph1, ph2) {
+        var data2 = phdb.filter(function (el) { return el[0] === ph2; })[0];
+        if (data2 && data2[3] !== 'nasal') {
+            var data1_1 = phdb.filter(function (el) { return el[0] === ph1; })[0];
+            if (data1_1) {
+                var result = phdb.filter(function (el) {
+                    return el[1] === data2[1]
+                        && el[2] === data1_1[2]
+                        && el[3] === data1_1[3];
+                })[0];
+                if (result && result[0]) {
+                    return result[0];
+                }
+            }
+        }
+        return ph1;
+    };
     var newArr = __spreadArray([], __read(word));
     for (var i = 0; i < word.length - 1; ++i) {
         newArr[i] = voiceAssimilate(word[i], word[i + 1]);
@@ -702,48 +705,6 @@ var ArbSorter = (function () {
     };
     return ArbSorter;
 }());
-var jitter = function (v, percent) {
-    if (percent === void 0) { percent = 10; }
-    var move = v + percent / 100;
-    return v + move * (Math.random() - 0.5);
-};
-var naturalWeights = function (phonemes) {
-    var p = phonemes.split(/\s+/gu);
-    var weighted = {};
-    var n = p.length;
-    for (var i = 0; i < n; ++i) {
-        weighted[p[i]] = jitter((Math.log(n + 1) - Math.log(i + 1)) / n);
-    }
-    var temp = '';
-    for (var k in weighted) {
-        temp += k + ":" + weighted[k] + " ";
-    }
-    temp.trim();
-    return temp;
-};
-var ruleToDict = function (rule) {
-    var e_10, _a;
-    var items = rule.trim().split(/\s+/gu);
-    var d = {};
-    try {
-        for (var items_1 = __values(items), items_1_1 = items_1.next(); !items_1_1.done; items_1_1 = items_1.next()) {
-            var item = items_1_1.value;
-            if (!item.includes(':')) {
-                throw new Error(item + " is not a valid phoneme and weight.");
-            }
-            var _b = __read(item.split(':'), 2), value = _b[0], weight = _b[1];
-            d[value] = parseFloat(weight);
-        }
-    }
-    catch (e_10_1) { e_10 = { error: e_10_1 }; }
-    finally {
-        try {
-            if (items_1_1 && !items_1_1.done && (_a = items_1.return)) _a.call(items_1);
-        }
-        finally { if (e_10) throw e_10.error; }
-    }
-    return d;
-};
 var SoundSystem = (function () {
     function SoundSystem() {
         this.phonemeset = {};
@@ -814,6 +775,49 @@ var SoundSystem = (function () {
         return word;
     };
     SoundSystem.prototype.addPhUnit = function (name, selection) {
+        var naturalWeights = function (phonemes) {
+            var jitter = function (v, percent) {
+                if (percent === void 0) { percent = 10; }
+                var move = v + percent / 100;
+                return v + move * (Math.random() - 0.5);
+            };
+            var p = phonemes.split(/\s+/gu);
+            var weighted = {};
+            var n = p.length;
+            for (var i = 0; i < n; ++i) {
+                weighted[p[i]] = jitter((Math.log(n + 1) - Math.log(i + 1)) / n);
+            }
+            var temp = '';
+            for (var k in weighted) {
+                temp += k + ":" + weighted[k] + " ";
+            }
+            temp.trim();
+            return temp;
+        };
+        var ruleToDict = function (rule) {
+            var e_10, _a;
+            var items = rule.trim().split(/\s+/gu);
+            var d = {};
+            try {
+                for (var items_1 = __values(items), items_1_1 = items_1.next(); !items_1_1.done; items_1_1 = items_1.next()) {
+                    var item = items_1_1.value;
+                    if (!item.includes(':')) {
+                        throw new Error(item + " is not a valid phoneme and "
+                            + 'weight.');
+                    }
+                    var _b = __read(item.split(':'), 2), value = _b[0], weight = _b[1];
+                    d[value] = parseFloat(weight);
+                }
+            }
+            catch (e_10_1) { e_10 = { error: e_10_1 }; }
+            finally {
+                try {
+                    if (items_1_1 && !items_1_1.done && (_a = items_1.return)) _a.call(items_1);
+                }
+                finally { if (e_10) throw e_10.error; }
+            }
+            return d;
+        };
         if (!selection.includes(':')) {
             selection = naturalWeights(selection);
         }

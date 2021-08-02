@@ -37,7 +37,7 @@ class PhonologyDefinition {
         ) {
             let line = this.defFileArr[this.defFileLineNum]!;
             
-            line = line.replace(/#.*/, '').trim();
+            line = line.replace(/#.*/u, '').trim();
             if (line === '') {
                 continue;
             }
@@ -134,6 +134,8 @@ class PhonologyDefinition {
         if (this.categories.length > 0 && this.categories[0] !== 'words:') {
             throw new Error("both 'words:' and 'categories:' found. Please "
                 + 'only use one.');
+        } else if (this.categories.length === 0) {
+            this.soundsys.addCategory('words:', 1);
         }
         this.categories = ['words:'];
         

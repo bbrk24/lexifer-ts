@@ -27,8 +27,6 @@ declare class PhonologyDefinition {
 declare const data: [string, string, string, string, string][];
 declare let phdb: [string, string, string, string][];
 declare const initialize: (notation?: string) => void;
-declare const nasalAssimilate: (ph1: string, ph2: string) => string;
-declare const voiceAssimilate: (ph1: string, ph2: string) => string;
 declare const coronalMetathesis: (ph1: string, ph2: string) => [string, string];
 declare const applyAssimilations: (word: string[]) => string[];
 declare const applyCoronalMetathesis: (word: string[]) => string[];
@@ -67,11 +65,6 @@ declare class ArbSorter {
     split(word: string): string[];
     sort(l: string[]): string[];
 }
-declare const jitter: (v: number, percent?: number) => number;
-declare const naturalWeights: (phonemes: string) => string;
-declare const ruleToDict: (rule: string) => {
-    [key: string]: number;
-};
 interface Rule {
     _weight: number;
     [key: string]: number;

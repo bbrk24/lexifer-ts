@@ -49,39 +49,6 @@ class ArbSorter {
     }
 }
 
-const jitter = (v: number, percent = 10) => {
-    let move = v + percent / 100;
-    return v + move * (Math.random() - 0.5);
-}
-
-const naturalWeights = (phonemes: string) => {
-    let p = phonemes.split(/\s+/gu);
-    let weighted: { [key: string]: number } = {};
-    let n = p.length;
-    for (let i = 0; i < n; ++i) {
-        weighted[p[i]!] = jitter((Math.log(n + 1) - Math.log(i + 1)) / n);
-    }
-    let temp = '';
-    for (let k in weighted) {
-        temp += `${k}:${weighted[k]} `;
-    }
-    temp.trim();
-    return temp;
-};
-
-const ruleToDict = (rule: string) => {
-    let items = rule.trim().split(/\s+/gu);
-    let d: { [key: string]: number } = {};
-    for (let item of items) {
-        if (!item.includes(':')) {
-            throw new Error(`${item} is not a valid phoneme and weight.`);
-        }
-        let [value, weight] = item.split(':');
-        d[value!] = parseFloat(weight!);
-    }
-    return d;
-};
-
 interface Rule {
     _weight: number,
     [key: string]: number
@@ -162,6 +129,42 @@ class SoundSystem {
     }
     
     addPhUnit(name: string, selection: string) {
+        const naturalWeights = (phonemes: string) => {
+            const jitter = (v: number, percent = 10) => {
+                let move = v + percent / 100;
+                return v + move * (Math.random() - 0.5);
+            };
+            
+            let p = phonemes.split(/\s+/gu);
+            let weighted: { [key: string]: number } = {};
+            let n = p.length;
+            for (let i = 0; i < n; ++i) {
+                weighted[p[i]!] = jitter(
+                    (Math.log(n + 1) - Math.log(i + 1)) / n
+                );
+            }
+            let temp = '';
+            for (let k in weighted) {
+                temp += `${k}:${weighted[k]} `;
+            }
+            temp.trim();
+            return temp;
+        };
+        
+        const ruleToDict = (rule: string) => {
+            let items = rule.trim().split(/\s+/gu);
+            let d: { [key: string]: number } = {};
+            for (let item of items) {
+                if (!item.includes(':')) {
+                    throw new Error(`${item} is not a valid phoneme and `
+                        + 'weight.');
+                }
+                let [value, weight] = item.split(':');
+                d[value!] = parseFloat(weight!);
+            }
+            return d;
+        };
+        
         if (!selection.includes(':')) {
             selection = naturalWeights(selection);
         }

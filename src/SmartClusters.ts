@@ -74,40 +74,6 @@ const initialize = (notation = 'ipa') => {
     }
 };
 
-const nasalAssimilate = (ph1: string, ph2: string) => {
-    let data1 = phdb.filter(el => el[0] === ph1)[0];
-    if (data1 && data1[3] === 'nasal') {
-        let data2 = phdb.filter(el => el[0] === ph2)[0];
-        if (data2) {
-            let result = phdb.filter(el =>
-                el[2] === data2![2] && el[3] === 'nasal'
-            )[0];
-            if (result && result[0]) {
-                return result[0];
-            }
-        }
-    }
-    return ph1;
-};
-
-const voiceAssimilate = (ph1: string, ph2: string) => {
-    let data2 = phdb.filter(el => el[0] === ph2)[0];
-    if (data2 && data2[3] !== 'nasal') {
-        let data1 = phdb.filter(el => el[0] === ph1)[0];
-        if (data1) {
-            let result = phdb.filter(el =>
-                el[1] === data2![1]
-                && el[2] === data1![2]
-                && el[3] === data1![3]
-            )[0];
-            if (result && result[0]) {
-                return result[0];
-            }
-        }
-    }
-    return ph1;
-};
-
 const coronalMetathesis = (ph1: string, ph2: string): [string, string] => {
     let data1 = phdb.filter(el => el[0] === ph1)[0];
     if (data1 && data1[2] === 'alveolar') {
@@ -125,6 +91,40 @@ const coronalMetathesis = (ph1: string, ph2: string): [string, string] => {
 };
 
 const applyAssimilations = (word: string[]) => {
+    const nasalAssimilate = (ph1: string, ph2: string) => {
+        let data1 = phdb.filter(el => el[0] === ph1)[0];
+        if (data1 && data1[3] === 'nasal') {
+            let data2 = phdb.filter(el => el[0] === ph2)[0];
+            if (data2) {
+                let result = phdb.filter(el =>
+                    el[2] === data2![2] && el[3] === 'nasal'
+                )[0];
+                if (result && result[0]) {
+                    return result[0];
+                }
+            }
+        }
+        return ph1;
+    };
+    
+    const voiceAssimilate = (ph1: string, ph2: string) => {
+        let data2 = phdb.filter(el => el[0] === ph2)[0];
+        if (data2 && data2[3] !== 'nasal') {
+            let data1 = phdb.filter(el => el[0] === ph1)[0];
+            if (data1) {
+                let result = phdb.filter(el =>
+                    el[1] === data2![1]
+                    && el[2] === data1![2]
+                    && el[3] === data1![3]
+                )[0];
+                if (result && result[0]) {
+                    return result[0];
+                }
+            }
+        }
+        return ph1;
+    };
+    
     let newArr = [...word];
     for (let i = 0; i < word.length - 1; ++i) {
         newArr[i] = voiceAssimilate(word[i]!, word[i + 1]!);
