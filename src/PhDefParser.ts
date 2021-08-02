@@ -61,7 +61,7 @@ class PhonologyDefinition {
             } else if (line.includes('=')) {
                 this.parseClass(line);
             } else {
-                throw new Error(`parsing error at '${line}'`);
+                throw new Error(`parsing error at '${line}'.`);
             }
         }
         if ((this.soundsys.useAssim || this.soundsys.useCoronalMetathesis)
@@ -101,7 +101,7 @@ class PhonologyDefinition {
                     this.soundsys.withCoronalMetathesis();
                     break;
                 default:
-                    throw new Error(`unknown option '${option}'`);
+                    throw new Error(`unknown option '${option}'.`);
             }
         }
     }
@@ -132,7 +132,7 @@ class PhonologyDefinition {
     
     private parseWords(line: string) {
         if (this.categories.length > 0 && this.categories[0] !== 'words:') {
-            throw new Error("Both 'words:' and 'categories:' found. Please "
+            throw new Error("both 'words:' and 'categories:' found. Please "
                 + 'only use one.');
         }
         this.categories = ['words:'];
@@ -154,8 +154,8 @@ class PhonologyDefinition {
                     rules[i]!.split(':');
                 weight = parseFloat(weightStr ?? 'NaN');
                 if (isNaN(weight)) {
-                    throw new Error(`'${rules[i]}' is not a valud pattern and`
-                        + 'weight');
+                    throw new Error(`'${rules[i]}' is not a valid pattern and`
+                        + 'weight.');
                 }
             } else {
                 rule = rules[i]!;
@@ -211,9 +211,9 @@ class PhonologyDefinition {
                     }
                 }
             } else if (row.length > n) {
-                throw new Error(`Cluster field row too long: ${line}`);
+                throw new Error(`cluster field row too long: '${line}'.`);
             } else {
-                throw new Error(`Cluster field row too short: ${line}`);
+                throw new Error(`cluster field row too short: '${line}'.`);
             }
         }
     }
@@ -233,13 +233,13 @@ class PhonologyDefinition {
         } else if (this.categories.includes(sclass)) {
             this.addRules(values, sclass);
         } else {
-            throw new Error(`Unknown category '${sclass}'.`);
+            throw new Error(`unknown category '${sclass}'.`);
         }
     }
     
     private parseCategories(line: string) {
         if (this.categories.includes('words:')) {
-            throw new Error("Both 'words:' and 'categories:' found. Please "
+            throw new Error("both 'words:' and 'categories:' found. Please "
                 + 'only use one.');
         }
         
@@ -273,7 +273,7 @@ class PhonologyDefinition {
                 this.stderr(`Could only generate ${wordList.length} word`
                     + `${wordList.length === 1 ? '' : 's'} `
                     + (cat === 'words:' ? '' : `of category '${cat}' `)
-                    + `(${n} requested)`);
+                    + `(${n} requested).`);
             }
             
             if (cat !== 'words:') {

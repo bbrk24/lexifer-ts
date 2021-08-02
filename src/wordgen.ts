@@ -26,7 +26,7 @@ class ArbSorter {
         let w = this.split(word);
         let arrayedWord = w.map(char => this.ords[char]);
         if (arrayedWord.includes(undefined)) {
-            throw new Error(`Word with unknown letter: '${word}'.\n`
+            throw new Error(`word with unknown letter: '${word}'.\n`
                 + 'A filter or assimilation might have caused this.');
         }
         return <number[]>arrayedWord;
@@ -74,7 +74,7 @@ const ruleToDict = (rule: string) => {
     let d: { [key: string]: number } = {};
     for (let item of items) {
         if (!item.includes(':')) {
-            throw new Error(`${item} is not a valid phoneme and weight`);
+            throw new Error(`${item} is not a valid phoneme and weight.`);
         }
         let [value, weight] = item.split(':');
         d[value!] = parseFloat(weight!);
@@ -129,8 +129,8 @@ class SoundSystem {
                 }
                 
                 if (rule[i] !== prevc) {
-                    throw new Error("Misplaced '!' option: in non-duplicate"
-                        + ` environment: ${rule}`);
+                    throw new Error("misplaced '!' option: in non-duplicate"
+                        + ` environment: '${rule}'.`);
                 }
                 if (rule[i]! in this.phonemeset) {
                     let nph = this.phonemeset[rule[i]!]!.select();
@@ -172,7 +172,7 @@ class SoundSystem {
         if (this.ruleset[cat]) {
             this.ruleset[cat]![rule] = weight;
         } else {
-            throw new Error(`Uninitialized category '${cat}' referenced`)
+            throw new Error(`uninitialized category '${cat}' referenced.`)
         }
     }
     
@@ -226,7 +226,7 @@ class SoundSystem {
             }
             ruleSelector = new WeightedSelector(dict);
         } else {
-            throw new Error(`Unknown category '${category}'.`);
+            throw new Error(`unknown category '${category}'.`);
         }
         
         // If they request more words than are possible, we don't want to lock
@@ -245,7 +245,7 @@ class SoundSystem {
                 }
             }
         }
-
+        
         let wordList = Array.from(words);
         if (!(unsorted || verbose)) {
             if (this.sorter) {

@@ -93,7 +93,7 @@ var PhonologyDefinition = (function () {
                 this.parseClass(line);
             }
             else {
-                throw new Error("parsing error at '" + line + "'");
+                throw new Error("parsing error at '" + line + "'.");
             }
         }
         if ((this.soundsys.useAssim || this.soundsys.useCoronalMetathesis)
@@ -133,7 +133,7 @@ var PhonologyDefinition = (function () {
                         this.soundsys.withCoronalMetathesis();
                         break;
                     default:
-                        throw new Error("unknown option '" + option + "'");
+                        throw new Error("unknown option '" + option + "'.");
                 }
             }
         }
@@ -189,7 +189,7 @@ var PhonologyDefinition = (function () {
     };
     PhonologyDefinition.prototype.parseWords = function (line) {
         if (this.categories.length > 0 && this.categories[0] !== 'words:') {
-            throw new Error("Both 'words:' and 'categories:' found. Please "
+            throw new Error("both 'words:' and 'categories:' found. Please "
                 + 'only use one.');
         }
         this.categories = ['words:'];
@@ -207,8 +207,8 @@ var PhonologyDefinition = (function () {
                 _a = __read(rules[i].split(':'), 2), rule = _a[0], weightStr = _a[1];
                 weight = parseFloat(weightStr !== null && weightStr !== void 0 ? weightStr : 'NaN');
                 if (isNaN(weight)) {
-                    throw new Error("'" + rules[i] + "' is not a valud pattern and"
-                        + 'weight');
+                    throw new Error("'" + rules[i] + "' is not a valid pattern and"
+                        + 'weight.');
                 }
             }
             else {
@@ -269,10 +269,10 @@ var PhonologyDefinition = (function () {
                 }
             }
             else if (row.length > n) {
-                throw new Error("Cluster field row too long: " + line);
+                throw new Error("cluster field row too long: '" + line + "'.");
             }
             else {
-                throw new Error("Cluster field row too short: " + line);
+                throw new Error("cluster field row too short: '" + line + "'.");
             }
         }
     };
@@ -294,13 +294,13 @@ var PhonologyDefinition = (function () {
             this.addRules(values, sclass);
         }
         else {
-            throw new Error("Unknown category '" + sclass + "'.");
+            throw new Error("unknown category '" + sclass + "'.");
         }
     };
     PhonologyDefinition.prototype.parseCategories = function (line) {
         var e_5, _a;
         if (this.categories.includes('words:')) {
-            throw new Error("Both 'words:' and 'categories:' found. Please "
+            throw new Error("both 'words:' and 'categories:' found. Please "
                 + 'only use one.');
         }
         var splitLine = line.split(/\s+/gu);
@@ -347,7 +347,7 @@ var PhonologyDefinition = (function () {
                     this.stderr("Could only generate " + wordList.length + " word"
                         + ((wordList.length === 1 ? '' : 's') + " ")
                         + (cat === 'words:' ? '' : "of category '" + cat + "' ")
-                        + ("(" + n + " requested)"));
+                        + ("(" + n + " requested)."));
                 }
                 if (cat !== 'words:') {
                     words += "\n\n" + cat + ":\n";
@@ -544,7 +544,7 @@ var WeightedSelector = (function () {
                 return this.keys[i];
             }
         }
-        throw new Error("Failed to choose options from '" + this.keys.join("', '") + "'");
+        throw new Error("failed to choose options from '" + this.keys.join("', '") + "'.");
     };
     return WeightedSelector;
 }());
@@ -680,7 +680,7 @@ var ArbSorter = (function () {
         var w = this.split(word);
         var arrayedWord = w.map(function (char) { return _this.ords[char]; });
         if (arrayedWord.includes(undefined)) {
-            throw new Error("Word with unknown letter: '" + word + "'.\n"
+            throw new Error("word with unknown letter: '" + word + "'.\n"
                 + 'A filter or assimilation might have caused this.');
         }
         return arrayedWord;
@@ -729,7 +729,7 @@ var ruleToDict = function (rule) {
         for (var items_1 = __values(items), items_1_1 = items_1.next(); !items_1_1.done; items_1_1 = items_1.next()) {
             var item = items_1_1.value;
             if (!item.includes(':')) {
-                throw new Error(item + " is not a valid phoneme and weight");
+                throw new Error(item + " is not a valid phoneme and weight.");
             }
             var _b = __read(item.split(':'), 2), value = _b[0], weight = _b[1];
             d[value] = parseFloat(weight);
@@ -783,8 +783,8 @@ var SoundSystem = (function () {
                     prevc = rule[i - 1];
                 }
                 if (rule[i] !== prevc) {
-                    throw new Error("Misplaced '!' option: in non-duplicate"
-                        + (" environment: " + rule));
+                    throw new Error("misplaced '!' option: in non-duplicate"
+                        + (" environment: '" + rule + "'."));
                 }
                 if (rule[i] in this.phonemeset) {
                     var nph = this.phonemeset[rule[i]].select();
@@ -825,7 +825,7 @@ var SoundSystem = (function () {
             this.ruleset[cat][rule] = weight;
         }
         else {
-            throw new Error("Uninitialized category '" + cat + "' referenced");
+            throw new Error("uninitialized category '" + cat + "' referenced.");
         }
     };
     SoundSystem.prototype.addCategory = function (name, weight) {
@@ -868,7 +868,7 @@ var SoundSystem = (function () {
             ruleSelector = new WeightedSelector(dict);
         }
         else {
-            throw new Error("Unknown category '" + category + "'.");
+            throw new Error("unknown category '" + category + "'.");
         }
         for (var i = 0; i < n * 2 + 1; ++i) {
             var rule = ruleSelector.select();

@@ -3,7 +3,7 @@ class WeightedSelector {
     private weights: number[];
     private sum: number;
     private n: number;
-
+    
     constructor(dic: { [key: string]: number | undefined }) {
         this.keys = []
         this.weights = []
@@ -27,7 +27,7 @@ class WeightedSelector {
                 return this.keys[i]!;
             }
         }
-        throw new Error(`Failed to choose options from '${this.keys.join("', '")}'`);
+        throw new Error(`failed to choose options from '${this.keys.join("', '")}'.`);
     }
 }
 
