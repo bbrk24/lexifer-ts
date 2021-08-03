@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file.
 
+## v1.1.0
+
+### Added
+
+Word categories -- words can now be separated into categories that will be
+displayed separately in wordgen mode, and categories can have relative
+frequencies for paragraph mode.
+
+Verbose mode -- in wordgen mode, the user can request to see each step of the
+word generation process individually, which is useful for debugging.
+
+The `words:` directive now allows words to have relative frequencies specified.
+
+### Changed
+
+The project is now built with a shell script rather than raw `tsc`, which
+removes the need for me to combine them by hand, substantially reducing
+deployment time and streamlining testing.
+
 ## v1.0.4
 
 ### Changed

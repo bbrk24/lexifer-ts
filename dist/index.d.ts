@@ -90,7 +90,7 @@ declare class SoundSystem {
     useDigraphs(): void;
     withStdAssimilations(): void;
     withCoronalMetathesis(): void;
-    generate(n: number, verbose: boolean, unsorted: boolean, category: string): string[];
+    generate(n: number, verbose: boolean, unsorted: boolean, category: string, force?: boolean): string[];
     randomCategory(): string;
 }
 declare const textify: (phsys: SoundSystem, sentences?: number) => string;

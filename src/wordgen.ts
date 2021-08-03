@@ -171,7 +171,7 @@ class SoundSystem {
         this.phonemeset[name] = new WeightedSelector(ruleToDict(selection));
     }
     
-    addRule(rule: string, weight: number, cat: string = 'words:') {
+    addRule(rule: string, weight: number, cat = 'words:') {
         if (this.ruleset[cat]) {
             this.ruleset[cat]![rule] = weight;
         } else {
@@ -215,7 +215,8 @@ class SoundSystem {
         n: number,
         verbose: boolean,
         unsorted: boolean,
-        category: string
+        category: string,
+        force = false
     ) {
         let words = new Set<string>();
         Word.verbose = verbose;
@@ -232,11 +233,15 @@ class SoundSystem {
             throw new Error(`unknown category '${category}'.`);
         }
         
-        // If they request more words than are possible, we don't want to lock
-        // up. Instead, try up to twice as many times (plus one just in case),
-        // and then cut off after that.
-        // This doesn't guarantee that it's impossible to generate more.
-        for (let i = 0; i < n * 2 + 1; ++i) {
+        /* If they request more words than are possible, we don't want to lock
+           up. Instead, try up to twice as many times (plus one just in case),
+           and then cut off after that. However, this doesn't guarantee that
+           it's impossible to generate more. Setting `force` to true requires
+           it to generate that many words, or freeze if it can't. It's
+           currently only used in paragraph mode, which chooses one word at a
+           time. I think it's safe to assume it's always possible to generate
+           at least one valid word. */
+        for (let i = 0; force || i < n * 2 + 1; ++i) {
             let rule = ruleSelector.select();
             let form = this.runRule(rule);
             let word = new Word(form, rule);
@@ -283,7 +288,8 @@ const textify = (phsys: SoundSystem, sentences = 25) => {
             1,
             false,
             true,
-            phsys.randomCategory()
+            phsys.randomCategory(),
+            true
         )[0]!
             .toString()
             .replace(/./u, el => el.toUpperCase());
@@ -293,7 +299,8 @@ const textify = (phsys: SoundSystem, sentences = 25) => {
                 1,
                 false,
                 true,
-                phsys.randomCategory()
+                phsys.randomCategory(),
+                true
             )[0]}`;
             if (j === comma) {
                 text += ',';

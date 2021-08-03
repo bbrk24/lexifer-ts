@@ -5,7 +5,7 @@ import { SoundSystem } from './wordgen';
 const main = (
     file: string,
     num?: number,
-    verbose: boolean = false,
+    verbose = false,
     unsorted?: boolean,
     onePerLine?: boolean,
     stderr: (inp: string | Error) => void = console.error

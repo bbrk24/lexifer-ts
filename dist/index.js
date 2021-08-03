@@ -858,8 +858,9 @@ var SoundSystem = (function () {
     SoundSystem.prototype.withCoronalMetathesis = function () {
         this.useCoronalMetathesis = true;
     };
-    SoundSystem.prototype.generate = function (n, verbose, unsorted, category) {
+    SoundSystem.prototype.generate = function (n, verbose, unsorted, category, force) {
         var _a;
+        if (force === void 0) { force = false; }
         var words = new Set();
         Word.verbose = verbose;
         Word.sorter = this.sorter;
@@ -874,7 +875,7 @@ var SoundSystem = (function () {
         else {
             throw new Error("unknown category '" + category + "'.");
         }
-        for (var i = 0; i < n * 2 + 1; ++i) {
+        for (var i = 0; force || i < n * 2 + 1; ++i) {
             var rule = ruleSelector.select();
             var form = this.runRule(rule);
             var word = new Word(form, rule);
@@ -917,11 +918,11 @@ var textify = function (phsys, sentences) {
         if (sent >= 7) {
             comma = Math.floor(Math.random() * (sent - 1));
         }
-        text += phsys.generate(1, false, true, phsys.randomCategory())[0]
+        text += phsys.generate(1, false, true, phsys.randomCategory(), true)[0]
             .toString()
             .replace(/./u, function (el) { return el.toUpperCase(); });
         for (var j = 0; j < sent; ++j) {
-            text += " " + phsys.generate(1, false, true, phsys.randomCategory())[0];
+            text += " " + phsys.generate(1, false, true, phsys.randomCategory(), true)[0];
             if (j === comma) {
                 text += ',';
             }
