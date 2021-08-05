@@ -15,10 +15,8 @@ class Word {
     }
     
     private applyFilter(pat: string, repl: string) {
-        let regex = new RegExp(pat, 'gu');
-        
         let newWord = last(this.forms)!;
-        newWord = newWord.replace(regex, repl);
+        newWord = newWord.replace(new RegExp(pat, 'gu'), repl);
         if (newWord.includes('REJECT')) {
             newWord = 'REJECT';
         }
@@ -62,7 +60,7 @@ class Word {
                 )
             )
                 .join('');
-
+            
             if (newWord !== last(this.forms)) {
                 this.forms.push(newWord);
                 this.filters.push('coronal-metathesis');
@@ -73,7 +71,7 @@ class Word {
     toString() {
         if (Word.verbose) {
             let ans = '';
-            for (let i = 0; i < this.forms.length; ++i) {
+            for (let i in this.forms) {
                 ans += `${this.filters[i]} – ${this.forms[i]}\n`;
             }
             return ans;

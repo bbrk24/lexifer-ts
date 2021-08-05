@@ -3,8 +3,8 @@
     "compilerOptions": {
         "allowUnreachableCode": false,
         "allowUnusedLabels": false,
-        "noImplicitOverride": true,
         "noImplicitReturns": true,
+        "noImplicitThis": true,
         "noUncheckedIndexedAccess": true,
         "strict": true,
         "strictPropertyInitialization": false,
@@ -12,10 +12,9 @@
         "downlevelIteration": true,
         "noEmitOnError": true,
         "outFile": "./dist/index.js",
-        "esModuleInterop": true,
+        "removeComments": true,
         "forceConsistentCasingInFileNames": true,
         "target": "ES5",
-        "lib": ["ES2015", "ES2016.Array.Include", "DOM"],
-        "removeComments": true
+        "lib": ["ES2015", "ES2016.Array.Include", "DOM"]
     }
 }

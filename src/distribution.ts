@@ -2,7 +2,6 @@ class WeightedSelector {
     private keys: string[];
     private weights: number[];
     private sum: number;
-    private n: number;
     
     constructor(dic: { [key: string]: number | undefined }) {
         this.keys = []
@@ -15,19 +14,19 @@ class WeightedSelector {
             }
         }
         this.sum = this.weights.reduce((a, b) => a + b, 0);
-        this.n = this.keys.length;
     }
     
     select() {
         let pick = Math.random() * this.sum;
         let temp = 0;
-        for (let i = 0; i < this.n; ++i) {
+        for (let i = 0; i < this.keys.length; ++i) {
             temp += this.weights[i]!;
             if (pick < temp) {
                 return this.keys[i]!;
             }
         }
-        throw new Error(`failed to choose options from '${this.keys.join("', '")}'.`);
+        throw new Error('failed to choose options from '
+            + `'${this.keys.join("', '")}'.`);
     }
 }
 

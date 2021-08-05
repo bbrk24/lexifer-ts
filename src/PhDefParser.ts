@@ -113,6 +113,7 @@ class PhonologyDefinition {
                 continue;
             }
             
+            // FIXME: what if they forget the '>'?
             let [pre, post] = filt.split('>');
             this.addFilter(pre!, post!);
         }
@@ -189,11 +190,9 @@ class PhonologyDefinition {
         let n = c2list.length;
         
         while (!['', '\n', undefined].includes(
-            this.defFileArr[this.defFileLineNum]!
+            this.defFileArr[this.defFileLineNum]
         )) {
-            ++this.defFileLineNum;
-            
-            let line = this.defFileArr[this.defFileLineNum] ?? '';
+            let line = this.defFileArr[++this.defFileLineNum] ?? '';
             line = line.replace(/#.*/, '').trim();
             if (line === '') {
                 continue;
@@ -221,9 +220,9 @@ class PhonologyDefinition {
     }
     
     private parseClass(line: string) {
-        let [sclass, values] = line.split('=');
-        sclass = sclass!.trim();
-        values = values!.trim();
+        let [sclass, values] = <[string, string]>line.split('=');
+        sclass = sclass.trim();
+        values = values.trim();
         if (sclass[0] === '$') {
             this.macros.push([
                 new RegExp(`\\${sclass}`, 'gu'),
@@ -235,7 +234,8 @@ class PhonologyDefinition {
         } else if (this.categories.includes(sclass)) {
             this.addRules(values, sclass);
         } else {
-            throw new Error(`unknown category '${sclass}'.`);
+            throw new Error(`unknown category '${sclass}'. Please put category`
+                + " definitions after the 'categories:' statement.");
         }
     }
     
@@ -250,14 +250,16 @@ class PhonologyDefinition {
         
         for (let cat of splitLine) {
             if (weighted) {
-                let [name, weight] = cat.split(':');
+                let [name, weight] = <[string, string | undefined]>
+                    cat.split(':');
                 let weightNum = parseFloat(weight ?? 'NaN')
                 if (isNaN(weightNum)) {
-                    throw new Error(`${cat} is not a valid category and weight.`);
+                    throw new Error(`${cat} is not a valid category and `
+                        + 'weight.');
                 }
                 
-                this.categories.push(name!);
-                this.soundsys.addCategory(name!, weightNum);
+                this.categories.push(name);
+                this.soundsys.addCategory(name, weightNum);
             } else {
                 this.categories.push(cat);
                 this.soundsys.addCategory(cat, 1);
@@ -265,7 +267,7 @@ class PhonologyDefinition {
         }
     }
     
-    generate(n = 1, verbose = false, unsorted = false, onePerLine = false) {
+    generate(n = 1, verbose = false, unsorted = verbose, onePerLine = false) {
         let words = '';
         let wordList: string[] = [];
         

@@ -250,8 +250,7 @@ var PhonologyDefinition = (function () {
         c2list.shift();
         var n = c2list.length;
         while (!['', '\n', undefined].includes(this.defFileArr[this.defFileLineNum])) {
-            ++this.defFileLineNum;
-            var line = (_a = this.defFileArr[this.defFileLineNum]) !== null && _a !== void 0 ? _a : '';
+            var line = (_a = this.defFileArr[++this.defFileLineNum]) !== null && _a !== void 0 ? _a : '';
             line = line.replace(/#.*/, '').trim();
             if (line === '') {
                 continue;
@@ -297,7 +296,8 @@ var PhonologyDefinition = (function () {
             this.addRules(values, sclass);
         }
         else {
-            throw new Error("unknown category '" + sclass + "'.");
+            throw new Error("unknown category '" + sclass + "'. Please put category"
+                + " definitions after the 'categories:' statement.");
         }
     };
     PhonologyDefinition.prototype.parseCategories = function (line) {
@@ -315,7 +315,8 @@ var PhonologyDefinition = (function () {
                     var _b = __read(cat.split(':'), 2), name_1 = _b[0], weight = _b[1];
                     var weightNum = parseFloat(weight !== null && weight !== void 0 ? weight : 'NaN');
                     if (isNaN(weightNum)) {
-                        throw new Error(cat + " is not a valid category and weight.");
+                        throw new Error(cat + " is not a valid category and "
+                            + 'weight.');
                     }
                     this.categories.push(name_1);
                     this.soundsys.addCategory(name_1, weightNum);
@@ -338,7 +339,7 @@ var PhonologyDefinition = (function () {
         var e_6, _a;
         if (n === void 0) { n = 1; }
         if (verbose === void 0) { verbose = false; }
-        if (unsorted === void 0) { unsorted = false; }
+        if (unsorted === void 0) { unsorted = verbose; }
         if (onePerLine === void 0) { onePerLine = false; }
         var words = '';
         var wordList = [];
@@ -536,18 +537,18 @@ var WeightedSelector = (function () {
             }
         }
         this.sum = this.weights.reduce(function (a, b) { return a + b; }, 0);
-        this.n = this.keys.length;
     }
     WeightedSelector.prototype.select = function () {
         var pick = Math.random() * this.sum;
         var temp = 0;
-        for (var i = 0; i < this.n; ++i) {
+        for (var i = 0; i < this.keys.length; ++i) {
             temp += this.weights[i];
             if (pick < temp) {
                 return this.keys[i];
             }
         }
-        throw new Error("failed to choose options from '" + this.keys.join("', '") + "'.");
+        throw new Error('failed to choose options from '
+            + ("'" + this.keys.join("', '") + "'."));
     };
     return WeightedSelector;
 }());
@@ -559,7 +560,7 @@ var main = function (file, num, verbose, unsorted, onePerLine, stderr) {
         var pd = new PhonologyDefinition(new SoundSystem(), file, stderr);
         if (typeof num == 'number') {
             if (verbose) {
-                if (!unsorted) {
+                if (unsorted == false) {
                     stderr("** 'Unsorted' option always enabled in verbose "
                         + 'mode.');
                     unsorted = true;
@@ -600,9 +601,8 @@ var Word = (function () {
         this.filters = [rule];
     }
     Word.prototype.applyFilter = function (pat, repl) {
-        var regex = new RegExp(pat, 'gu');
         var newWord = last(this.forms);
-        newWord = newWord.replace(regex, repl);
+        newWord = newWord.replace(new RegExp(pat, 'gu'), repl);
         if (newWord.includes('REJECT')) {
             newWord = 'REJECT';
         }
@@ -653,7 +653,7 @@ var Word = (function () {
     Word.prototype.toString = function () {
         if (Word.verbose) {
             var ans = '';
-            for (var i = 0; i < this.forms.length; ++i) {
+            for (var i in this.forms) {
                 ans += this.filters[i] + " \u2013 " + this.forms[i] + "\n";
             }
             return ans;
@@ -674,7 +674,7 @@ var ArbSorter = (function () {
         this.ords = {};
         this.vals = [];
         for (var i in graphs) {
-            this.ords[graphs[i]] = parseInt(i);
+            this.ords[graphs[i]] = +i;
             this.vals.push(graphs[i]);
         }
     }
@@ -748,10 +748,10 @@ var SoundSystem = (function () {
                         + (" environment: '" + rule + "'."));
                 }
                 if (rule[i] in this.phonemeset) {
-                    var nph = this.phonemeset[rule[i]].select();
-                    while (nph === last(s)) {
+                    var nph = void 0;
+                    do {
                         nph = this.phonemeset[rule[i]].select();
-                    }
+                    } while (nph === last(s));
                     s.push(nph);
                 }
             }
@@ -806,7 +806,7 @@ var SoundSystem = (function () {
                             + 'weight.');
                     }
                     var _b = __read(item.split(':'), 2), value = _b[0], weight = _b[1];
-                    d[value] = parseFloat(weight);
+                    d[value] = +weight;
                 }
             }
             catch (e_10_1) { e_10 = { error: e_10_1 }; }

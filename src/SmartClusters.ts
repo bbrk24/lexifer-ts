@@ -60,7 +60,7 @@ const data: [string, string, string, string, string][] = [
 
 let phdb: [string, string, string, string][] = [];
 
-const initialize = (notation = 'ipa') => {
+const initialize = (notation: 'ipa' | 'digraph' = 'ipa') => {
     if (notation === 'ipa') {
         for (let row of data) {
             phdb.push([row[0], row[2], row[3], row[4]]);

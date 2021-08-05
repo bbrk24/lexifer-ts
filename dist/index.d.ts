@@ -26,7 +26,7 @@ declare class PhonologyDefinition {
 }
 declare const data: [string, string, string, string, string][];
 declare let phdb: [string, string, string, string][];
-declare const initialize: (notation?: string) => void;
+declare const initialize: (notation?: 'ipa' | 'digraph') => void;
 declare const coronalMetathesis: (ph1: string, ph2: string) => [string, string];
 declare const applyAssimilations: (word: string[]) => string[];
 declare const applyCoronalMetathesis: (word: string[]) => string[];
@@ -34,7 +34,6 @@ declare class WeightedSelector {
     private keys;
     private weights;
     private sum;
-    private n;
     constructor(dic: {
         [key: string]: number | undefined;
     });

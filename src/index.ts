@@ -17,7 +17,7 @@ const main = (
             // wordlist mode
             
             if (verbose) {
-                if (!unsorted) {
+                if (unsorted == false) {
                     stderr("** 'Unsorted' option always enabled in verbose "
                         + 'mode.');
                     unsorted = true;

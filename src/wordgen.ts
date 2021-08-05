@@ -17,7 +17,7 @@ class ArbSorter {
         this.ords = {};
         this.vals = [];
         for (let i in graphs) {
-            this.ords[graphs[i]!] = parseInt(i);
+            this.ords[graphs[i]!] = +i;
             this.vals.push(graphs[i]!);
         }
     }
@@ -100,10 +100,10 @@ class SoundSystem {
                         + ` environment: '${rule}'.`);
                 }
                 if (rule[i]! in this.phonemeset) {
-                    let nph = this.phonemeset[rule[i]!]!.select();
-                    while (nph === last(s)) {
+                    let nph: string;
+                    do {
                         nph = this.phonemeset[rule[i]!]!.select();
-                    }
+                    } while (nph === last(s));
                     s.push(nph);
                 }
             } else if (rule[i]! in this.phonemeset) {
@@ -159,8 +159,9 @@ class SoundSystem {
                     throw new Error(`${item} is not a valid phoneme and `
                         + 'weight.');
                 }
-                let [value, weight] = item.split(':');
-                d[value!] = parseFloat(weight!);
+                let [value, weight] = <[string, string]>
+                    item.split(':');
+                d[value] = +weight;
             }
             return d;
         };
@@ -224,7 +225,7 @@ class SoundSystem {
         let ruleSelector: WeightedSelector;
         
         if (this.ruleset[category]) {
-            let dict = { ...this.ruleset[category]!, _weight: undefined };
+            let dict = { ...this.ruleset[category], _weight: undefined };
             if (Object.keys(dict).length === 1) {
                 dict = { [category]: 0, ...dict };
             }
