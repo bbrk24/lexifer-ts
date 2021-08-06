@@ -1,0 +1,12 @@
+{
+    "include": ["*.ts"],
+    "compilerOptions": {
+        "noImplicitReturns": true,
+        "noImplicitThis": true,
+        "noUncheckedIndexedAccess": true,
+        "strict": true,
+        "strictPropertyInitialization": false,
+        "forceConsistentCasingInFileNames": true,
+        "lib": ["ES2015", "ES2016.Array.Include", "DOM"]
+    }
+}
