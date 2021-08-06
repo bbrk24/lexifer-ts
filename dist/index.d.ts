@@ -24,8 +24,31 @@ declare class PhonologyDefinition {
     generate(n?: number, verbose?: boolean, unsorted?: boolean, onePerLine?: boolean): string;
     paragraph(sentences?: number): string;
 }
-declare const data: [string, string, string, string, string][];
-declare let phdb: [string, string, string, string][];
+declare const enum Voicing {
+    Voiceless = 0,
+    Voiced = 1
+}
+declare const enum Place {
+    Bilabial = 0,
+    Labiodental = 1,
+    Alveolar = 2,
+    Postalveolar = 3,
+    Retroflex = 4,
+    Palatal = 5,
+    Velar = 6,
+    Uvular = 7
+}
+declare const enum Manner {
+    Stop = 0,
+    Fricative = 1,
+    Nasal = 2,
+    Sibilant = 3,
+    LateralFricative = 4,
+    LateralAffricate = 5,
+    Affricate = 6
+}
+declare const data: [string, string, Voicing, Place, Manner][];
+declare let phdb: [string, Voicing, Place, Manner][];
 declare const initialize: (notation?: 'ipa' | 'digraph') => void;
 declare const coronalMetathesis: (ph1: string, ph2: string) => [string, string];
 declare const applyAssimilations: (word: string[]) => string[];

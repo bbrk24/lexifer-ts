@@ -1,64 +1,89 @@
-const data: [string, string, string, string, string][] = [
+const enum Voicing {
+    Voiceless, Voiced
+}
+
+const enum Place {
+    Bilabial,
+    Labiodental,
+    Alveolar,
+    Postalveolar,
+    Retroflex,
+    Palatal,
+    Velar,
+    Uvular
+}
+
+const enum Manner {
+    Stop,
+    Fricative,
+    Nasal,
+    Sibilant,
+    LateralFricative,
+    LateralAffricate,
+    Affricate
+}
+
+const data: [string, string, Voicing, Place, Manner][] = [
     // Bilabial, labio-dental
-    ['p', 'p', 'voiceless', 'bilabial', 'stop'],
-    ['b', 'b', 'voiced', 'bilabial', 'stop'],
-    [`ɸ`, 'ph', 'voiceless', 'bilabial', 'fricative'],
-    [`β`, 'bh', 'voiced', 'bilabial', 'fricative'],
-    ['f', 'f', 'voiceless', 'labiodental', 'fricative'],
-    ['v', 'v', 'voiced', 'labiodental', 'fricative'],
-    ['m', 'm', 'voiced', 'bilabial', 'nasal'],
-    ['m', 'm', 'voiced', 'labiodental', 'nasal'],
+    ['p',  'p',   Voicing.Voiceless, Place.Bilabial,     Manner.Stop],
+    ['b',  'b',   Voicing.Voiced,    Place.Bilabial,     Manner.Stop],
+    [`ɸ`,  'ph',  Voicing.Voiceless, Place.Bilabial,     Manner.Fricative],
+    [`β`,  'bh',  Voicing.Voiced,    Place.Bilabial,     Manner.Fricative],
+    ['f',  'f',   Voicing.Voiceless, Place.Labiodental,  Manner.Fricative],
+    ['v',  'v',   Voicing.Voiced,    Place.Labiodental,  Manner.Fricative],
+    ['m',  'm',   Voicing.Voiced,    Place.Bilabial,     Manner.Nasal],
+    ['m',  'm',   Voicing.Voiced,    Place.Labiodental,  Manner.Nasal],
     // Alveolar
-    ['t', 't', 'voiceless', 'alveolar', 'stop'],
-    ['d', 'd', 'voiced', 'alveolar', 'stop'],
-    ['s', 's', 'voiceless', 'alveolar', 'sibilant'],
-    ['z', 'z', 'voiced', 'alveolar', 'sibilant'],
-    [`θ`, 'th', 'voiceless', 'alveolar', 'fricative'],
-    ['ð', 'dh', 'voiced', 'alveolar', 'fricative'],
-    [`ɬ`, 'lh', 'voiceless', 'alveolar', 'lateral fricative'],
-    [`ɮ`, 'ldh', 'voiced', 'alveolar', 'lateral fricative'],
-    [`tɬ`, 'tl', 'voiceless', 'alveolar', 'lateral affricate'],
-    [`dɮ`, 'dl', 'voiced', 'alveolar', 'lateral affricate'],
-    ['ts', 'ts', 'voiceless', 'alveolar', 'affricate'],
-    ['dz', 'dz', 'voiced', 'alveolar', 'affricate'],
-    [`ʃ`, 'sh', 'voiceless', 'postalveolar', 'sibilant'],
-    [`ʒ`, 'zh', 'voiced', 'postalveolar', 'sibilant'],
-    [`tʃ`, 'ch', 'voiceless', 'postalveolar', 'affricate'],
-    [`dʒ`, 'j', 'voiced', 'postalveolar', 'affricate'],
-    ['n', 'n', 'voiced', 'alveolar', 'nasal'],
+    ['t',  't',   Voicing.Voiceless, Place.Alveolar,     Manner.Stop],
+    ['d',  'd',   Voicing.Voiced,    Place.Alveolar,     Manner.Stop],
+    ['s',  's',   Voicing.Voiceless, Place.Alveolar,     Manner.Sibilant],
+    ['z',  'z',   Voicing.Voiced,    Place.Alveolar,     Manner.Sibilant],
+    [`θ`,  'th',  Voicing.Voiceless, Place.Alveolar,     Manner.Fricative],
+    ['ð',  'dh',  Voicing.Voiced,    Place.Alveolar,     Manner.Fricative],
+    [`ɬ`,  'lh',  Voicing.Voiceless, Place.Alveolar,     Manner.LateralFricative],
+    [`ɮ`,  'ldh', Voicing.Voiced,    Place.Alveolar,     Manner.LateralFricative],
+    [`tɬ`, 'tl',  Voicing.Voiceless, Place.Alveolar,     Manner.LateralAffricate],
+    [`dɮ`, 'dl',  Voicing.Voiced,    Place.Alveolar,     Manner.LateralAffricate],
+    ['ts', 'ts',  Voicing.Voiceless, Place.Alveolar,     Manner.Affricate],
+    ['dz', 'dz',  Voicing.Voiced,    Place.Alveolar,     Manner.Affricate],
+    [`ʃ`,  'sh',  Voicing.Voiceless, Place.Postalveolar, Manner.Sibilant],
+    [`ʒ`,  'zh',  Voicing.Voiced,    Place.Postalveolar, Manner.Sibilant],
+    [`tʃ`, 'ch',  Voicing.Voiceless, Place.Postalveolar, Manner.Affricate],
+    [`dʒ`, 'j',   Voicing.Voiced,    Place.Postalveolar, Manner.Affricate],
+    ['n',  'n',   Voicing.Voiced,    Place.Alveolar,     Manner.Nasal],
     // Retroflex
-    [`ʈ`, 'rt', 'voiceless', 'retroflex', 'stop'],
-    [`ɖ`, 'rd', 'voiced', 'retroflex', 'stop'],
-    [`ʂ`, 'sr', 'voiceless', 'retroflex', 'sibilant'],
-    [`ʐ`, 'zr', 'voiced', 'retroflex', 'sibilant'],
-    [`ʈʂ`, 'rts', 'voiceless', 'retroflex', 'affricate'],
-    [`ɖʐ`, 'rdz', 'voiced', 'retroflex', 'affricate'],
-    [`ɳ`, 'rn', 'voiced', 'retroflex', 'nasal'],
+    [`ʈ`,  'rt',  Voicing.Voiceless, Place.Retroflex,    Manner.Stop],
+    [`ɖ`,  'rd',  Voicing.Voiced,    Place.Retroflex,    Manner.Stop],
+    [`ʂ`,  'sr',  Voicing.Voiceless, Place.Retroflex,    Manner.Sibilant],
+    [`ʐ`,  'zr',  Voicing.Voiced,    Place.Retroflex,    Manner.Sibilant],
+    [`ʈʂ`, 'rts', Voicing.Voiceless, Place.Retroflex,    Manner.Affricate],
+    [`ɖʐ`, 'rdz', Voicing.Voiced,    Place.Retroflex,    Manner.Affricate],
+    [`ɳ`,  'rn',  Voicing.Voiced,    Place.Retroflex,    Manner.Nasal],
     // Palatal
-    ['c', 'ky', 'voiceless', 'palatal', 'stop'],
-    [`ɟ`, 'gy', 'voiced', 'palatal', 'stop'],
-    [`ɕ`, 'sy', 'voiceless', 'palatal', 'sibilant'],
-    [`ʑ`, 'zy', 'voiced', 'palatal', 'sibilant'],
-    ['ç', 'hy', 'voiceless', 'palatal', 'fricative'],
-    [`ʝ`, 'yy', 'voiced', 'palatal', 'fricative'],
-    [`tɕ`, 'cy', 'voiceless', 'palatal', 'affricate'],
-    [`dʑ`, 'jy', 'voiced', 'palatal', 'affricate'],
-    [`ɲ`, 'ny', 'voiced', 'palatal', 'nasal'],
+    ['c',  'ky',  Voicing.Voiceless, Place.Palatal,      Manner.Stop],
+    [`ɟ`,  'gy',  Voicing.Voiced,    Place.Palatal,      Manner.Stop],
+    [`ɕ`,  'sy',  Voicing.Voiceless, Place.Palatal,      Manner.Sibilant],
+    [`ʑ`,  'zy',  Voicing.Voiced,    Place.Palatal,      Manner.Sibilant],
+    ['ç',  'hy',  Voicing.Voiceless, Place.Palatal,      Manner.Fricative],
+    [`ʝ`,  'yy',  Voicing.Voiced,    Place.Palatal,      Manner.Fricative],
+    [`tɕ`, 'cy',  Voicing.Voiceless, Place.Palatal,      Manner.Affricate],
+    [`dʑ`, 'jy',  Voicing.Voiced,    Place.Palatal,      Manner.Affricate],
+    [`ɲ`,  'ny',  Voicing.Voiced,    Place.Palatal,      Manner.Nasal],
     // Velar
-    ['k', 'k', 'voiceless', 'velar', 'stop'],
-    ['g', 'g', 'voiced', 'velar', 'stop'],
-    ['x', 'kh', 'voiceless', 'velar', 'fricative'],
-    [`ɣ`, 'gh', 'voiced', 'velar', 'fricative'],
-    [`ŋ`, 'ng', 'voiced', 'velar', 'nasal'],
+    ['k',  'k',   Voicing.Voiceless, Place.Velar,        Manner.Stop],
+    ['g',  'g',   Voicing.Voiced,    Place.Velar,        Manner.Stop],
+    ['x',  'kh',  Voicing.Voiceless, Place.Velar,        Manner.Fricative],
+    [`ɣ`,  'gh',  Voicing.Voiced,    Place.Velar,        Manner.Fricative],
+    [`ŋ`,  'ng',  Voicing.Voiced,    Place.Velar,        Manner.Nasal],
     // Uvular
-    ['q', 'q', 'voiceless', 'uvular', 'stop'],
-    [`ɢ`, 'gq', 'voiced', 'uvular', 'stop'],
-    [`χ`, 'qh', 'voiceless', 'uvular', 'fricative'],
-    [`ʁ`, 'gqh', 'voiced', 'uvular', 'fricative'],
-    [`ɴ`, 'nq', 'voiced', 'uvular', 'nasal']
+    ['q',  'q',   Voicing.Voiceless, Place.Uvular,       Manner.Stop],
+    [`ɢ`,  'gq',  Voicing.Voiced,    Place.Uvular,       Manner.Stop],
+    [`χ`,  'qh',  Voicing.Voiceless, Place.Uvular,       Manner.Fricative],
+    [`ʁ`,  'gqh', Voicing.Voiced,    Place.Uvular,       Manner.Fricative],
+    [`ɴ`,  'nq',  Voicing.Voiced,    Place.Uvular,       Manner.Nasal]
 ];
 
-let phdb: [string, string, string, string][] = [];
+let phdb: [string, Voicing, Place, Manner][] = [];
 
 const initialize = (notation: 'ipa' | 'digraph' = 'ipa') => {
     if (notation === 'ipa') {
@@ -76,12 +101,12 @@ const initialize = (notation: 'ipa' | 'digraph' = 'ipa') => {
 
 const coronalMetathesis = (ph1: string, ph2: string): [string, string] => {
     let data1 = phdb.filter(el => el[0] === ph1)[0];
-    if (data1 && data1[2] === 'alveolar') {
+    if (data1 && data1[2] === Place.Alveolar) {
         let data2 = phdb.filter(el => el[0] === ph2)[0];
         if (
             data2
-            && ['velar', 'bilabial'].includes(data2[2])
-            && ['stop', 'nasal'].includes(data2[3])
+            && [Place.Velar, Place.Bilabial].includes(data2[2])
+            && [Manner.Stop, Manner.Nasal].includes(data2[3])
             && data2[3] === data1[3]
         ) {
             return [ph2, ph1];
@@ -93,11 +118,11 @@ const coronalMetathesis = (ph1: string, ph2: string): [string, string] => {
 const applyAssimilations = (word: string[]) => {
     const nasalAssimilate = (ph1: string, ph2: string) => {
         let data1 = phdb.filter(el => el[0] === ph1)[0];
-        if (data1 && data1[3] === 'nasal') {
+        if (data1 && data1[3] === Manner.Nasal) {
             let data2 = phdb.filter(el => el[0] === ph2)[0];
             if (data2) {
                 let result = phdb.filter(el =>
-                    el[2] === data2![2] && el[3] === 'nasal'
+                    el[2] === data2![2] && el[3] === Manner.Nasal
                 )[0];
                 if (result && result[0]) {
                     return result[0];
@@ -109,7 +134,7 @@ const applyAssimilations = (word: string[]) => {
     
     const voiceAssimilate = (ph1: string, ph2: string) => {
         let data2 = phdb.filter(el => el[0] === ph2)[0];
-        if (data2 && data2[3] !== 'nasal') {
+        if (data2 && data2[3] !== Manner.Nasal) {
             let data1 = phdb.filter(el => el[0] === ph1)[0];
             if (data1) {
                 let result = phdb.filter(el =>

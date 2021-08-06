@@ -15,6 +15,9 @@ word generation process individually, which is useful for debugging.
 
 The `words:` directive now allows words to have relative frequencies specified.
 
+If a filter doesn't contain `>`, the program will now alert the user rather
+than throwing a TypeError.
+
 ### Changed
 
 The project is now built with a shell script rather than raw `tsc`, which

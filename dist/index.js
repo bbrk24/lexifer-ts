@@ -167,6 +167,10 @@ var PhonologyDefinition = (function () {
         }
     };
     PhonologyDefinition.prototype.addFilter = function (pre, post) {
+        if (!post) {
+            throw new Error("malformed filter '" + pre + "': filters must look like"
+                + "'old > new'.");
+        }
         pre = pre.trim();
         post = post.trim();
         this.soundsys.addFilter(pre, post);
@@ -313,7 +317,7 @@ var PhonologyDefinition = (function () {
                 var cat = splitLine_1_1.value;
                 if (weighted) {
                     var _b = __read(cat.split(':'), 2), name_1 = _b[0], weight = _b[1];
-                    var weightNum = parseFloat(weight !== null && weight !== void 0 ? weight : 'NaN');
+                    var weightNum = +weight;
                     if (isNaN(weightNum)) {
                         throw new Error(cat + " is not a valid category and "
                             + 'weight.');
@@ -374,57 +378,57 @@ var PhonologyDefinition = (function () {
     return PhonologyDefinition;
 }());
 var data = [
-    ['p', 'p', 'voiceless', 'bilabial', 'stop'],
-    ['b', 'b', 'voiced', 'bilabial', 'stop'],
-    ["\u0278", 'ph', 'voiceless', 'bilabial', 'fricative'],
-    ["\u03B2", 'bh', 'voiced', 'bilabial', 'fricative'],
-    ['f', 'f', 'voiceless', 'labiodental', 'fricative'],
-    ['v', 'v', 'voiced', 'labiodental', 'fricative'],
-    ['m', 'm', 'voiced', 'bilabial', 'nasal'],
-    ['m', 'm', 'voiced', 'labiodental', 'nasal'],
-    ['t', 't', 'voiceless', 'alveolar', 'stop'],
-    ['d', 'd', 'voiced', 'alveolar', 'stop'],
-    ['s', 's', 'voiceless', 'alveolar', 'sibilant'],
-    ['z', 'z', 'voiced', 'alveolar', 'sibilant'],
-    ["\u03B8", 'th', 'voiceless', 'alveolar', 'fricative'],
-    ['ð', 'dh', 'voiced', 'alveolar', 'fricative'],
-    ["\u026C", 'lh', 'voiceless', 'alveolar', 'lateral fricative'],
-    ["\u026E", 'ldh', 'voiced', 'alveolar', 'lateral fricative'],
-    ["t\u026C", 'tl', 'voiceless', 'alveolar', 'lateral affricate'],
-    ["d\u026E", 'dl', 'voiced', 'alveolar', 'lateral affricate'],
-    ['ts', 'ts', 'voiceless', 'alveolar', 'affricate'],
-    ['dz', 'dz', 'voiced', 'alveolar', 'affricate'],
-    ["\u0283", 'sh', 'voiceless', 'postalveolar', 'sibilant'],
-    ["\u0292", 'zh', 'voiced', 'postalveolar', 'sibilant'],
-    ["t\u0283", 'ch', 'voiceless', 'postalveolar', 'affricate'],
-    ["d\u0292", 'j', 'voiced', 'postalveolar', 'affricate'],
-    ['n', 'n', 'voiced', 'alveolar', 'nasal'],
-    ["\u0288", 'rt', 'voiceless', 'retroflex', 'stop'],
-    ["\u0256", 'rd', 'voiced', 'retroflex', 'stop'],
-    ["\u0282", 'sr', 'voiceless', 'retroflex', 'sibilant'],
-    ["\u0290", 'zr', 'voiced', 'retroflex', 'sibilant'],
-    ["\u0288\u0282", 'rts', 'voiceless', 'retroflex', 'affricate'],
-    ["\u0256\u0290", 'rdz', 'voiced', 'retroflex', 'affricate'],
-    ["\u0273", 'rn', 'voiced', 'retroflex', 'nasal'],
-    ['c', 'ky', 'voiceless', 'palatal', 'stop'],
-    ["\u025F", 'gy', 'voiced', 'palatal', 'stop'],
-    ["\u0255", 'sy', 'voiceless', 'palatal', 'sibilant'],
-    ["\u0291", 'zy', 'voiced', 'palatal', 'sibilant'],
-    ['ç', 'hy', 'voiceless', 'palatal', 'fricative'],
-    ["\u029D", 'yy', 'voiced', 'palatal', 'fricative'],
-    ["t\u0255", 'cy', 'voiceless', 'palatal', 'affricate'],
-    ["d\u0291", 'jy', 'voiced', 'palatal', 'affricate'],
-    ["\u0272", 'ny', 'voiced', 'palatal', 'nasal'],
-    ['k', 'k', 'voiceless', 'velar', 'stop'],
-    ['g', 'g', 'voiced', 'velar', 'stop'],
-    ['x', 'kh', 'voiceless', 'velar', 'fricative'],
-    ["\u0263", 'gh', 'voiced', 'velar', 'fricative'],
-    ["\u014B", 'ng', 'voiced', 'velar', 'nasal'],
-    ['q', 'q', 'voiceless', 'uvular', 'stop'],
-    ["\u0262", 'gq', 'voiced', 'uvular', 'stop'],
-    ["\u03C7", 'qh', 'voiceless', 'uvular', 'fricative'],
-    ["\u0281", 'gqh', 'voiced', 'uvular', 'fricative'],
-    ["\u0274", 'nq', 'voiced', 'uvular', 'nasal']
+    ['p', 'p', 0, 0, 0],
+    ['b', 'b', 1, 0, 0],
+    ["\u0278", 'ph', 0, 0, 1],
+    ["\u03B2", 'bh', 1, 0, 1],
+    ['f', 'f', 0, 1, 1],
+    ['v', 'v', 1, 1, 1],
+    ['m', 'm', 1, 0, 2],
+    ['m', 'm', 1, 1, 2],
+    ['t', 't', 0, 2, 0],
+    ['d', 'd', 1, 2, 0],
+    ['s', 's', 0, 2, 3],
+    ['z', 'z', 1, 2, 3],
+    ["\u03B8", 'th', 0, 2, 1],
+    ['ð', 'dh', 1, 2, 1],
+    ["\u026C", 'lh', 0, 2, 4],
+    ["\u026E", 'ldh', 1, 2, 4],
+    ["t\u026C", 'tl', 0, 2, 5],
+    ["d\u026E", 'dl', 1, 2, 5],
+    ['ts', 'ts', 0, 2, 6],
+    ['dz', 'dz', 1, 2, 6],
+    ["\u0283", 'sh', 0, 3, 3],
+    ["\u0292", 'zh', 1, 3, 3],
+    ["t\u0283", 'ch', 0, 3, 6],
+    ["d\u0292", 'j', 1, 3, 6],
+    ['n', 'n', 1, 2, 2],
+    ["\u0288", 'rt', 0, 4, 0],
+    ["\u0256", 'rd', 1, 4, 0],
+    ["\u0282", 'sr', 0, 4, 3],
+    ["\u0290", 'zr', 1, 4, 3],
+    ["\u0288\u0282", 'rts', 0, 4, 6],
+    ["\u0256\u0290", 'rdz', 1, 4, 6],
+    ["\u0273", 'rn', 1, 4, 2],
+    ['c', 'ky', 0, 5, 0],
+    ["\u025F", 'gy', 1, 5, 0],
+    ["\u0255", 'sy', 0, 5, 3],
+    ["\u0291", 'zy', 1, 5, 3],
+    ['ç', 'hy', 0, 5, 1],
+    ["\u029D", 'yy', 1, 5, 1],
+    ["t\u0255", 'cy', 0, 5, 6],
+    ["d\u0291", 'jy', 1, 5, 6],
+    ["\u0272", 'ny', 1, 5, 2],
+    ['k', 'k', 0, 6, 0],
+    ['g', 'g', 1, 6, 0],
+    ['x', 'kh', 0, 6, 1],
+    ["\u0263", 'gh', 1, 6, 1],
+    ["\u014B", 'ng', 1, 6, 2],
+    ['q', 'q', 0, 7, 0],
+    ["\u0262", 'gq', 1, 7, 0],
+    ["\u03C7", 'qh', 0, 7, 1],
+    ["\u0281", 'gqh', 1, 7, 1],
+    ["\u0274", 'nq', 1, 7, 2]
 ];
 var phdb = [];
 var initialize = function (notation) {
@@ -466,11 +470,11 @@ var initialize = function (notation) {
 };
 var coronalMetathesis = function (ph1, ph2) {
     var data1 = phdb.filter(function (el) { return el[0] === ph1; })[0];
-    if (data1 && data1[2] === 'alveolar') {
+    if (data1 && data1[2] === 2) {
         var data2 = phdb.filter(function (el) { return el[0] === ph2; })[0];
         if (data2
-            && ['velar', 'bilabial'].includes(data2[2])
-            && ['stop', 'nasal'].includes(data2[3])
+            && [6, 0].includes(data2[2])
+            && [0, 2].includes(data2[3])
             && data2[3] === data1[3]) {
             return [ph2, ph1];
         }
@@ -480,11 +484,11 @@ var coronalMetathesis = function (ph1, ph2) {
 var applyAssimilations = function (word) {
     var nasalAssimilate = function (ph1, ph2) {
         var data1 = phdb.filter(function (el) { return el[0] === ph1; })[0];
-        if (data1 && data1[3] === 'nasal') {
+        if (data1 && data1[3] === 2) {
             var data2_1 = phdb.filter(function (el) { return el[0] === ph2; })[0];
             if (data2_1) {
                 var result = phdb.filter(function (el) {
-                    return el[2] === data2_1[2] && el[3] === 'nasal';
+                    return el[2] === data2_1[2] && el[3] === 2;
                 })[0];
                 if (result && result[0]) {
                     return result[0];
@@ -495,7 +499,7 @@ var applyAssimilations = function (word) {
     };
     var voiceAssimilate = function (ph1, ph2) {
         var data2 = phdb.filter(function (el) { return el[0] === ph2; })[0];
-        if (data2 && data2[3] !== 'nasal') {
+        if (data2 && data2[3] !== 2) {
             var data1_1 = phdb.filter(function (el) { return el[0] === ph1; })[0];
             if (data1_1) {
                 var result = phdb.filter(function (el) {

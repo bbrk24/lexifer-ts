@@ -113,13 +113,16 @@ class PhonologyDefinition {
                 continue;
             }
             
-            // FIXME: what if they forget the '>'?
             let [pre, post] = filt.split('>');
-            this.addFilter(pre!, post!);
+            this.addFilter(pre!, post);
         }
     }
     
-    private addFilter(pre: string, post: string) {
+    private addFilter(pre: string, post: string | undefined) {
+        if (!post) {
+            throw new Error(`malformed filter '${pre}': filters must look like`
+                + "'old > new'.");
+        }
         pre = pre.trim();
         post = post.trim();
         this.soundsys.addFilter(pre, post);
@@ -252,7 +255,10 @@ class PhonologyDefinition {
             if (weighted) {
                 let [name, weight] = <[string, string | undefined]>
                     cat.split(':');
-                let weightNum = parseFloat(weight ?? 'NaN')
+                /* This `!` doesn't mean it's never undefined, it means that
+                   even if it's undefined that's a non-issue. `+undefined`
+                   evaluates to NaN, and typeof NaN == 'number'. */
+                let weightNum = +weight!;
                 if (isNaN(weightNum)) {
                     throw new Error(`${cat} is not a valid category and `
                         + 'weight.');
