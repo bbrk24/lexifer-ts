@@ -20,6 +20,9 @@ than throwing a TypeError.
 
 ### Changed
 
+Custom error messages are now more descriptive, such as `parsing error at 'a'`
+rather than just `a`.
+
 The project is now built with a shell script rather than raw `tsc`, which
 removes the need for me to combine them by hand, substantially reducing
 deployment time and streamlining testing.
