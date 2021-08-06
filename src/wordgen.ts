@@ -33,7 +33,7 @@ class ArbSorter {
     }
     
     valuesAsWord(values: number[]) {
-        return values.map(v => this.vals[v])
+        return values.map(v => this.vals[v]!)
             .join('');
     }
     
@@ -72,10 +72,7 @@ class SoundSystem {
                 continue;
             }
             
-            if (
-                i < n - 1
-                && rule[i + 1] === '?'
-            ) {
+            if (i < n - 1 && rule[i + 1] === '?') {
                 if (Math.random() * 100 < this.randpercent) {
                     if (rule[i]! in this.phonemeset) {
                         s.push(this.phonemeset[rule[i]!]!.select());

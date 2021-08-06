@@ -212,9 +212,9 @@ var PhonologyDefinition = (function () {
             if (weighted) {
                 var weightStr = void 0;
                 _a = __read(rules[i].split(':'), 2), rule = _a[0], weightStr = _a[1];
-                weight = parseFloat(weightStr !== null && weightStr !== void 0 ? weightStr : 'NaN');
+                weight = +weightStr;
                 if (isNaN(weight)) {
-                    throw new Error("'" + rules[i] + "' is not a valid pattern and"
+                    throw new Error("'" + rules[i] + "' is not a valid pattern and "
                         + 'weight.');
                 }
             }
@@ -726,8 +726,7 @@ var SoundSystem = (function () {
             if ('?!'.includes(rule[i])) {
                 continue;
             }
-            if (i < n - 1
-                && rule[i + 1] === '?') {
+            if (i < n - 1 && rule[i + 1] === '?') {
                 if (Math.random() * 100 < this.randpercent) {
                     if (rule[i] in this.phonemeset) {
                         s.push(this.phonemeset[rule[i]].select());

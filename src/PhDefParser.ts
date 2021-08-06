@@ -158,9 +158,12 @@ class PhonologyDefinition {
                 let weightStr: string | undefined;
                 [rule, weightStr] = <[string, string | undefined]>
                     rules[i]!.split(':');
-                weight = parseFloat(weightStr ?? 'NaN');
+                /* This `!` doesn't mean it's never undefined, it means that
+                   even if it's undefined that's a non-issue. `+undefined`
+                   evaluates to NaN, and typeof NaN == 'number'. */
+                weight = +weightStr!;
                 if (isNaN(weight)) {
-                    throw new Error(`'${rules[i]}' is not a valid pattern and`
+                    throw new Error(`'${rules[i]}' is not a valid pattern and `
                         + 'weight.');
                 }
             } else {
@@ -255,9 +258,7 @@ class PhonologyDefinition {
             if (weighted) {
                 let [name, weight] = <[string, string | undefined]>
                     cat.split(':');
-                /* This `!` doesn't mean it's never undefined, it means that
-                   even if it's undefined that's a non-issue. `+undefined`
-                   evaluates to NaN, and typeof NaN == 'number'. */
+                // See previous block comment
                 let weightNum = +weight!;
                 if (isNaN(weightNum)) {
                     throw new Error(`${cat} is not a valid category and `
