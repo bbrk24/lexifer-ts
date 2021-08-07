@@ -169,7 +169,7 @@ var PhonologyDefinition = (function () {
     PhonologyDefinition.prototype.addFilter = function (pre, post) {
         if (!post) {
             throw new Error("malformed filter '" + pre + "': filters must look like"
-                + "'old > new'.");
+                + " 'old > new'.");
         }
         pre = pre.trim();
         post = post.trim();
@@ -210,13 +210,13 @@ var PhonologyDefinition = (function () {
             var rule = void 0;
             var weight = void 0;
             if (weighted) {
-                var weightStr = void 0;
-                _a = __read(rules[i].split(':'), 2), rule = _a[0], weightStr = _a[1];
-                weight = +weightStr;
-                if (isNaN(weight)) {
+                if (invalidItemAndWeight(rules[i])) {
                     throw new Error("'" + rules[i] + "' is not a valid pattern and "
                         + 'weight.');
                 }
+                var weightStr = void 0;
+                _a = __read(rules[i].split(':'), 2), rule = _a[0], weightStr = _a[1];
+                weight = +weightStr;
             }
             else {
                 rule = rules[i];
@@ -316,12 +316,12 @@ var PhonologyDefinition = (function () {
             for (var splitLine_1 = __values(splitLine), splitLine_1_1 = splitLine_1.next(); !splitLine_1_1.done; splitLine_1_1 = splitLine_1.next()) {
                 var cat = splitLine_1_1.value;
                 if (weighted) {
-                    var _b = __read(cat.split(':'), 2), name_1 = _b[0], weight = _b[1];
-                    var weightNum = +weight;
-                    if (isNaN(weightNum)) {
+                    if (invalidItemAndWeight(cat)) {
                         throw new Error(cat + " is not a valid category and "
                             + 'weight.');
                     }
+                    var _b = __read(cat.split(':'), 2), name_1 = _b[0], weight = _b[1];
+                    var weightNum = +weight;
                     this.categories.push(name_1);
                     this.soundsys.addCategory(name_1, weightNum);
                 }
@@ -670,6 +670,14 @@ var Word = (function () {
     Word.sorter = null;
     return Word;
 }());
+var invalidItemAndWeight = function (item) {
+    var parts = item.split(':');
+    if (parts.length !== 2) {
+        return false;
+    }
+    var weight = +parts[1];
+    return isNaN(weight) || weight <= 0 || weight === Infinity;
+};
 var ArbSorter = (function () {
     function ArbSorter(order) {
         var graphs = order.split(/\s+/gu);
@@ -804,8 +812,8 @@ var SoundSystem = (function () {
             try {
                 for (var items_1 = __values(items), items_1_1 = items_1.next(); !items_1_1.done; items_1_1 = items_1.next()) {
                     var item = items_1_1.value;
-                    if (!item.includes(':')) {
-                        throw new Error(item + " is not a valid phoneme and "
+                    if (invalidItemAndWeight(item)) {
+                        throw new Error("'" + item + "' is not a valid phoneme and "
                             + 'weight.');
                     }
                     var _b = __read(item.split(':'), 2), value = _b[0], weight = _b[1];

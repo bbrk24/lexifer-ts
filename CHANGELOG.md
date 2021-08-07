@@ -15,13 +15,17 @@ word generation process individually, which is useful for debugging.
 
 The `words:` directive now allows words to have relative frequencies specified.
 
-If a filter doesn't contain `>`, the program will now alert the user rather
-than throwing a TypeError.
-
 ### Changed
 
 Custom error messages are now more descriptive, such as `parsing error at 'a'`
 rather than just `a`.
+
+If a filter doesn't contain `>`, the program will now alert the user rather
+than throwing a TypeError.
+
+If a category has a weight that is a valid but nonsensical number (like `-1`
+or `Infinity`), the program will display an error message rather than just
+returning 'woo!'.
 
 The project is now built with a shell script rather than raw `tsc`, which
 removes the need for me to combine them by hand, substantially reducing

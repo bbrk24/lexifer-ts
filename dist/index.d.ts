@@ -77,6 +77,7 @@ declare class Word {
     applyCoronalMetathesis(): void;
     toString(): string;
 }
+declare const invalidItemAndWeight: (item: string) => boolean;
 declare class ArbSorter {
     private splitter;
     private ords;

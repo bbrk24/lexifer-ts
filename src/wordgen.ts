@@ -4,6 +4,15 @@ import wrap from './textwrap';
 import last from './last';
 import Word from './word';
 
+const invalidItemAndWeight = (item: string) => {
+    let parts = item.split(':');
+    if (parts.length !== 2) {
+        return false;
+    }
+    let weight = +parts[1]!;
+    return isNaN(weight) || weight <= 0 || weight === Infinity;
+}
+
 class ArbSorter {
     private splitter: RegExp;
     private ords: { [key: string]: number };
@@ -152,12 +161,11 @@ class SoundSystem {
             let items = rule.trim().split(/\s+/gu);
             let d: { [key: string]: number } = {};
             for (let item of items) {
-                if (!item.includes(':')) {
-                    throw new Error(`${item} is not a valid phoneme and `
+                if (invalidItemAndWeight(item)) {
+                    throw new Error(`'${item}' is not a valid phoneme and `
                         + 'weight.');
                 }
-                let [value, weight] = <[string, string]>
-                    item.split(':');
+                let [value, weight] = <[string, string]>item.split(':');
                 d[value] = +weight;
             }
             return d;
@@ -315,4 +323,4 @@ const textify = (phsys: SoundSystem, sentences = 25) => {
     return text;
 };
 
-export { SoundSystem, textify, ArbSorter };
+export { SoundSystem, textify, ArbSorter, invalidItemAndWeight };

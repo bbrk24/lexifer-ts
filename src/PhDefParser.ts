@@ -1,4 +1,4 @@
-import { SoundSystem, textify } from './wordgen';
+import { SoundSystem, textify, invalidItemAndWeight } from './wordgen';
 
 class PhonologyDefinition {
     private macros: [RegExp, string][] = [];
@@ -121,7 +121,7 @@ class PhonologyDefinition {
     private addFilter(pre: string, post: string | undefined) {
         if (!post) {
             throw new Error(`malformed filter '${pre}': filters must look like`
-                + "'old > new'.");
+                + " 'old > new'.");
         }
         pre = pre.trim();
         post = post.trim();
@@ -155,17 +155,13 @@ class PhonologyDefinition {
             let weight: number;
             
             if (weighted) {
-                let weightStr: string | undefined;
-                [rule, weightStr] = <[string, string | undefined]>
-                    rules[i]!.split(':');
-                /* This `!` doesn't mean it's never undefined, it means that
-                   even if it's undefined that's a non-issue. `+undefined`
-                   evaluates to NaN, and typeof NaN == 'number'. */
-                weight = +weightStr!;
-                if (isNaN(weight)) {
+                if (invalidItemAndWeight(rules[i]!)) {
                     throw new Error(`'${rules[i]}' is not a valid pattern and `
                         + 'weight.');
                 }
+                let weightStr: string;
+                [rule, weightStr] = <[string, string]>rules[i]!.split(':');
+                weight = +weightStr;
             } else {
                 rule = rules[i]!;
                 weight = 10.0 / Math.pow((i + 1), 0.9);
@@ -256,14 +252,12 @@ class PhonologyDefinition {
         
         for (let cat of splitLine) {
             if (weighted) {
-                let [name, weight] = <[string, string | undefined]>
-                    cat.split(':');
-                // See previous block comment
-                let weightNum = +weight!;
-                if (isNaN(weightNum)) {
+                if (invalidItemAndWeight(cat)) {
                     throw new Error(`${cat} is not a valid category and `
                         + 'weight.');
                 }
+                let [name, weight] = <[string, string]>cat.split(':');
+                let weightNum = +weight;
                 
                 this.categories.push(name);
                 this.soundsys.addCategory(name, weightNum);

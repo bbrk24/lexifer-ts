@@ -1,6 +1,6 @@
 {
     "name": "lexifer",
-    "version": "1.1.0-beta.1+2",
+    "version": "1.1.0-beta.2",
     "private": true,
     "devDependencies": {
         "@types/node": "^16.4.12",
