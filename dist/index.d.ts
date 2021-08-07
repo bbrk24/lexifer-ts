@@ -1,18 +1,17 @@
 declare class PhonologyDefinition {
+    private stderr;
     private macros;
     private letters;
     private phClasses;
     private categories;
-    private stderr;
     private defFileLineNum;
     private defFileArr;
     soundsys: SoundSystem;
-    constructor(soundsys: SoundSystem, defFile: string, stderr: (inp: string | Error) => void);
+    constructor(defFile: string, stderr: (inp: string | Error) => void);
     private parse;
     private sanityCheck;
     private parseOption;
     private parseFilter;
-    private addFilter;
     private parseReject;
     private parseWords;
     private addRules;

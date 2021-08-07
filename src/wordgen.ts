@@ -7,7 +7,7 @@ import Word from './word';
 const invalidItemAndWeight = (item: string) => {
     let parts = item.split(':');
     if (parts.length !== 2) {
-        return false;
+        return true;
     }
     let weight = +parts[1]!;
     return isNaN(weight) || weight <= 0 || weight === Infinity;
@@ -229,15 +229,14 @@ class SoundSystem {
         Word.sorter = this.sorter;
         let ruleSelector: WeightedSelector;
         
-        if (this.ruleset[category]) {
-            let dict = { ...this.ruleset[category], _weight: undefined };
-            if (Object.keys(dict).length === 1) {
-                dict = { [category]: 0, ...dict };
-            }
-            ruleSelector = new WeightedSelector(dict);
-        } else {
+        if (!this.ruleset[category]) {
             throw new Error(`unknown category '${category}'.`);
         }
+        let dict = { ...this.ruleset[category], _weight: undefined };
+        if (Object.keys(dict).length === 1) {
+            dict = { [category]: 0, ...dict };
+        }
+        ruleSelector = new WeightedSelector(dict);
         
         /* If they request more words than are possible, we don't want to lock
            up. Instead, try up to twice as many times (plus one just in case),
@@ -247,6 +246,7 @@ class SoundSystem {
            currently only used in paragraph mode, which chooses one word at a
            time. I think it's safe to assume it's always possible to generate
            at least one valid word. */
+        // FIXME: 2n + 1 might not be enough
         for (let i = 0; force || i < n * 2 + 1; ++i) {
             let rule = ruleSelector.select();
             let form = this.runRule(rule);

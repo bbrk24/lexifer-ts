@@ -1,6 +1,5 @@
 import wrap from './textwrap';
 import PhonologyDefinition from './PhDefParser';
-import { SoundSystem } from './wordgen';
 
 const main = (
     file: string,
@@ -12,12 +11,11 @@ const main = (
 ) => {
     let ans = '';
     try {
-        let pd = new PhonologyDefinition(new SoundSystem(), file, stderr);
+        let pd = new PhonologyDefinition(file, stderr);
         if (typeof num == 'number') {
             // wordlist mode
-            
             if (verbose) {
-                if (unsorted == false) {
+                if (unsorted === false) {
                     stderr("** 'Unsorted' option always enabled in verbose "
                         + 'mode.');
                     unsorted = true;
@@ -27,7 +25,6 @@ const main = (
                         + 'mode.');
                 }
             }
-            
             ans = wrap(pd.generate(num, verbose, unsorted, onePerLine));
         } else {
             // paragraph mode

@@ -43,18 +43,18 @@ var __values = (this && this.__values) || function(o) {
     throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
 };
 var PhonologyDefinition = (function () {
-    function PhonologyDefinition(soundsys, defFile, stderr) {
+    function PhonologyDefinition(defFile, stderr) {
+        this.stderr = stderr;
         this.macros = [];
         this.letters = [];
         this.phClasses = [];
         this.categories = [];
         this.defFileLineNum = 0;
+        this.soundsys = new SoundSystem();
         if (defFile.trim() === '') {
             throw new Error('Please include a definition.');
         }
-        this.soundsys = soundsys;
         this.defFileArr = defFile.split('\n');
-        this.stderr = stderr;
         this.parse();
         this.sanityCheck();
     }
@@ -154,8 +154,14 @@ var PhonologyDefinition = (function () {
                 if (filt === '') {
                     continue;
                 }
-                var _d = __read(filt.split('>'), 2), pre = _d[0], post = _d[1];
-                this.addFilter(pre, post);
+                var filtParts = filt.split('>');
+                if (filtParts.length !== 2) {
+                    throw new Error("malformed filter '" + filt + "': filters must look like"
+                        + " 'old > new'.");
+                }
+                var pre = filtParts[0].trim();
+                var post = filtParts[1].trim();
+                this.soundsys.addFilter(pre, post);
             }
         }
         catch (e_2_1) { e_2 = { error: e_2_1 }; }
@@ -165,15 +171,6 @@ var PhonologyDefinition = (function () {
             }
             finally { if (e_2) throw e_2.error; }
         }
-    };
-    PhonologyDefinition.prototype.addFilter = function (pre, post) {
-        if (!post) {
-            throw new Error("malformed filter '" + pre + "': filters must look like"
-                + " 'old > new'.");
-        }
-        pre = pre.trim();
-        post = post.trim();
-        this.soundsys.addFilter(pre, post);
     };
     PhonologyDefinition.prototype.parseReject = function (line) {
         var e_3, _a;
@@ -561,10 +558,10 @@ var main = function (file, num, verbose, unsorted, onePerLine, stderr) {
     if (stderr === void 0) { stderr = console.error; }
     var ans = '';
     try {
-        var pd = new PhonologyDefinition(new SoundSystem(), file, stderr);
+        var pd = new PhonologyDefinition(file, stderr);
         if (typeof num == 'number') {
             if (verbose) {
-                if (unsorted == false) {
+                if (unsorted === false) {
                     stderr("** 'Unsorted' option always enabled in verbose "
                         + 'mode.');
                     unsorted = true;
@@ -673,7 +670,7 @@ var Word = (function () {
 var invalidItemAndWeight = function (item) {
     var parts = item.split(':');
     if (parts.length !== 2) {
-        return false;
+        return true;
     }
     var weight = +parts[1];
     return isNaN(weight) || weight <= 0 || weight === Infinity;
@@ -876,16 +873,14 @@ var SoundSystem = (function () {
         Word.verbose = verbose;
         Word.sorter = this.sorter;
         var ruleSelector;
-        if (this.ruleset[category]) {
-            var dict = __assign(__assign({}, this.ruleset[category]), { _weight: undefined });
-            if (Object.keys(dict).length === 1) {
-                dict = __assign((_a = {}, _a[category] = 0, _a), dict);
-            }
-            ruleSelector = new WeightedSelector(dict);
-        }
-        else {
+        if (!this.ruleset[category]) {
             throw new Error("unknown category '" + category + "'.");
         }
+        var dict = __assign(__assign({}, this.ruleset[category]), { _weight: undefined });
+        if (Object.keys(dict).length === 1) {
+            dict = __assign((_a = {}, _a[category] = 0, _a), dict);
+        }
+        ruleSelector = new WeightedSelector(dict);
         for (var i = 0; force || i < n * 2 + 1; ++i) {
             var rule = ruleSelector.select();
             var form = this.runRule(rule);

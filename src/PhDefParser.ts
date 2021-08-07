@@ -6,26 +6,20 @@ class PhonologyDefinition {
     private phClasses: string[] = [];
     private categories: string[] = [];
     
-    private stderr: (inp: string | Error) => void;
-    
     // a bit of a hack since JS can't read files directly
     private defFileLineNum = 0;
     private defFileArr: string[];
     
-    soundsys: SoundSystem;
+    soundsys = new SoundSystem();
     
     constructor(
-        soundsys: SoundSystem,
         defFile: string,
-        stderr: (inp: string | Error) => void
+        private stderr: (inp: string | Error) => void
     ) {
         if (defFile.trim() === '') {
             throw new Error('Please include a definition.');
         }
-        
-        this.soundsys = soundsys;
         this.defFileArr = defFile.split('\n');
-        this.stderr = stderr;
         this.parse();
         this.sanityCheck();
     }
@@ -113,19 +107,16 @@ class PhonologyDefinition {
                 continue;
             }
             
-            let [pre, post] = filt.split('>');
-            this.addFilter(pre!, post);
+            let filtParts = filt.split('>');
+            if (filtParts.length !== 2) {
+                throw new Error(`malformed filter '${filt}': filters must look like`
+                    + " 'old > new'.");
+            }
+            
+            let pre = filtParts[0]!.trim();
+            let post = filtParts[1]!.trim();
+            this.soundsys.addFilter(pre, post);
         }
-    }
-    
-    private addFilter(pre: string, post: string | undefined) {
-        if (!post) {
-            throw new Error(`malformed filter '${pre}': filters must look like`
-                + " 'old > new'.");
-        }
-        pre = pre.trim();
-        post = post.trim();
-        this.soundsys.addFilter(pre, post);
     }
     
     private parseReject(line: string) {
