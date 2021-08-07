@@ -137,7 +137,7 @@ class SoundSystem {
     addPhUnit(name: string, selection: string) {
         const naturalWeights = (phonemes: string) => {
             const jitter = (v: number, percent = 10) => {
-                let move = v + percent / 100;
+                let move = v * percent / 100;
                 return v + move * (Math.random() - 0.5);
             };
             

@@ -317,7 +317,7 @@ var PhonologyDefinition = (function () {
                 var cat = splitLine_1_1.value;
                 if (weighted) {
                     if (invalidItemAndWeight(cat)) {
-                        throw new Error(cat + " is not a valid category and "
+                        throw new Error("'" + cat + "' is not a valid category and "
                             + 'weight.');
                     }
                     var _b = __read(cat.split(':'), 2), name_1 = _b[0], weight = _b[1];
@@ -789,7 +789,7 @@ var SoundSystem = (function () {
         var naturalWeights = function (phonemes) {
             var jitter = function (v, percent) {
                 if (percent === void 0) { percent = 10; }
-                var move = v + percent / 100;
+                var move = v * percent / 100;
                 return v + move * (Math.random() - 0.5);
             };
             var p = phonemes.split(/\s+/gu);

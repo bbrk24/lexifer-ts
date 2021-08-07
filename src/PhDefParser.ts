@@ -253,7 +253,7 @@ class PhonologyDefinition {
         for (let cat of splitLine) {
             if (weighted) {
                 if (invalidItemAndWeight(cat)) {
-                    throw new Error(`${cat} is not a valid category and `
+                    throw new Error(`'${cat}' is not a valid category and `
                         + 'weight.');
                 }
                 let [name, weight] = <[string, string]>cat.split(':');
