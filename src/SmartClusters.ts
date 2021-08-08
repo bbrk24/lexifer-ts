@@ -85,18 +85,14 @@ const data: [string, string, Voicing, Place, Manner][] = [
 
 let phdb: [string, Voicing, Place, Manner][] = [];
 
-// For the expect-error comments, see:
-// https://github.com/microsoft/TypeScript/issues/45355
 const initialize = (isIpa: boolean = true) => {
     if (isIpa) {
         for (let row of data) {
-            row.splice(1, 1); // @ts-expect-error
-            phdb.push(row);
+            phdb.push([row[0], row[2], row[3], row[4]]);
         }
     } else {
         for (let row of data) {
-            row.shift(); // @ts-expect-error
-            phdb.push(row);
+            phdb.push([row[1], row[2], row[3], row[4]]);
         }
     }
 };

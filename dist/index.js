@@ -316,14 +316,12 @@ let phdb = [];
 const initialize = (isIpa = true) => {
     if (isIpa) {
         for (let row of data) {
-            row.splice(1, 1);
-            phdb.push(row);
+            phdb.push([row[0], row[2], row[3], row[4]]);
         }
     }
     else {
         for (let row of data) {
-            row.shift();
-            phdb.push(row);
+            phdb.push([row[1], row[2], row[3], row[4]]);
         }
     }
 };
