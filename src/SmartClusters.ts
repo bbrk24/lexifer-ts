@@ -18,8 +18,10 @@ const enum Manner {
     Fricative,
     Nasal,
     Sibilant,
-    LateralFricative,
-    LateralAffricate,
+    // LateralFricative and LateralAffricate are too long
+    // they don't let the data array items fit in 80 chars when indented
+    LatFric,
+    LatAffric,
     Affricate
 }
 
@@ -40,10 +42,10 @@ const data: [string, string, Voicing, Place, Manner][] = [
     ['z',  'z',   Voicing.Voiced,    Place.Alveolar,     Manner.Sibilant],
     ['θ',  'th',  Voicing.Voiceless, Place.Alveolar,     Manner.Fricative],
     ['ð',  'dh',  Voicing.Voiced,    Place.Alveolar,     Manner.Fricative],
-    ['ɬ',  'lh',  Voicing.Voiceless, Place.Alveolar,     Manner.LateralFricative],
-    ['ɮ',  'ldh', Voicing.Voiced,    Place.Alveolar,     Manner.LateralFricative],
-    ['tɬ', 'tl',  Voicing.Voiceless, Place.Alveolar,     Manner.LateralAffricate],
-    ['dɮ', 'dl',  Voicing.Voiced,    Place.Alveolar,     Manner.LateralAffricate],
+    ['ɬ',  'lh',  Voicing.Voiceless, Place.Alveolar,     Manner.LatFric],
+    ['ɮ',  'ldh', Voicing.Voiced,    Place.Alveolar,     Manner.LatFric],
+    ['tɬ', 'tl',  Voicing.Voiceless, Place.Alveolar,     Manner.LatAffric],
+    ['dɮ', 'dl',  Voicing.Voiced,    Place.Alveolar,     Manner.LatAffric],
     ['ts', 'ts',  Voicing.Voiceless, Place.Alveolar,     Manner.Affricate],
     ['dz', 'dz',  Voicing.Voiced,    Place.Alveolar,     Manner.Affricate],
     ['ʃ',  'sh',  Voicing.Voiceless, Place.Postalveolar, Manner.Sibilant],

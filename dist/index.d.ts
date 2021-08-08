@@ -42,8 +42,8 @@ declare const enum Manner {
     Fricative = 1,
     Nasal = 2,
     Sibilant = 3,
-    LateralFricative = 4,
-    LateralAffricate = 5,
+    LatFric = 4,
+    LatAffric = 5,
     Affricate = 6
 }
 declare const data: [string, string, Voicing, Place, Manner][];

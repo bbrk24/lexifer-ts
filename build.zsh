@@ -3,13 +3,13 @@ cat src/*.ts > combined.ts
 sed -i '' '/export/d' combined.ts
 sed -i '' '/import/d' combined.ts
 echo 'Compiling to JS...'
-tsc > errors.txt
-if [ -s errors.txt ]
+tsc > errors
+if [ -s errors ]
 then
     echo 'Build errors:'
-    cat errors.txt
-    rm errors.txt
+    cat errors
+    rm errors
 else
-    rm errors.txt
+    rm errors
     echo 'Done.'
 fi

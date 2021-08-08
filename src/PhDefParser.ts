@@ -109,8 +109,8 @@ class PhonologyDefinition {
             
             let filtParts = filt.split('>');
             if (filtParts.length !== 2) {
-                throw new Error(`malformed filter '${filt}': filters must look like`
-                    + " 'old > new'.");
+                throw new Error(`malformed filter '${filt}': filters must look`
+                    + " like 'old > new'.");
             }
             
             let pre = filtParts[0]!.trim();
