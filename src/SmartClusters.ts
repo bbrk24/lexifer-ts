@@ -85,46 +85,32 @@ const data: [string, string, Voicing, Place, Manner][] = [
 
 let phdb: [string, Voicing, Place, Manner][] = [];
 
-const initialize = (notation: 'ipa' | 'digraph' = 'ipa') => {
-    if (notation === 'ipa') {
+// For the expect-error comments, see:
+// https://github.com/microsoft/TypeScript/issues/45355
+const initialize = (isIpa: boolean = true) => {
+    if (isIpa) {
         for (let row of data) {
-            phdb.push([row[0], row[2], row[3], row[4]]);
-        }
-    } else if (notation === 'digraph') {
-        for (let row of data) {
-            phdb.push([row[1], row[2], row[3], row[4]]);
+            row.splice(1, 1); // @ts-expect-error
+            phdb.push(row);
         }
     } else {
-        throw new Error(`Unknown notation: ${notation}`);
-    }
-};
-
-const coronalMetathesis = (ph1: string, ph2: string): [string, string] => {
-    let data1 = phdb.filter(el => el[0] === ph1)[0];
-    if (data1 && data1[2] === Place.Alveolar) {
-        let data2 = phdb.filter(el => el[0] === ph2)[0];
-        if (
-            data2
-            && [Place.Velar, Place.Bilabial].includes(data2[2])
-            && [Manner.Stop, Manner.Nasal].includes(data2[3])
-            && data2[3] === data1[3]
-        ) {
-            return [ph2, ph1];
+        for (let row of data) {
+            row.shift(); // @ts-expect-error
+            phdb.push(row);
         }
     }
-    return [ph1, ph2];
 };
 
 const applyAssimilations = (word: string[]) => {
     const nasalAssimilate = (ph1: string, ph2: string) => {
-        let data1 = phdb.filter(el => el[0] === ph1)[0];
+        let data1 = phdb.find(el => el[0] === ph1);
         if (data1 && data1[3] === Manner.Nasal) {
-            let data2 = phdb.filter(el => el[0] === ph2)[0];
+            let data2 = phdb.find(el => el[0] === ph2);
             if (data2) {
-                let result = phdb.filter(el =>
+                let result = phdb.find(el =>
                     el[2] === data2![2] && el[3] === Manner.Nasal
-                )[0];
-                if (result && result[0]) {
+                );
+                if (result) {
                     return result[0];
                 }
             }
@@ -133,16 +119,16 @@ const applyAssimilations = (word: string[]) => {
     };
     
     const voiceAssimilate = (ph1: string, ph2: string) => {
-        let data2 = phdb.filter(el => el[0] === ph2)[0];
+        let data2 = phdb.find(el => el[0] === ph2);
         if (data2 && data2[3] !== Manner.Nasal) {
-            let data1 = phdb.filter(el => el[0] === ph1)[0];
+            let data1 = phdb.find(el => el[0] === ph1);
             if (data1) {
-                let result = phdb.filter(el =>
+                let result = phdb.find(el =>
                     el[1] === data2![1]
                     && el[2] === data1![2]
                     && el[3] === data1![3]
-                )[0];
-                if (result && result[0]) {
+                );
+                if (result) {
                     return result[0];
                 }
             }
@@ -159,6 +145,22 @@ const applyAssimilations = (word: string[]) => {
 };
 
 const applyCoronalMetathesis = (word: string[]) => {
+    const coronalMetathesis = (ph1: string, ph2: string): [string, string] => {
+        let data1 = phdb.filter(el => el[0] === ph1)[0];
+        if (data1 && data1[2] === Place.Alveolar) {
+            let data2 = phdb.filter(el => el[0] === ph2)[0];
+            if (
+                data2
+                && [Place.Velar, Place.Bilabial].includes(data2[2])
+                && [Manner.Stop, Manner.Nasal].includes(data2[3])
+                && data2[3] === data1[3]
+            ) {
+                return [ph2, ph1];
+            }
+        }
+        return [ph1, ph2];
+    };
+    
     let newArr = [...word];
     for (let i = 0; i < word.length - 1; ++i) {
         [newArr[i], newArr[i + 1]] = coronalMetathesis(word[i]!, word[i + 1]!);

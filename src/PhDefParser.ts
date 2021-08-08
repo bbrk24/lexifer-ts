@@ -89,10 +89,10 @@ class PhonologyDefinition {
                     this.soundsys.useDigraphs();
                     break;
                 case 'std-assimilations':
-                    this.soundsys.withStdAssimilations();
+                    this.soundsys.useAssim = true;
                     break;
                 case 'coronal-metathesis':
-                    this.soundsys.withCoronalMetathesis();
+                    this.soundsys.useCoronalMetathesis = true;
                     break;
                 default:
                     throw new Error(`unknown option '${option}'.`);

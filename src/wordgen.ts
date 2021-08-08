@@ -206,15 +206,7 @@ class SoundSystem {
     }
     
     useDigraphs() {
-        initialize('digraph');
-    }
-    
-    withStdAssimilations() {
-        this.useAssim = true;
-    }
-    
-    withCoronalMetathesis() {
-        this.useCoronalMetathesis = true;
+        initialize(false);
     }
     
     generate(
@@ -239,15 +231,14 @@ class SoundSystem {
         ruleSelector = new WeightedSelector(dict);
         
         /* If they request more words than are possible, we don't want to lock
-           up. Instead, try up to twice as many times (plus one just in case),
+           up. Instead, try up to three times as many (note: is this enough?),
            and then cut off after that. However, this doesn't guarantee that
            it's impossible to generate more. Setting `force` to true requires
            it to generate that many words, or freeze if it can't. It's
            currently only used in paragraph mode, which chooses one word at a
            time. I think it's safe to assume it's always possible to generate
            at least one valid word. */
-        // FIXME: 2n + 1 might not be enough
-        for (let i = 0; force || i < n * 2 + 1; ++i) {
+        for (let i = 0; force || i < 3 * n; ++i) {
             let rule = ruleSelector.select();
             let form = this.runRule(rule);
             let word = new Word(form, rule);

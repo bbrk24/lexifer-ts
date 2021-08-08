@@ -48,8 +48,7 @@ declare const enum Manner {
 }
 declare const data: [string, string, Voicing, Place, Manner][];
 declare let phdb: [string, Voicing, Place, Manner][];
-declare const initialize: (notation?: 'ipa' | 'digraph') => void;
-declare const coronalMetathesis: (ph1: string, ph2: string) => [string, string];
+declare const initialize: (isIpa?: boolean) => void;
 declare const applyAssimilations: (word: string[]) => string[];
 declare const applyCoronalMetathesis: (word: string[]) => string[];
 declare class WeightedSelector {
@@ -110,8 +109,6 @@ declare class SoundSystem {
     addSortOrder(order: string): void;
     useIpa(): void;
     useDigraphs(): void;
-    withStdAssimilations(): void;
-    withCoronalMetathesis(): void;
     generate(n: number, verbose: boolean, unsorted: boolean, category: string, force?: boolean): string[];
     randomCategory(): string;
 }

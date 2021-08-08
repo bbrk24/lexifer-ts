@@ -23,7 +23,7 @@ rather than just `a`.
 If a filter doesn't contain `>`, the program will now alert the user rather
 than throwing a TypeError.
 
-If a category has a weight that is a valid but nonsensical number (like `-1`
+If a phoneme has a weight that is a valid but nonsensical number (like `-1`
 or `Infinity`), the program will display an error message rather than just
 returning 'woo!'.
 

@@ -127,10 +127,10 @@ var PhonologyDefinition = (function () {
                         this.soundsys.useDigraphs();
                         break;
                     case 'std-assimilations':
-                        this.soundsys.withStdAssimilations();
+                        this.soundsys.useAssim = true;
                         break;
                     case 'coronal-metathesis':
-                        this.soundsys.withCoronalMetathesis();
+                        this.soundsys.useCoronalMetathesis = true;
                         break;
                     default:
                         throw new Error("unknown option '" + option + "'.");
@@ -428,14 +428,15 @@ var data = [
     ["\u0274", 'nq', 1, 7, 2]
 ];
 var phdb = [];
-var initialize = function (notation) {
+var initialize = function (isIpa) {
     var e_7, _a, e_8, _b;
-    if (notation === void 0) { notation = 'ipa'; }
-    if (notation === 'ipa') {
+    if (isIpa === void 0) { isIpa = true; }
+    if (isIpa) {
         try {
             for (var data_1 = __values(data), data_1_1 = data_1.next(); !data_1_1.done; data_1_1 = data_1.next()) {
                 var row = data_1_1.value;
-                phdb.push([row[0], row[2], row[3], row[4]]);
+                row.splice(1, 1);
+                phdb.push(row);
             }
         }
         catch (e_7_1) { e_7 = { error: e_7_1 }; }
@@ -446,11 +447,12 @@ var initialize = function (notation) {
             finally { if (e_7) throw e_7.error; }
         }
     }
-    else if (notation === 'digraph') {
+    else {
         try {
             for (var data_2 = __values(data), data_2_1 = data_2.next(); !data_2_1.done; data_2_1 = data_2.next()) {
                 var row = data_2_1.value;
-                phdb.push([row[1], row[2], row[3], row[4]]);
+                row.shift();
+                phdb.push(row);
             }
         }
         catch (e_8_1) { e_8 = { error: e_8_1 }; }
@@ -461,33 +463,17 @@ var initialize = function (notation) {
             finally { if (e_8) throw e_8.error; }
         }
     }
-    else {
-        throw new Error("Unknown notation: " + notation);
-    }
-};
-var coronalMetathesis = function (ph1, ph2) {
-    var data1 = phdb.filter(function (el) { return el[0] === ph1; })[0];
-    if (data1 && data1[2] === 2) {
-        var data2 = phdb.filter(function (el) { return el[0] === ph2; })[0];
-        if (data2
-            && [6, 0].includes(data2[2])
-            && [0, 2].includes(data2[3])
-            && data2[3] === data1[3]) {
-            return [ph2, ph1];
-        }
-    }
-    return [ph1, ph2];
 };
 var applyAssimilations = function (word) {
     var nasalAssimilate = function (ph1, ph2) {
-        var data1 = phdb.filter(function (el) { return el[0] === ph1; })[0];
+        var data1 = phdb.find(function (el) { return el[0] === ph1; });
         if (data1 && data1[3] === 2) {
-            var data2_1 = phdb.filter(function (el) { return el[0] === ph2; })[0];
+            var data2_1 = phdb.find(function (el) { return el[0] === ph2; });
             if (data2_1) {
-                var result = phdb.filter(function (el) {
+                var result = phdb.find(function (el) {
                     return el[2] === data2_1[2] && el[3] === 2;
-                })[0];
-                if (result && result[0]) {
+                });
+                if (result) {
                     return result[0];
                 }
             }
@@ -495,16 +481,16 @@ var applyAssimilations = function (word) {
         return ph1;
     };
     var voiceAssimilate = function (ph1, ph2) {
-        var data2 = phdb.filter(function (el) { return el[0] === ph2; })[0];
+        var data2 = phdb.find(function (el) { return el[0] === ph2; });
         if (data2 && data2[3] !== 2) {
-            var data1_1 = phdb.filter(function (el) { return el[0] === ph1; })[0];
+            var data1_1 = phdb.find(function (el) { return el[0] === ph1; });
             if (data1_1) {
-                var result = phdb.filter(function (el) {
+                var result = phdb.find(function (el) {
                     return el[1] === data2[1]
                         && el[2] === data1_1[2]
                         && el[3] === data1_1[3];
-                })[0];
-                if (result && result[0]) {
+                });
+                if (result) {
                     return result[0];
                 }
             }
@@ -520,6 +506,19 @@ var applyAssimilations = function (word) {
 };
 var applyCoronalMetathesis = function (word) {
     var _a;
+    var coronalMetathesis = function (ph1, ph2) {
+        var data1 = phdb.filter(function (el) { return el[0] === ph1; })[0];
+        if (data1 && data1[2] === 2) {
+            var data2 = phdb.filter(function (el) { return el[0] === ph2; })[0];
+            if (data2
+                && [6, 0].includes(data2[2])
+                && [0, 2].includes(data2[3])
+                && data2[3] === data1[3]) {
+                return [ph2, ph1];
+            }
+        }
+        return [ph1, ph2];
+    };
     var newArr = __spreadArray([], __read(word));
     for (var i = 0; i < word.length - 1; ++i) {
         _a = __read(coronalMetathesis(word[i], word[i + 1]), 2), newArr[i] = _a[0], newArr[i + 1] = _a[1];
@@ -858,13 +857,7 @@ var SoundSystem = (function () {
         initialize();
     };
     SoundSystem.prototype.useDigraphs = function () {
-        initialize('digraph');
-    };
-    SoundSystem.prototype.withStdAssimilations = function () {
-        this.useAssim = true;
-    };
-    SoundSystem.prototype.withCoronalMetathesis = function () {
-        this.useCoronalMetathesis = true;
+        initialize(false);
     };
     SoundSystem.prototype.generate = function (n, verbose, unsorted, category, force) {
         var _a;
@@ -881,7 +874,7 @@ var SoundSystem = (function () {
             dict = __assign((_a = {}, _a[category] = 0, _a), dict);
         }
         ruleSelector = new WeightedSelector(dict);
-        for (var i = 0; force || i < n * 2 + 1; ++i) {
+        for (var i = 0; force || i < 3 * n; ++i) {
             var rule = ruleSelector.select();
             var form = this.runRule(rule);
             var word = new Word(form, rule);
