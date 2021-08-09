@@ -4,16 +4,12 @@
         "allowUnreachableCode": false,
         "allowUnusedLabels": false,
         "noImplicitReturns": true,
-        "noImplicitThis": true,
         "noUncheckedIndexedAccess": true,
         "strict": true,
-        "strictPropertyInitialization": false,
         "declaration": true,
-        "downlevelIteration": true,
         "noEmitOnError": true,
         "outFile": "./dist/index.js",
         "removeComments": true,
-        "forceConsistentCasingInFileNames": true,
         "target": "ES2015",
         "lib": ["ES2015", "ES2016.Array.Include", "DOM"]
     }
