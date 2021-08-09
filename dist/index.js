@@ -513,7 +513,7 @@ const invalidItemAndWeight = (item) => {
         return true;
     }
     let weight = +parts[1];
-    return isNaN(weight) || weight <= 0 || weight === Infinity;
+    return isNaN(weight) || weight < 0 || weight === Infinity;
 };
 class ArbSorter {
     constructor(order) {
