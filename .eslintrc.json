@@ -242,6 +242,7 @@
                         "private-instance-field",
                         "public-instance-field",
                         "constructor",
+                        "get",
                         "private-method",
                         "public-method"
                     ]

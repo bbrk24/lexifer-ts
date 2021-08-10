@@ -1,5 +1,5 @@
 /*!
-Lexifer TS v1.2.0-alpha.1
+Lexifer TS v1.2.0-alpha.2
 
 Copyright (c) 2021 William Baker
 
@@ -73,29 +73,37 @@ declare const enum Place {
     Uvular = 7
 }
 declare const enum Manner {
-    Stop = 0,
+    Plosive = 0,
     Fricative = 1,
     Nasal = 2,
     Sibilant = 3,
     LatFric = 4,
     LatAffric = 5,
-    Affricate = 6
+    Affricate = 6,
+    Approx = 7,
+    LatApprox = 8,
+    Trill = 9
 }
 declare class Segment {
+    static index: 'digraph' | 'ipa';
     ipa: string;
     digraph: string;
     voiced: boolean;
     place: Place;
     manner: Manner;
     constructor(arr: [string, string, boolean, Place, Manner]);
+    get isStop(): boolean;
+    get isPeripheral(): boolean;
+    get isApprox(): boolean;
+    toString(): string;
 }
 declare class ClusterEngine {
     isIpa: boolean;
-    private static segments;
-    private index;
+    private static readonly segments;
     constructor(isIpa: boolean);
     applyAssimilations(word: string[]): string[];
     applyCoronalMetathesis(word: string[]): string[];
+    applyRejections(word: string[]): string[];
 }
 declare const wrap: (str: string) => string;
 declare class Word {
@@ -109,6 +117,7 @@ declare class Word {
     applyFilters(filters: [string, string][]): void;
     applyAssimilations(): void;
     applyCoronalMetathesis(): void;
+    applyRejections(): void;
     toString(): string;
 }
 declare const invalidItemAndWeight: (item: string) => boolean;
@@ -133,6 +142,7 @@ declare class SoundSystem {
     randpercent: number;
     useAssim: boolean;
     useCoronalMetathesis: boolean;
+    useRejections: boolean;
     ruleset: {
         [key: string]: Rule;
     };

@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## v1.2.0
+
+### Added
+
+`std-rejections` -- rejects obstruent-approximant and nasal-trill clusters if
+both consonants have the same place of articulation.
+
 ## v1.1.2
 
 This version contains very little in the way of functional changes, but

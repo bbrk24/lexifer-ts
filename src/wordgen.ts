@@ -103,6 +103,7 @@ class SoundSystem {
     randpercent = 10;
     useAssim = false;
     useCoronalMetathesis = false;
+    useRejections = false;
     ruleset: { [key: string]: Rule } = {};
     sorter: ArbSorter | null = null;
 
@@ -170,6 +171,9 @@ class SoundSystem {
         }
         if (this.useCoronalMetathesis) {
             word.applyCoronalMetathesis();
+        }
+        if (this.useRejections) {
+            word.applyRejections();
         }
 
         word.applyFilters(this.filters);

@@ -86,7 +86,12 @@ class PhonologyDefinition {
                 throw new Error(`parsing error at '${line}'.`);
             }
         }
-        if ((this.soundsys.useAssim || this.soundsys.useCoronalMetathesis)
+        if (
+            (
+                this.soundsys.useAssim
+                || this.soundsys.useCoronalMetathesis
+                || this.soundsys.useRejections
+            )
             && !this.soundsys.sorter
         ) {
             this.stderr("Without 'letters:' cannot apply assimilations or "

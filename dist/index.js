@@ -1,6 +1,6 @@
 "use strict";
 /*!
-Lexifer TS v1.2.0-alpha.1
+Lexifer TS v1.2.0-alpha.2
 
 Copyright (c) 2021 William Baker
 
@@ -162,7 +162,9 @@ class PhonologyDefinition {
                 throw new Error(`parsing error at '${line}'.`);
             }
         }
-        if ((this.soundsys.useAssim || this.soundsys.useCoronalMetathesis)
+        if ((this.soundsys.useAssim
+            || this.soundsys.useCoronalMetathesis
+            || this.soundsys.useRejections)
             && !this.soundsys.sorter) {
             this.stderr("Without 'letters:' cannot apply assimilations or "
                 + 'coronal metathesis.');
@@ -396,37 +398,51 @@ class Segment {
     constructor(arr) {
         [this.ipa, this.digraph, this.voiced, this.place, this.manner] = arr;
     }
+    get isStop() {
+        return this.manner === 2 || this.manner === 0;
+    }
+    get isPeripheral() {
+        return this.place === 0 || this.place === 6;
+    }
+    get isApprox() {
+        return this.manner === 7
+            || this.manner === 8
+            || this.manner === 9;
+    }
+    toString() {
+        return this[Segment.index];
+    }
 }
 class ClusterEngine {
     constructor(isIpa) {
         this.isIpa = isIpa;
-        this.index = isIpa ? 'ipa' : 'digraph';
+        Segment.index = isIpa ? 'ipa' : 'digraph';
     }
     applyAssimilations(word) {
         const nasalAssimilate = (ph1, ph2) => {
-            const data1 = ClusterEngine.segments.find(el => el[this.index] === ph1);
+            const data1 = ClusterEngine.segments.find(el => el.toString() === ph1);
             if (data1 && data1.manner === 2) {
-                const data2 = ClusterEngine.segments.find(el => el[this.index] === ph2);
-                if (data2) {
+                const data2 = ClusterEngine.segments.find(el => el.toString() === ph2);
+                if (data2 && !data2.isApprox) {
                     const result = ClusterEngine.segments.find(el => el.place === data2.place
                         && el.manner === 2);
                     if (result) {
-                        return result[this.index];
+                        return result.toString();
                     }
                 }
             }
             return ph1;
         };
         const voiceAssimilate = (ph1, ph2) => {
-            const data2 = ClusterEngine.segments.find(el => el[this.index] === ph2);
-            if (data2 && data2.manner !== 2) {
-                const data1 = ClusterEngine.segments.find(el => el[this.index] === ph1);
+            const data2 = ClusterEngine.segments.find(el => el.toString() === ph2);
+            if (data2 && !data2.isApprox) {
+                const data1 = ClusterEngine.segments.find(el => el.toString() === ph1);
                 if (data1) {
                     const result = ClusterEngine.segments.find(el => el.voiced === data2.voiced
                         && el.place === data1.place
                         && el.manner === data1.manner);
                     if (result) {
-                        return result[this.index];
+                        return result.toString();
                     }
                 }
             }
@@ -441,12 +457,12 @@ class ClusterEngine {
     }
     applyCoronalMetathesis(word) {
         const coronalMetathesis = (ph1, ph2) => {
-            const data1 = ClusterEngine.segments.find(el => el[this.index] === ph1);
+            const data1 = ClusterEngine.segments.find(el => el.toString() === ph1);
             if (data1 && data1.place === 2) {
-                const data2 = ClusterEngine.segments.find(el => el[this.index] === ph2);
+                const data2 = ClusterEngine.segments.find(el => el.toString() === ph2);
                 if (data2
-                    && [6, 0].includes(data2.place)
-                    && [0, 2].includes(data2.manner)
+                    && data2.isPeripheral
+                    && data2.isStop
                     && data2.manner === data1.manner) {
                     return [ph2, ph1];
                 }
@@ -459,6 +475,30 @@ class ClusterEngine {
         }
         return newArr;
     }
+    applyRejections(word) {
+        const rejectCluster = (ph1, ph2) => {
+            const data1 = ClusterEngine.segments.find(el => el.toString() === ph1);
+            if (data1 && data1.manner !== 3) {
+                const data2 = ClusterEngine.segments.find(el => el.toString() === ph2);
+                if (data2
+                    && data2.isApprox
+                    && data2.place === data1.place) {
+                    if (data2.manner === 9) {
+                        return data1.isApprox
+                            || data1.manner === 2;
+                    }
+                    return data1 !== data2;
+                }
+            }
+            return false;
+        };
+        for (let i = 0; i < word.length - 1; ++i) {
+            if (rejectCluster(word[i], word[i + 1])) {
+                return ['REJECT'];
+            }
+        }
+        return word;
+    }
 }
 ClusterEngine.segments = [
     new Segment(['p', 'p', false, 0, 0]),
@@ -469,6 +509,9 @@ ClusterEngine.segments = [
     new Segment(['v', 'v', true, 1, 1]),
     new Segment(['m', 'm', true, 0, 2]),
     new Segment(['m', 'm', true, 1, 2]),
+    new Segment(['ʋ', 'vw', true, 0, 7]),
+    new Segment(['w', 'w', true, 0, 7]),
+    new Segment(['w', 'w', true, 1, 7]),
     new Segment(['t', 't', false, 2, 0]),
     new Segment(['d', 'd', true, 2, 0]),
     new Segment(['s', 's', false, 2, 3]),
@@ -486,6 +529,9 @@ ClusterEngine.segments = [
     new Segment(['tʃ', 'ch', false, 3, 6]),
     new Segment(['dʒ', 'j', true, 3, 6]),
     new Segment(['n', 'n', true, 2, 2]),
+    new Segment(['ɹ', 'rh', true, 2, 7]),
+    new Segment(['l', 'l', true, 2, 8]),
+    new Segment(['r', 'r', true, 2, 9]),
     new Segment(['ʈ', 'rt', false, 4, 0]),
     new Segment(['ɖ', 'rd', true, 4, 0]),
     new Segment(['ʂ', 'sr', false, 4, 3]),
@@ -493,6 +539,8 @@ ClusterEngine.segments = [
     new Segment(['ʈʂ', 'rts', false, 4, 6]),
     new Segment(['ɖʐ', 'rdz', true, 4, 6]),
     new Segment(['ɳ', 'rn', true, 4, 2]),
+    new Segment(['ɻ', 'rr', true, 4, 7]),
+    new Segment(['ɭ', 'rl', true, 4, 8]),
     new Segment(['c', 'ky', false, 5, 0]),
     new Segment(['ɟ', 'gy', true, 5, 0]),
     new Segment(['ɕ', 'sy', false, 5, 3]),
@@ -502,11 +550,13 @@ ClusterEngine.segments = [
     new Segment(['tɕ', 'cy', false, 5, 6]),
     new Segment(['dʑ', 'jy', true, 5, 6]),
     new Segment(['ɲ', 'ny', true, 5, 2]),
+    new Segment(['j', 'y', true, 5, 7]),
     new Segment(['k', 'k', false, 6, 0]),
     new Segment(['g', 'g', true, 6, 0]),
     new Segment(['x', 'kh', false, 6, 1]),
     new Segment(['ɣ', 'gh', true, 6, 1]),
     new Segment(['ŋ', 'ng', true, 6, 2]),
+    new Segment(['ɰ', 'wy', true, 6, 7]),
     new Segment(['q', 'q', false, 7, 0]),
     new Segment(['ɢ', 'gq', true, 7, 0]),
     new Segment(['χ', 'qh', false, 7, 1]),
@@ -555,6 +605,16 @@ class Word {
             if (newWord !== last(this.forms)) {
                 this.forms.push(newWord);
                 this.filters.push('coronal-metathesis');
+            }
+        }
+    }
+    applyRejections() {
+        if (Word.sorter && Word.clusterEngine) {
+            const newWord = Word.clusterEngine.applyRejections(Word.sorter.split(last(this.forms)))
+                .join('');
+            if (newWord !== last(this.forms)) {
+                this.forms.push(newWord);
+                this.filters.push('std-rejections');
             }
         }
     }
@@ -624,6 +684,7 @@ class SoundSystem {
         this.randpercent = 10;
         this.useAssim = false;
         this.useCoronalMetathesis = false;
+        this.useRejections = false;
         this.ruleset = {};
         this.sorter = null;
     }
@@ -685,6 +746,9 @@ class SoundSystem {
         }
         if (this.useCoronalMetathesis) {
             word.applyCoronalMetathesis();
+        }
+        if (this.useRejections) {
+            word.applyRejections();
         }
         word.applyFilters(this.filters);
         return word;
