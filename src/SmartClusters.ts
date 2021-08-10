@@ -20,15 +20,11 @@
  * IN THE SOFTWARE.
  */
 
-const enum Voicing {
-    Voiceless, Voiced
-}
-
 const enum Place {
     Bilabial,
     Labiodental,
     Alveolar,
-    Postalveolar,
+    PostAlv,
     Retroflex,
     Palatal,
     Velar,
@@ -47,151 +43,181 @@ const enum Manner {
     Affricate
 }
 
-const data: [string, string, Voicing, Place, Manner][] = [
-    // Bilabial, labio-dental
-    ['p',  'p',   Voicing.Voiceless, Place.Bilabial,     Manner.Stop],
-    ['b',  'b',   Voicing.Voiced,    Place.Bilabial,     Manner.Stop],
-    ['ɸ',  'ph',  Voicing.Voiceless, Place.Bilabial,     Manner.Fricative],
-    ['β',  'bh',  Voicing.Voiced,    Place.Bilabial,     Manner.Fricative],
-    ['f',  'f',   Voicing.Voiceless, Place.Labiodental,  Manner.Fricative],
-    ['v',  'v',   Voicing.Voiced,    Place.Labiodental,  Manner.Fricative],
-    ['m',  'm',   Voicing.Voiced,    Place.Bilabial,     Manner.Nasal],
-    ['m',  'm',   Voicing.Voiced,    Place.Labiodental,  Manner.Nasal],
-    // Alveolar
-    ['t',  't',   Voicing.Voiceless, Place.Alveolar,     Manner.Stop],
-    ['d',  'd',   Voicing.Voiced,    Place.Alveolar,     Manner.Stop],
-    ['s',  's',   Voicing.Voiceless, Place.Alveolar,     Manner.Sibilant],
-    ['z',  'z',   Voicing.Voiced,    Place.Alveolar,     Manner.Sibilant],
-    ['θ',  'th',  Voicing.Voiceless, Place.Alveolar,     Manner.Fricative],
-    ['ð',  'dh',  Voicing.Voiced,    Place.Alveolar,     Manner.Fricative],
-    ['ɬ',  'lh',  Voicing.Voiceless, Place.Alveolar,     Manner.LatFric],
-    ['ɮ',  'ldh', Voicing.Voiced,    Place.Alveolar,     Manner.LatFric],
-    ['tɬ', 'tl',  Voicing.Voiceless, Place.Alveolar,     Manner.LatAffric],
-    ['dɮ', 'dl',  Voicing.Voiced,    Place.Alveolar,     Manner.LatAffric],
-    ['ts', 'ts',  Voicing.Voiceless, Place.Alveolar,     Manner.Affricate],
-    ['dz', 'dz',  Voicing.Voiced,    Place.Alveolar,     Manner.Affricate],
-    ['ʃ',  'sh',  Voicing.Voiceless, Place.Postalveolar, Manner.Sibilant],
-    ['ʒ',  'zh',  Voicing.Voiced,    Place.Postalveolar, Manner.Sibilant],
-    ['tʃ', 'ch',  Voicing.Voiceless, Place.Postalveolar, Manner.Affricate],
-    ['dʒ', 'j',   Voicing.Voiced,    Place.Postalveolar, Manner.Affricate],
-    ['n',  'n',   Voicing.Voiced,    Place.Alveolar,     Manner.Nasal],
-    // Retroflex
-    ['ʈ',  'rt',  Voicing.Voiceless, Place.Retroflex,    Manner.Stop],
-    ['ɖ',  'rd',  Voicing.Voiced,    Place.Retroflex,    Manner.Stop],
-    ['ʂ',  'sr',  Voicing.Voiceless, Place.Retroflex,    Manner.Sibilant],
-    ['ʐ',  'zr',  Voicing.Voiced,    Place.Retroflex,    Manner.Sibilant],
-    ['ʈʂ', 'rts', Voicing.Voiceless, Place.Retroflex,    Manner.Affricate],
-    ['ɖʐ', 'rdz', Voicing.Voiced,    Place.Retroflex,    Manner.Affricate],
-    ['ɳ',  'rn',  Voicing.Voiced,    Place.Retroflex,    Manner.Nasal],
-    // Palatal
-    ['c',  'ky',  Voicing.Voiceless, Place.Palatal,      Manner.Stop],
-    ['ɟ',  'gy',  Voicing.Voiced,    Place.Palatal,      Manner.Stop],
-    ['ɕ',  'sy',  Voicing.Voiceless, Place.Palatal,      Manner.Sibilant],
-    ['ʑ',  'zy',  Voicing.Voiced,    Place.Palatal,      Manner.Sibilant],
-    ['ç',  'hy',  Voicing.Voiceless, Place.Palatal,      Manner.Fricative],
-    ['ʝ',  'yy',  Voicing.Voiced,    Place.Palatal,      Manner.Fricative],
-    ['tɕ', 'cy',  Voicing.Voiceless, Place.Palatal,      Manner.Affricate],
-    ['dʑ', 'jy',  Voicing.Voiced,    Place.Palatal,      Manner.Affricate],
-    ['ɲ',  'ny',  Voicing.Voiced,    Place.Palatal,      Manner.Nasal],
-    // Velar
-    ['k',  'k',   Voicing.Voiceless, Place.Velar,        Manner.Stop],
-    ['g',  'g',   Voicing.Voiced,    Place.Velar,        Manner.Stop],
-    ['x',  'kh',  Voicing.Voiceless, Place.Velar,        Manner.Fricative],
-    ['ɣ',  'gh',  Voicing.Voiced,    Place.Velar,        Manner.Fricative],
-    ['ŋ',  'ng',  Voicing.Voiced,    Place.Velar,        Manner.Nasal],
-    // Uvular
-    ['q',  'q',   Voicing.Voiceless, Place.Uvular,       Manner.Stop],
-    ['ɢ',  'gq',  Voicing.Voiced,    Place.Uvular,       Manner.Stop],
-    ['χ',  'qh',  Voicing.Voiceless, Place.Uvular,       Manner.Fricative],
-    ['ʁ',  'gqh', Voicing.Voiced,    Place.Uvular,       Manner.Fricative],
-    ['ɴ',  'nq',  Voicing.Voiced,    Place.Uvular,       Manner.Nasal]
-];
+class Segment {
+    ipa: string;
+    digraph: string;
+    voiced: boolean;
+    place: Place;
+    manner: Manner;
 
-let phdb: [string, Voicing, Place, Manner][];
-
-const initialize = (isIpa = true) => {
-    phdb = [];
-    if (isIpa) {
-        for (const row of data) {
-            phdb.push([row[0], row[2], row[3], row[4]]);
-        }
-    } else {
-        for (const row of data) {
-            phdb.push([row[1], row[2], row[3], row[4]]);
-        }
+    constructor(arr: [string, string, boolean, Place, Manner]) {
+        [this.ipa, this.digraph, this.voiced, this.place, this.manner] = arr;
     }
-};
+}
 
-const applyAssimilations = (word: string[]) => {
-    const nasalAssimilate = (ph1: string, ph2: string) => {
-        const data1 = phdb.find(el => el[0] === ph1);
-        if (data1 && data1[3] === Manner.Nasal) {
-            const data2 = phdb.find(el => el[0] === ph2);
-            if (data2) {
-                const result = phdb.find(el =>
-                    el[2] === data2![2] && el[3] === Manner.Nasal);
-                if (result) {
-                    return result[0];
+class ClusterEngine {
+    /*
+     * Using a constructor from a tuple might be slower at runtime, but it only
+     * runs once, and takes up fewer characters.
+     */
+    private static segments: Segment[] = [
+        // Bilabial, labio-dental
+        new Segment(['p',  'p',   false, Place.Bilabial,    Manner.Stop]),
+        new Segment(['b',  'b',   true,  Place.Bilabial,    Manner.Stop]),
+        new Segment(['ɸ',  'ph',  false, Place.Bilabial,    Manner.Fricative]),
+        new Segment(['β',  'bh',  true,  Place.Bilabial,    Manner.Fricative]),
+        new Segment(['f',  'f',   false, Place.Labiodental, Manner.Fricative]),
+        new Segment(['v',  'v',   true,  Place.Labiodental, Manner.Fricative]),
+        new Segment(['m',  'm',   true,  Place.Bilabial,    Manner.Nasal]),
+        new Segment(['m',  'm',   true,  Place.Labiodental, Manner.Nasal]),
+        // Alveolar
+        new Segment(['t',  't',   false, Place.Alveolar,    Manner.Stop]),
+        new Segment(['d',  'd',   true,  Place.Alveolar,    Manner.Stop]),
+        new Segment(['s',  's',   false, Place.Alveolar,    Manner.Sibilant]),
+        new Segment(['z',  'z',   true,  Place.Alveolar,    Manner.Sibilant]),
+        new Segment(['θ',  'th',  false, Place.Alveolar,    Manner.Fricative]),
+        new Segment(['ð',  'dh',  true,  Place.Alveolar,    Manner.Fricative]),
+        new Segment(['ɬ',  'lh',  false, Place.Alveolar,    Manner.LatFric]),
+        new Segment(['ɮ',  'ldh', true,  Place.Alveolar,    Manner.LatFric]),
+        new Segment(['tɬ', 'tl',  false, Place.Alveolar,    Manner.LatAffric]),
+        new Segment(['dɮ', 'dl',  true,  Place.Alveolar,    Manner.LatAffric]),
+        new Segment(['ts', 'ts',  false, Place.Alveolar,    Manner.Affricate]),
+        new Segment(['dz', 'dz',  true,  Place.Alveolar,    Manner.Affricate]),
+        new Segment(['ʃ',  'sh',  false, Place.PostAlv,     Manner.Sibilant]),
+        new Segment(['ʒ',  'zh',  true,  Place.PostAlv,     Manner.Sibilant]),
+        new Segment(['tʃ', 'ch',  false, Place.PostAlv,     Manner.Affricate]),
+        new Segment(['dʒ', 'j',   true,  Place.PostAlv,     Manner.Affricate]),
+        new Segment(['n',  'n',   true,  Place.Alveolar,    Manner.Nasal]),
+        // Retroflex
+        new Segment(['ʈ',  'rt',  false, Place.Retroflex,   Manner.Stop]),
+        new Segment(['ɖ',  'rd',  true,  Place.Retroflex,   Manner.Stop]),
+        new Segment(['ʂ',  'sr',  false, Place.Retroflex,   Manner.Sibilant]),
+        new Segment(['ʐ',  'zr',  true,  Place.Retroflex,   Manner.Sibilant]),
+        new Segment(['ʈʂ', 'rts', false, Place.Retroflex,   Manner.Affricate]),
+        new Segment(['ɖʐ', 'rdz', true,  Place.Retroflex,   Manner.Affricate]),
+        new Segment(['ɳ',  'rn',  true,  Place.Retroflex,   Manner.Nasal]),
+        // Palatal
+        new Segment(['c',  'ky',  false, Place.Palatal,     Manner.Stop]),
+        new Segment(['ɟ',  'gy',  true,  Place.Palatal,     Manner.Stop]),
+        new Segment(['ɕ',  'sy',  false, Place.Palatal,     Manner.Sibilant]),
+        new Segment(['ʑ',  'zy',  true,  Place.Palatal,     Manner.Sibilant]),
+        new Segment(['ç',  'hy',  false, Place.Palatal,     Manner.Fricative]),
+        new Segment(['ʝ',  'yy',  true,  Place.Palatal,     Manner.Fricative]),
+        new Segment(['tɕ', 'cy',  false, Place.Palatal,     Manner.Affricate]),
+        new Segment(['dʑ', 'jy',  true,  Place.Palatal,     Manner.Affricate]),
+        new Segment(['ɲ',  'ny',  true,  Place.Palatal,     Manner.Nasal]),
+        // Velar
+        new Segment(['k',  'k',   false, Place.Velar,       Manner.Stop]),
+        new Segment(['g',  'g',   true,  Place.Velar,       Manner.Stop]),
+        new Segment(['x',  'kh',  false, Place.Velar,       Manner.Fricative]),
+        new Segment(['ɣ',  'gh',  true,  Place.Velar,       Manner.Fricative]),
+        new Segment(['ŋ',  'ng',  true,  Place.Velar,       Manner.Nasal]),
+        // Uvular
+        new Segment(['q',  'q',   false, Place.Uvular,      Manner.Stop]),
+        new Segment(['ɢ',  'gq',  true,  Place.Uvular,      Manner.Stop]),
+        new Segment(['χ',  'qh',  false, Place.Uvular,      Manner.Fricative]),
+        new Segment(['ʁ',  'gqh', true,  Place.Uvular,      Manner.Fricative]),
+        new Segment(['ɴ',  'nq',  true,  Place.Uvular,      Manner.Nasal])
+    ];
+
+    private index: 'digraph' | 'ipa';
+
+    constructor(public isIpa: boolean) {
+        this.index = isIpa ? 'ipa' : 'digraph';
+    }
+
+    applyAssimilations(word: string[]) {
+        const nasalAssimilate = (ph1: string, ph2: string) => {
+            const data1 = ClusterEngine.segments.find(el =>
+                el[this.index] === ph1);
+
+            if (data1 && data1.manner === Manner.Nasal) {
+                const data2 = ClusterEngine.segments.find(el =>
+                    el[this.index] === ph2);
+
+                if (data2) {
+                    const result = ClusterEngine.segments.find(el =>
+                        el.place === data2!.place
+                        && el.manner === Manner.Nasal);
+
+                    if (result) {
+                        return result[this.index];
+                    }
                 }
             }
-        }
 
-        return ph1;
-    };
+            return ph1;
+        };
 
-    const voiceAssimilate = (ph1: string, ph2: string) => {
-        const data2 = phdb.find(el => el[0] === ph2);
-        if (data2 && data2[3] !== Manner.Nasal) {
-            const data1 = phdb.find(el => el[0] === ph1);
-            if (data1) {
-                const result = phdb.find(el =>
-                    el[1] === data2![1]
-                    && el[2] === data1![2]
-                    && el[3] === data1![3]);
-                if (result) {
-                    return result[0];
+        const voiceAssimilate = (ph1: string, ph2: string) => {
+            const data2 = ClusterEngine.segments.find(el =>
+                el[this.index] === ph2);
+
+            if (data2 && data2.manner !== Manner.Nasal) {
+                const data1 = ClusterEngine.segments.find(el =>
+                    el[this.index] === ph1);
+
+                if (data1) {
+                    const result = ClusterEngine.segments.find(el =>
+                        el.voiced === data2!.voiced
+                        && el.place === data1!.place
+                        && el.manner === data1!.manner);
+
+                    if (result) {
+                        return result[this.index];
+                    }
                 }
             }
+
+            return ph1;
+        };
+
+        const newArr = [...word];
+
+        for (let i = 0; i < word.length - 1; ++i) {
+            newArr[i] = voiceAssimilate(word[i]!, word[i + 1]!);
+            newArr[i] = nasalAssimilate(newArr[i]!, word[i + 1]!);
         }
 
-        return ph1;
-    };
-
-    const newArr = [...word];
-
-    for (let i = 0; i < word.length - 1; ++i) {
-        newArr[i] = voiceAssimilate(word[i]!, word[i + 1]!);
-        newArr[i] = nasalAssimilate(newArr[i]!, word[i + 1]!);
+        return newArr;
     }
 
-    return newArr;
-};
+    applyCoronalMetathesis(word: string[]) {
+        const coronalMetathesis = (
+            ph1: string,
+            ph2: string
+        ): [string, string] => {
+            const data1 = ClusterEngine.segments.find(el =>
+                el[this.index] === ph1);
 
-const applyCoronalMetathesis = (word: string[]) => {
-    const coronalMetathesis = (ph1: string, ph2: string): [string, string] => {
-        const data1 = phdb.filter(el => el[0] === ph1)[0];
-        if (data1 && data1[2] === Place.Alveolar) {
-            const data2 = phdb.filter(el => el[0] === ph2)[0];
-            if (
-                data2
-                && [Place.Velar, Place.Bilabial].includes(data2[2])
-                && [Manner.Stop, Manner.Nasal].includes(data2[3])
-                && data2[3] === data1[3]
-            ) {
-                return [ph2, ph1];
+            if (data1 && data1.place === Place.Alveolar) {
+                const data2 = ClusterEngine.segments.find(el =>
+                    el[this.index] === ph2);
+
+                if (
+                    data2
+                    && [Place.Velar, Place.Bilabial].includes(data2.place)
+                    && [Manner.Stop, Manner.Nasal].includes(data2.manner)
+                    && data2.manner === data1.manner
+                ) {
+                    return [ph2, ph1];
+                }
             }
+
+            return [ph1, ph2];
+        };
+
+        const newArr = [...word];
+
+        for (let i = 0; i < word.length - 1; ++i) {
+            [newArr[i], newArr[i + 1]] = coronalMetathesis(
+                word[i]!,
+                word[i + 1]!
+            );
         }
 
-        return [ph1, ph2];
-    };
-
-    const newArr = [...word];
-
-    for (let i = 0; i < word.length - 1; ++i) {
-        [newArr[i], newArr[i + 1]] = coronalMetathesis(word[i]!, word[i + 1]!);
+        return newArr;
     }
+}
 
-    return newArr;
-};
-
-export { initialize, applyAssimilations, applyCoronalMetathesis };
+export default ClusterEngine;

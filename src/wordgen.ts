@@ -20,11 +20,11 @@
  * IN THE SOFTWARE.
  */
 
-import { initialize } from './SmartClusters';
 import WeightedSelector from './distribution';
 import wrap from './textwrap';
 import last from './last';
 import Word from './word';
+import ClusterEngine from './SmartClusters';
 
 const invalidItemAndWeight = (item: string) => {
     const parts = item.split(':');
@@ -255,11 +255,11 @@ class SoundSystem {
     }
 
     useIpa() {
-        initialize();
+        Word.clusterEngine = new ClusterEngine(true);
     }
 
     useDigraphs() {
-        initialize(false);
+        Word.clusterEngine = new ClusterEngine(false);
     }
 
     generate(

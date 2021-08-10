@@ -21,12 +21,13 @@
  */
 
 import last from './last';
-import { applyAssimilations, applyCoronalMetathesis } from './SmartClusters';
+import ClusterEngine from './SmartClusters';
 import { ArbSorter } from './wordgen';
 
 class Word {
     static verbose = false;
     static sorter: ArbSorter | null = null;
+    static clusterEngine: ClusterEngine | null = null;
 
     private forms: string[];
     private filters: string[];
@@ -59,8 +60,8 @@ class Word {
     }
 
     applyAssimilations() {
-        if (Word.sorter) {
-            const newWord = applyAssimilations(
+        if (Word.sorter && Word.clusterEngine) {
+            const newWord = Word.clusterEngine.applyAssimilations(
                 Word.sorter.split(
                     last(this.forms)!
                 )
@@ -75,8 +76,8 @@ class Word {
     }
 
     applyCoronalMetathesis() {
-        if (Word.sorter) {
-            const newWord = applyCoronalMetathesis(
+        if (Word.sorter && Word.clusterEngine) {
+            const newWord = Word.clusterEngine.applyCoronalMetathesis(
                 Word.sorter.split(
                     last(this.forms)!
                 )

@@ -1,6 +1,6 @@
 "use strict";
 /*!
-Lexifer TS v1.1.2-rc.0
+Lexifer TS v1.2.0-alpha.1
 
 Copyright (c) 2021 William Baker
 
@@ -392,129 +392,127 @@ class PhonologyDefinition {
         return textify(this.soundsys, sentences);
     }
 }
-const data = [
-    ['p', 'p', 0, 0, 0],
-    ['b', 'b', 1, 0, 0],
-    ['ɸ', 'ph', 0, 0, 1],
-    ['β', 'bh', 1, 0, 1],
-    ['f', 'f', 0, 1, 1],
-    ['v', 'v', 1, 1, 1],
-    ['m', 'm', 1, 0, 2],
-    ['m', 'm', 1, 1, 2],
-    ['t', 't', 0, 2, 0],
-    ['d', 'd', 1, 2, 0],
-    ['s', 's', 0, 2, 3],
-    ['z', 'z', 1, 2, 3],
-    ['θ', 'th', 0, 2, 1],
-    ['ð', 'dh', 1, 2, 1],
-    ['ɬ', 'lh', 0, 2, 4],
-    ['ɮ', 'ldh', 1, 2, 4],
-    ['tɬ', 'tl', 0, 2, 5],
-    ['dɮ', 'dl', 1, 2, 5],
-    ['ts', 'ts', 0, 2, 6],
-    ['dz', 'dz', 1, 2, 6],
-    ['ʃ', 'sh', 0, 3, 3],
-    ['ʒ', 'zh', 1, 3, 3],
-    ['tʃ', 'ch', 0, 3, 6],
-    ['dʒ', 'j', 1, 3, 6],
-    ['n', 'n', 1, 2, 2],
-    ['ʈ', 'rt', 0, 4, 0],
-    ['ɖ', 'rd', 1, 4, 0],
-    ['ʂ', 'sr', 0, 4, 3],
-    ['ʐ', 'zr', 1, 4, 3],
-    ['ʈʂ', 'rts', 0, 4, 6],
-    ['ɖʐ', 'rdz', 1, 4, 6],
-    ['ɳ', 'rn', 1, 4, 2],
-    ['c', 'ky', 0, 5, 0],
-    ['ɟ', 'gy', 1, 5, 0],
-    ['ɕ', 'sy', 0, 5, 3],
-    ['ʑ', 'zy', 1, 5, 3],
-    ['ç', 'hy', 0, 5, 1],
-    ['ʝ', 'yy', 1, 5, 1],
-    ['tɕ', 'cy', 0, 5, 6],
-    ['dʑ', 'jy', 1, 5, 6],
-    ['ɲ', 'ny', 1, 5, 2],
-    ['k', 'k', 0, 6, 0],
-    ['g', 'g', 1, 6, 0],
-    ['x', 'kh', 0, 6, 1],
-    ['ɣ', 'gh', 1, 6, 1],
-    ['ŋ', 'ng', 1, 6, 2],
-    ['q', 'q', 0, 7, 0],
-    ['ɢ', 'gq', 1, 7, 0],
-    ['χ', 'qh', 0, 7, 1],
-    ['ʁ', 'gqh', 1, 7, 1],
-    ['ɴ', 'nq', 1, 7, 2]
+class Segment {
+    constructor(arr) {
+        [this.ipa, this.digraph, this.voiced, this.place, this.manner] = arr;
+    }
+}
+class ClusterEngine {
+    constructor(isIpa) {
+        this.isIpa = isIpa;
+        this.index = isIpa ? 'ipa' : 'digraph';
+    }
+    applyAssimilations(word) {
+        const nasalAssimilate = (ph1, ph2) => {
+            const data1 = ClusterEngine.segments.find(el => el[this.index] === ph1);
+            if (data1 && data1.manner === 2) {
+                const data2 = ClusterEngine.segments.find(el => el[this.index] === ph2);
+                if (data2) {
+                    const result = ClusterEngine.segments.find(el => el.place === data2.place
+                        && el.manner === 2);
+                    if (result) {
+                        return result[this.index];
+                    }
+                }
+            }
+            return ph1;
+        };
+        const voiceAssimilate = (ph1, ph2) => {
+            const data2 = ClusterEngine.segments.find(el => el[this.index] === ph2);
+            if (data2 && data2.manner !== 2) {
+                const data1 = ClusterEngine.segments.find(el => el[this.index] === ph1);
+                if (data1) {
+                    const result = ClusterEngine.segments.find(el => el.voiced === data2.voiced
+                        && el.place === data1.place
+                        && el.manner === data1.manner);
+                    if (result) {
+                        return result[this.index];
+                    }
+                }
+            }
+            return ph1;
+        };
+        const newArr = [...word];
+        for (let i = 0; i < word.length - 1; ++i) {
+            newArr[i] = voiceAssimilate(word[i], word[i + 1]);
+            newArr[i] = nasalAssimilate(newArr[i], word[i + 1]);
+        }
+        return newArr;
+    }
+    applyCoronalMetathesis(word) {
+        const coronalMetathesis = (ph1, ph2) => {
+            const data1 = ClusterEngine.segments.find(el => el[this.index] === ph1);
+            if (data1 && data1.place === 2) {
+                const data2 = ClusterEngine.segments.find(el => el[this.index] === ph2);
+                if (data2
+                    && [6, 0].includes(data2.place)
+                    && [0, 2].includes(data2.manner)
+                    && data2.manner === data1.manner) {
+                    return [ph2, ph1];
+                }
+            }
+            return [ph1, ph2];
+        };
+        const newArr = [...word];
+        for (let i = 0; i < word.length - 1; ++i) {
+            [newArr[i], newArr[i + 1]] = coronalMetathesis(word[i], word[i + 1]);
+        }
+        return newArr;
+    }
+}
+ClusterEngine.segments = [
+    new Segment(['p', 'p', false, 0, 0]),
+    new Segment(['b', 'b', true, 0, 0]),
+    new Segment(['ɸ', 'ph', false, 0, 1]),
+    new Segment(['β', 'bh', true, 0, 1]),
+    new Segment(['f', 'f', false, 1, 1]),
+    new Segment(['v', 'v', true, 1, 1]),
+    new Segment(['m', 'm', true, 0, 2]),
+    new Segment(['m', 'm', true, 1, 2]),
+    new Segment(['t', 't', false, 2, 0]),
+    new Segment(['d', 'd', true, 2, 0]),
+    new Segment(['s', 's', false, 2, 3]),
+    new Segment(['z', 'z', true, 2, 3]),
+    new Segment(['θ', 'th', false, 2, 1]),
+    new Segment(['ð', 'dh', true, 2, 1]),
+    new Segment(['ɬ', 'lh', false, 2, 4]),
+    new Segment(['ɮ', 'ldh', true, 2, 4]),
+    new Segment(['tɬ', 'tl', false, 2, 5]),
+    new Segment(['dɮ', 'dl', true, 2, 5]),
+    new Segment(['ts', 'ts', false, 2, 6]),
+    new Segment(['dz', 'dz', true, 2, 6]),
+    new Segment(['ʃ', 'sh', false, 3, 3]),
+    new Segment(['ʒ', 'zh', true, 3, 3]),
+    new Segment(['tʃ', 'ch', false, 3, 6]),
+    new Segment(['dʒ', 'j', true, 3, 6]),
+    new Segment(['n', 'n', true, 2, 2]),
+    new Segment(['ʈ', 'rt', false, 4, 0]),
+    new Segment(['ɖ', 'rd', true, 4, 0]),
+    new Segment(['ʂ', 'sr', false, 4, 3]),
+    new Segment(['ʐ', 'zr', true, 4, 3]),
+    new Segment(['ʈʂ', 'rts', false, 4, 6]),
+    new Segment(['ɖʐ', 'rdz', true, 4, 6]),
+    new Segment(['ɳ', 'rn', true, 4, 2]),
+    new Segment(['c', 'ky', false, 5, 0]),
+    new Segment(['ɟ', 'gy', true, 5, 0]),
+    new Segment(['ɕ', 'sy', false, 5, 3]),
+    new Segment(['ʑ', 'zy', true, 5, 3]),
+    new Segment(['ç', 'hy', false, 5, 1]),
+    new Segment(['ʝ', 'yy', true, 5, 1]),
+    new Segment(['tɕ', 'cy', false, 5, 6]),
+    new Segment(['dʑ', 'jy', true, 5, 6]),
+    new Segment(['ɲ', 'ny', true, 5, 2]),
+    new Segment(['k', 'k', false, 6, 0]),
+    new Segment(['g', 'g', true, 6, 0]),
+    new Segment(['x', 'kh', false, 6, 1]),
+    new Segment(['ɣ', 'gh', true, 6, 1]),
+    new Segment(['ŋ', 'ng', true, 6, 2]),
+    new Segment(['q', 'q', false, 7, 0]),
+    new Segment(['ɢ', 'gq', true, 7, 0]),
+    new Segment(['χ', 'qh', false, 7, 1]),
+    new Segment(['ʁ', 'gqh', true, 7, 1]),
+    new Segment(['ɴ', 'nq', true, 7, 2])
 ];
-let phdb;
-const initialize = (isIpa = true) => {
-    phdb = [];
-    if (isIpa) {
-        for (const row of data) {
-            phdb.push([row[0], row[2], row[3], row[4]]);
-        }
-    }
-    else {
-        for (const row of data) {
-            phdb.push([row[1], row[2], row[3], row[4]]);
-        }
-    }
-};
-const applyAssimilations = (word) => {
-    const nasalAssimilate = (ph1, ph2) => {
-        const data1 = phdb.find(el => el[0] === ph1);
-        if (data1 && data1[3] === 2) {
-            const data2 = phdb.find(el => el[0] === ph2);
-            if (data2) {
-                const result = phdb.find(el => el[2] === data2[2] && el[3] === 2);
-                if (result) {
-                    return result[0];
-                }
-            }
-        }
-        return ph1;
-    };
-    const voiceAssimilate = (ph1, ph2) => {
-        const data2 = phdb.find(el => el[0] === ph2);
-        if (data2 && data2[3] !== 2) {
-            const data1 = phdb.find(el => el[0] === ph1);
-            if (data1) {
-                const result = phdb.find(el => el[1] === data2[1]
-                    && el[2] === data1[2]
-                    && el[3] === data1[3]);
-                if (result) {
-                    return result[0];
-                }
-            }
-        }
-        return ph1;
-    };
-    const newArr = [...word];
-    for (let i = 0; i < word.length - 1; ++i) {
-        newArr[i] = voiceAssimilate(word[i], word[i + 1]);
-        newArr[i] = nasalAssimilate(newArr[i], word[i + 1]);
-    }
-    return newArr;
-};
-const applyCoronalMetathesis = (word) => {
-    const coronalMetathesis = (ph1, ph2) => {
-        const data1 = phdb.filter(el => el[0] === ph1)[0];
-        if (data1 && data1[2] === 2) {
-            const data2 = phdb.filter(el => el[0] === ph2)[0];
-            if (data2
-                && [6, 0].includes(data2[2])
-                && [0, 2].includes(data2[3])
-                && data2[3] === data1[3]) {
-                return [ph2, ph1];
-            }
-        }
-        return [ph1, ph2];
-    };
-    const newArr = [...word];
-    for (let i = 0; i < word.length - 1; ++i) {
-        [newArr[i], newArr[i + 1]] = coronalMetathesis(word[i], word[i + 1]);
-    }
-    return newArr;
-};
 const wrap = (str) => str.replace(/(?![^\n]{1,70}$)([^\n]{1,70})\s/gu, '$1\n');
 class Word {
     constructor(form, rule) {
@@ -541,8 +539,8 @@ class Word {
         }
     }
     applyAssimilations() {
-        if (Word.sorter) {
-            const newWord = applyAssimilations(Word.sorter.split(last(this.forms)))
+        if (Word.sorter && Word.clusterEngine) {
+            const newWord = Word.clusterEngine.applyAssimilations(Word.sorter.split(last(this.forms)))
                 .join('');
             if (newWord !== last(this.forms)) {
                 this.forms.push(newWord);
@@ -551,8 +549,8 @@ class Word {
         }
     }
     applyCoronalMetathesis() {
-        if (Word.sorter) {
-            const newWord = applyCoronalMetathesis(Word.sorter.split(last(this.forms)))
+        if (Word.sorter && Word.clusterEngine) {
+            const newWord = Word.clusterEngine.applyCoronalMetathesis(Word.sorter.split(last(this.forms)))
                 .join('');
             if (newWord !== last(this.forms)) {
                 this.forms.push(newWord);
@@ -573,6 +571,7 @@ class Word {
 }
 Word.verbose = false;
 Word.sorter = null;
+Word.clusterEngine = null;
 const invalidItemAndWeight = (item) => {
     const parts = item.split(':');
     if (parts.length !== 2) {
@@ -750,10 +749,10 @@ class SoundSystem {
         this.sorter = new ArbSorter(order);
     }
     useIpa() {
-        initialize();
+        Word.clusterEngine = new ClusterEngine(true);
     }
     useDigraphs() {
-        initialize(false);
+        Word.clusterEngine = new ClusterEngine(false);
     }
     generate(numWords, verbose, unsorted, category, force = false) {
         const words = new Set();

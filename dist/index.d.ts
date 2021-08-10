@@ -1,5 +1,5 @@
 /*!
-Lexifer TS v1.1.2-rc.0
+Lexifer TS v1.2.0-alpha.1
 
 Copyright (c) 2021 William Baker
 
@@ -62,15 +62,11 @@ declare class PhonologyDefinition {
     generate(numWords?: number, verbose?: boolean, unsorted?: boolean, onePerLine?: boolean): string;
     paragraph(sentences?: number): string;
 }
-declare const enum Voicing {
-    Voiceless = 0,
-    Voiced = 1
-}
 declare const enum Place {
     Bilabial = 0,
     Labiodental = 1,
     Alveolar = 2,
-    Postalveolar = 3,
+    PostAlv = 3,
     Retroflex = 4,
     Palatal = 5,
     Velar = 6,
@@ -85,15 +81,27 @@ declare const enum Manner {
     LatAffric = 5,
     Affricate = 6
 }
-declare const data: [string, string, Voicing, Place, Manner][];
-declare let phdb: [string, Voicing, Place, Manner][];
-declare const initialize: (isIpa?: boolean) => void;
-declare const applyAssimilations: (word: string[]) => string[];
-declare const applyCoronalMetathesis: (word: string[]) => string[];
+declare class Segment {
+    ipa: string;
+    digraph: string;
+    voiced: boolean;
+    place: Place;
+    manner: Manner;
+    constructor(arr: [string, string, boolean, Place, Manner]);
+}
+declare class ClusterEngine {
+    isIpa: boolean;
+    private static segments;
+    private index;
+    constructor(isIpa: boolean);
+    applyAssimilations(word: string[]): string[];
+    applyCoronalMetathesis(word: string[]): string[];
+}
 declare const wrap: (str: string) => string;
 declare class Word {
     static verbose: boolean;
     static sorter: ArbSorter | null;
+    static clusterEngine: ClusterEngine | null;
     private forms;
     private filters;
     constructor(form: string, rule: string);
