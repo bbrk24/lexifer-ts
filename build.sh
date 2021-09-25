@@ -1,7 +1,5 @@
 echo 'Combining files...'
-cat src/*.ts > combined.ts
-sed -i '' '/export/d' combined.ts
-sed -i '' '/import/d' combined.ts
+sed '/export/d;/import/d' src/*.ts > combined.ts
 echo 'Compiling to JS...'
 tsc > errors
 if [ -s errors ]
