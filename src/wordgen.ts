@@ -42,7 +42,7 @@ class ArbSorter {
     }
     
     valuesAsWord(values: number[]) {
-        return values.map(v => this.vals[v]!)
+        return values.map(v => this.vals[v])
             .join('');
     }
     
