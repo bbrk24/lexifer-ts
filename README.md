@@ -6,10 +6,8 @@ This is a TypeScript implementation of William Annis's
 To compile this, run the build shell script. Windows users may NOT use
 powershell, and will have to install a proper shell terminal. You may need to
 install typescript globally (`npm i -g typescript` or
-`yarn global add typescript`).
-
-The version available on Lingweenie is minified, and has one more function to
-connect the input fields into `main()`.
+`yarn global add typescript`). Note that the build script does not include the
+minification step.
 
 ## About tsconfig
 

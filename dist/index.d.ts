@@ -8,6 +8,7 @@ declare class WeightedSelector {
     select(): string;
 }
 declare const main: (file: string, num?: number | undefined, verbose?: boolean, unsorted?: boolean | undefined, onePerLine?: boolean, stderr?: (inp: string | Error) => void) => string;
+declare const genWords: () => void;
 declare function last<T>(array: T[]): T | undefined;
 declare class PhonologyDefinition {
     private stderr;

@@ -1,6 +1,7 @@
 import wrap from './textwrap';
 import PhonologyDefinition from './PhDefParser';
 
+// Original "main" -- returns a string
 const main = (
     file: string,
     num?: number,
@@ -49,3 +50,19 @@ const main = (
     }
     return ans;
 };
+
+// Actual code run when you click "generate"
+const genWords = () => {
+    document.getElementById('errors')!.innerHTML = '';
+
+    document.getElementById('result')!.innerHTML = main(
+        (<HTMLTextAreaElement>document.getElementById('def')).value,
+        parseInt((<HTMLInputElement>document.getElementById('number')).value) || undefined,
+        (<HTMLInputElement>document.getElementById('verbose')).checked,
+        (<HTMLInputElement>document.getElementById('unsorted')).checked,
+        (<HTMLInputElement>document.getElementById('one-per-line')).checked,
+        function stderr(message) {
+            document.getElementById('errors')!.innerHTML += message + '<br />';
+        }
+    ).replace(/\n/gu, '<br />');
+}

@@ -67,6 +67,12 @@ const main = (file, num, verbose = false, unsorted, onePerLine = false, stderr =
     }
     return ans;
 };
+const genWords = () => {
+    document.getElementById('errors').innerHTML = '';
+    document.getElementById('result').innerHTML = main(document.getElementById('def').value, parseInt(document.getElementById('number').value) || undefined, document.getElementById('verbose').checked, document.getElementById('unsorted').checked, document.getElementById('one-per-line').checked, function stderr(message) {
+        document.getElementById('errors').innerHTML += message + '<br />';
+    }).replace(/\n/gu, '<br />');
+};
 function last(array) {
     var length = array == null ? 0 : array.length;
     return length ? array[length - 1] : undefined;
