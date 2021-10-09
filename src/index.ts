@@ -6,7 +6,7 @@ const main = (
     num?: number,
     verbose = false,
     unsorted?: boolean,
-    onePerLine?: boolean,
+    onePerLine = false,
     stderr: (inp: string | Error) => void = console.error
 ) => {
     let ans = '';
@@ -14,18 +14,23 @@ const main = (
         let pd = new PhonologyDefinition(file, stderr);
         if (typeof num == 'number') {
             // wordlist mode
-            if (verbose) {
-                if (unsorted === false) {
-                    stderr("** 'Unsorted' option always enabled in verbose "
-                        + 'mode.');
-                    unsorted = true;
+            if (num < 0) {
+                stderr(`Cannot generate ${num} words.`);
+                ans = pd.paragraph();
+            } else {
+                if (verbose) {
+                    if (unsorted === false) {
+                        stderr("** 'Unsorted' option always enabled in verbose "
+                            + 'mode.');
+                        unsorted = true;
+                    }
+                    if (onePerLine) {
+                        stderr("** 'One per line' option ignored in verbose "
+                            + 'mode.');
+                    }
                 }
-                if (onePerLine) {
-                    stderr("** 'One per line' option ignored in verbose "
-                        + 'mode.');
-                }
+                ans = wrap(pd.generate(num, verbose, unsorted, onePerLine));
             }
-            ans = wrap(pd.generate(num, verbose, unsorted, onePerLine));
         } else {
             // paragraph mode
             if (verbose) {

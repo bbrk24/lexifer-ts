@@ -1,3 +1,14 @@
+declare class WeightedSelector {
+    private keys;
+    private weights;
+    private sum;
+    constructor(dic: {
+        [key: string]: number | undefined;
+    });
+    select(): string;
+}
+declare const main: (file: string, num?: number | undefined, verbose?: boolean, unsorted?: boolean | undefined, onePerLine?: boolean, stderr?: (inp: string | Error) => void) => string;
+declare function last<T>(array: T[]): T | undefined;
 declare class PhonologyDefinition {
     private stderr;
     private macros;
@@ -51,17 +62,6 @@ declare let phdb: [string, Voicing, Place, Manner][];
 declare const initialize: (isIpa?: boolean) => void;
 declare const applyAssimilations: (word: string[]) => string[];
 declare const applyCoronalMetathesis: (word: string[]) => string[];
-declare class WeightedSelector {
-    private keys;
-    private weights;
-    private sum;
-    constructor(dic: {
-        [key: string]: number | undefined;
-    });
-    select(): string;
-}
-declare const main: (file: string, num?: number | undefined, verbose?: boolean, unsorted?: boolean | undefined, onePerLine?: boolean | undefined, stderr?: (inp: string | Error) => void) => string;
-declare function last<T>(array: T[]): T | undefined;
 declare const wrap: (s: string) => string;
 declare class Word {
     static verbose: boolean;

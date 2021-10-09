@@ -52,7 +52,7 @@ class ArbSorter {
     }
     
     sort(l: string[]) {
-        let l2 = l.map(el => this.wordAsValues(el));
+        let l2 = l.filter(el => el !== '').map(el => this.wordAsValues(el));
         l2.sort((a, b) => a[0]! - b[0]!);
         return l2.map(el => this.valuesAsWord(el));
     }
@@ -76,6 +76,13 @@ class SoundSystem {
     private runRule(rule: string) {
         let n = rule.length;
         let s: string[] = [];
+
+        // guard against improper '!' that the loop won't catch
+        if (rule[1] === '!' || rule.includes('!!')) {
+            throw new Error("misplaced '!' option: in non-duplicate "
+                + `environment: '${rule}'.`);
+        }
+
         for (let i = 0; i < n; ++i) {
             if ('?!'.includes(rule[i]!)) {
                 continue;
@@ -287,8 +294,7 @@ const textify = (phsys: SoundSystem, sentences = 25) => {
             true,
             phsys.randomCategory(),
             true
-        )[0]!
-            .toString()
+        )[0]!.toString()
             .replace(/./u, el => el.toUpperCase());
         
         for (let j = 0; j < sent; ++j) {
@@ -310,8 +316,7 @@ const textify = (phsys: SoundSystem, sentences = 25) => {
             text += '? ';
         }
     }
-    text = wrap(text.trim());
-    return text;
+    return wrap(text.trim());
 };
 
 export { SoundSystem, textify, ArbSorter, invalidItemAndWeight };

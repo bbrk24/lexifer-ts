@@ -11,7 +11,7 @@ install typescript globally (`npm i -g typescript` or
 The version available on Lingweenie is minified, and has one more function to
 connect the input fields into `main()`.
 
-### About tsconfig
+## About tsconfig
 
 The main-level `tsconfig.json` is the one actually used during compilation.
 `src/tsconfig.json` is only used to aid the IDE, as otherwise unexpected errors

@@ -157,6 +157,16 @@ class PhonologyDefinition {
                 rule = rules[i]!;
                 weight = 10.0 / Math.pow((i + 1), 0.9);
             }
+
+            if (!rule.match(/[^?!]/u)) {
+                // doesn't need /g since we're using it as a boolean test
+                throw new Error(`'${rules[i]}' `
+                    + (cat ? `(in category ${cat}) ` : '')
+                    + 'will only produce empty words.');
+            }
+            if (rule.includes('??')) {
+                this.stderr("'??' is treated as '?'.");
+            }
             
             rule = this.expandMacros(rule);
             

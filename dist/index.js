@@ -1,4 +1,76 @@
 "use strict";
+class WeightedSelector {
+    constructor(dic) {
+        this.keys = [];
+        this.weights = [];
+        for (let key in dic) {
+            let weight = dic[key];
+            if (typeof weight == 'number') {
+                this.keys.push(key);
+                this.weights.push(weight);
+            }
+        }
+        this.sum = this.weights.reduce((a, b) => a + b, 0);
+    }
+    select() {
+        let pick = Math.random() * this.sum;
+        let temp = 0;
+        for (let i = 0; i < this.keys.length; ++i) {
+            temp += this.weights[i];
+            if (pick < temp) {
+                return this.keys[i];
+            }
+        }
+        throw new Error('failed to choose options from '
+            + `'${this.keys.join("', '")}'.`);
+    }
+}
+const main = (file, num, verbose = false, unsorted, onePerLine = false, stderr = console.error) => {
+    let ans = '';
+    try {
+        let pd = new PhonologyDefinition(file, stderr);
+        if (typeof num == 'number') {
+            if (num < 0) {
+                stderr(`Cannot generate ${num} words.`);
+                ans = pd.paragraph();
+            }
+            else {
+                if (verbose) {
+                    if (unsorted === false) {
+                        stderr("** 'Unsorted' option always enabled in verbose "
+                            + 'mode.');
+                        unsorted = true;
+                    }
+                    if (onePerLine) {
+                        stderr("** 'One per line' option ignored in verbose "
+                            + 'mode.');
+                    }
+                }
+                ans = wrap(pd.generate(num, verbose, unsorted, onePerLine));
+            }
+        }
+        else {
+            if (verbose) {
+                stderr("** 'Verbose' option ignored in paragraph mode.");
+            }
+            if (unsorted) {
+                stderr("** 'Unsorted' option ignored in paragraph mode.");
+            }
+            if (onePerLine) {
+                stderr("** 'One per line' option ignored in paragraph mode.");
+            }
+            ans = pd.paragraph();
+        }
+    }
+    catch (e) {
+        stderr(e);
+    }
+    return ans;
+};
+function last(array) {
+    var length = array == null ? 0 : array.length;
+    return length ? array[length - 1] : undefined;
+}
 class PhonologyDefinition {
     constructor(defFile, stderr) {
         this.stderr = stderr;
@@ -141,6 +213,14 @@ class PhonologyDefinition {
             else {
                 rule = rules[i];
                 weight = 10.0 / Math.pow((i + 1), 0.9);
+            }
+            if (!rule.match(/[^?!]/u)) {
+                throw new Error(`'${rules[i]}' `
+                    + (cat ? `(in category ${cat}) ` : '')
+                    + 'will only produce empty words.');
+            }
+            if (rule.includes('??')) {
+                this.stderr("'??' is treated as '?'.");
             }
             rule = this.expandMacros(rule);
             this.soundsys.addRule(rule, weight, cat);
@@ -381,72 +461,6 @@ const applyCoronalMetathesis = (word) => {
     }
     return newArr;
 };
-class WeightedSelector {
-    constructor(dic) {
-        this.keys = [];
-        this.weights = [];
-        for (let key in dic) {
-            let weight = dic[key];
-            if (typeof weight == 'number') {
-                this.keys.push(key);
-                this.weights.push(weight);
-            }
-        }
-        this.sum = this.weights.reduce((a, b) => a + b, 0);
-    }
-    select() {
-        let pick = Math.random() * this.sum;
-        let temp = 0;
-        for (let i = 0; i < this.keys.length; ++i) {
-            temp += this.weights[i];
-            if (pick < temp) {
-                return this.keys[i];
-            }
-        }
-        throw new Error('failed to choose options from '
-            + `'${this.keys.join("', '")}'.`);
-    }
-}
-const main = (file, num, verbose = false, unsorted, onePerLine, stderr = console.error) => {
-    let ans = '';
-    try {
-        let pd = new PhonologyDefinition(file, stderr);
-        if (typeof num == 'number') {
-            if (verbose) {
-                if (unsorted === false) {
-                    stderr("** 'Unsorted' option always enabled in verbose "
-                        + 'mode.');
-                    unsorted = true;
-                }
-                if (onePerLine) {
-                    stderr("** 'One per line' option ignored in verbose "
-                        + 'mode.');
-                }
-            }
-            ans = wrap(pd.generate(num, verbose, unsorted, onePerLine));
-        }
-        else {
-            if (verbose) {
-                stderr("** 'Verbose' option ignored in paragraph mode.");
-            }
-            if (unsorted) {
-                stderr("** 'Unsorted' option ignored in paragraph mode.");
-            }
-            if (onePerLine) {
-                stderr("** 'One per line' option ignored in paragraph mode.");
-            }
-            ans = pd.paragraph();
-        }
-    }
-    catch (e) {
-        stderr(e);
-    }
-    return ans;
-};
-function last(array) {
-    var length = array == null ? 0 : array.length;
-    return length ? array[length - 1] : undefined;
-}
 const wrap = (s) => s.replace(/(?![^\n]{1,70}$)([^\n]{1,70})\s/gu, '$1\n');
 class Word {
     constructor(form, rule) {
@@ -545,7 +559,7 @@ class ArbSorter {
             .filter((_, i) => i % 2);
     }
     sort(l) {
-        let l2 = l.map(el => this.wordAsValues(el));
+        let l2 = l.filter(el => el !== '').map(el => this.wordAsValues(el));
         l2.sort((a, b) => a[0] - b[0]);
         return l2.map(el => this.valuesAsWord(el));
     }
@@ -563,6 +577,10 @@ class SoundSystem {
     runRule(rule) {
         let n = rule.length;
         let s = [];
+        if (rule[1] === '!' || rule.includes('!!')) {
+            throw new Error("misplaced '!' option: in non-duplicate "
+                + `environment: '${rule}'.`);
+        }
         for (let i = 0; i < n; ++i) {
             if ('?!'.includes(rule[i])) {
                 continue;
@@ -737,8 +755,7 @@ const textify = (phsys, sentences = 25) => {
         if (sent >= 7) {
             comma = Math.floor(Math.random() * (sent - 1));
         }
-        text += phsys.generate(1, false, true, phsys.randomCategory(), true)[0]
-            .toString()
+        text += phsys.generate(1, false, true, phsys.randomCategory(), true)[0].toString()
             .replace(/./u, el => el.toUpperCase());
         for (let j = 0; j < sent; ++j) {
             text += ` ${phsys.generate(1, false, true, phsys.randomCategory(), true)[0]}`;
@@ -753,6 +770,5 @@ const textify = (phsys, sentences = 25) => {
             text += '? ';
         }
     }
-    text = wrap(text.trim());
-    return text;
+    return wrap(text.trim());
 };
