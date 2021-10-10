@@ -27,5 +27,5 @@ else
         >> ./dist/lexifer.min.js
     echo 'Done.'
     echo 'Minified file size:' \
-        "$(wc -c ./dist/lexifer.min.js | cut -d ' ' -f 1) bytes"
+        "$(wc -c ./dist/lexifer.min.js | awk '{print $1}') bytes"
 fi
