@@ -58,8 +58,11 @@ class ArbSorter {
     }
 }
 
+// to prevent the user from typing whatever key I use to store the weight
+const _weight = Symbol();
+
 interface Rule {
-    _weight: number,
+    [_weight]: number,
     [key: string]: number
 }
 
@@ -78,7 +81,7 @@ class SoundSystem {
         let s: string[] = [];
 
         // guard against improper '!' that the loop won't catch
-        if (rule[1] === '!' || rule.includes('!!')) {
+        if (rule[0] === '!' || rule[1] === '!' || rule.includes('!!')) {
             throw new Error("misplaced '!' option: in non-duplicate "
                 + `environment: '${rule}'.`);
         }
@@ -193,7 +196,7 @@ class SoundSystem {
     }
     
     addCategory(name: string, weight: number) {
-        this.ruleset[name] = { _weight: weight };
+        this.ruleset[name] = { [_weight]: weight };
     }
     
     addFilter(pat: string, repl: string) {
@@ -231,7 +234,7 @@ class SoundSystem {
         if (!this.ruleset[category]) {
             throw new Error(`unknown category '${category}'.`);
         }
-        let dict = { ...this.ruleset[category], _weight: undefined };
+        let dict = { ...this.ruleset[category], [_weight]: undefined };
         if (Object.keys(dict).length === 1) {
             dict = { [category]: 0, ...dict };
         }
@@ -272,12 +275,12 @@ class SoundSystem {
     randomCategory() {
         let weightedCats: { [key: string]: number } = {};
         for (let cat in this.ruleset) {
-            weightedCats[cat] = this.ruleset[cat]!._weight;
+            weightedCats[cat] = this.ruleset[cat]![_weight];
         }
         let catSelector = new WeightedSelector(weightedCats);
         return catSelector.select();
     }
-};
+}
 
 const textify = (phsys: SoundSystem, sentences = 25) => {
     let text = '';

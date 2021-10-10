@@ -140,6 +140,19 @@ class PhonologyDefinition {
     private addRules(line: string, cat?: string) {
         let rules = line.split(/\s+/gu);
         let weighted = line.includes(':');
+
+        // only warn about this once
+        // plus, it can be detected right away
+        if (line.includes('??')) {
+            this.stderr("'??' is treated as '?'.");
+        }
+
+        // only warn about this once
+        // it can be detected right away, but it's harder to find
+        if (line[0] === '?' || line.match(/\s\?[^?!]/u)) {
+            // doesn't need /g since I'm using it as a boolean test
+            this.stderr("'?' at the beginning of a rule does nothing.");
+        }
         
         for (let i = 0; i < rules.length; ++i) {
             let rule: string;
@@ -158,14 +171,19 @@ class PhonologyDefinition {
                 weight = 10.0 / Math.pow((i + 1), 0.9);
             }
 
+            // inform the user of empty words
+            // if it can only produce empty words, error
+            // if it will sometimes produce empty words, warn
             if (!rule.match(/[^?!]/u)) {
-                // doesn't need /g since we're using it as a boolean test
-                throw new Error(`'${rules[i]}' `
-                    + (cat ? `(in category ${cat}) ` : '')
-                    + 'will only produce empty words.');
-            }
-            if (rule.includes('??')) {
-                this.stderr("'??' is treated as '?'.");
+                throw new Error(`'${rules[i]}'`
+                    + `${(cat ? ` (in category ${cat})` : '')} will only `
+                    + 'produce empty words.');
+            } else if (rule.match(/^\?*[^?!]!?\?+!?$/u)) {
+                // don't know what random-rate or category weight is
+                // so this may not even be an issue
+                this.stderr(`'${rules[i]}'`
+                    + `${(cat ? ` (in category ${cat})` : '')} may produce `
+                    + 'empty words.');
             }
             
             rule = this.expandMacros(rule);

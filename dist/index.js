@@ -69,7 +69,7 @@ const main = (file, num, verbose = false, unsorted, onePerLine = false, stderr =
 };
 const genWords = () => {
     document.getElementById('errors').innerHTML = '';
-    document.getElementById('result').innerHTML = main(document.getElementById('def').value, parseInt(document.getElementById('number').value) || undefined, document.getElementById('verbose').checked, document.getElementById('unsorted').checked, document.getElementById('one-per-line').checked, function stderr(message) {
+    document.getElementById('result').innerHTML = main(document.getElementById('def').value, parseInt(document.getElementById('number').value) || undefined, document.getElementById('verbose').checked, document.getElementById('unsorted').checked, document.getElementById('one-per-line').checked, message => {
         document.getElementById('errors').innerHTML += message + '<br />';
     }).replace(/\n/gu, '<br />');
 };
@@ -204,6 +204,12 @@ class PhonologyDefinition {
     addRules(line, cat) {
         let rules = line.split(/\s+/gu);
         let weighted = line.includes(':');
+        if (line.includes('??')) {
+            this.stderr("'??' is treated as '?'.");
+        }
+        if (line[0] === '?' || line.match(/\s\?[^?!]/u)) {
+            this.stderr("'?' at the beginning of a rule does nothing.");
+        }
         for (let i = 0; i < rules.length; ++i) {
             let rule;
             let weight;
@@ -221,12 +227,14 @@ class PhonologyDefinition {
                 weight = 10.0 / Math.pow((i + 1), 0.9);
             }
             if (!rule.match(/[^?!]/u)) {
-                throw new Error(`'${rules[i]}' `
-                    + (cat ? `(in category ${cat}) ` : '')
-                    + 'will only produce empty words.');
+                throw new Error(`'${rules[i]}'`
+                    + `${(cat ? ` (in category ${cat})` : '')} will only `
+                    + 'produce empty words.');
             }
-            if (rule.includes('??')) {
-                this.stderr("'??' is treated as '?'.");
+            else if (rule.match(/^\?*[^?!]!?\?+!?$/u)) {
+                this.stderr(`'${rules[i]}'`
+                    + `${(cat ? ` (in category ${cat})` : '')} may produce `
+                    + 'empty words.');
             }
             rule = this.expandMacros(rule);
             this.soundsys.addRule(rule, weight, cat);
@@ -570,6 +578,7 @@ class ArbSorter {
         return l2.map(el => this.valuesAsWord(el));
     }
 }
+const _weight = Symbol();
 class SoundSystem {
     constructor() {
         this.phonemeset = {};
@@ -583,7 +592,7 @@ class SoundSystem {
     runRule(rule) {
         let n = rule.length;
         let s = [];
-        if (rule[1] === '!' || rule.includes('!!')) {
+        if (rule[0] === '!' || rule[1] === '!' || rule.includes('!!')) {
             throw new Error("misplaced '!' option: in non-duplicate "
                 + `environment: '${rule}'.`);
         }
@@ -688,7 +697,7 @@ class SoundSystem {
         }
     }
     addCategory(name, weight) {
-        this.ruleset[name] = { _weight: weight };
+        this.ruleset[name] = { [_weight]: weight };
     }
     addFilter(pat, repl) {
         if (repl === '!') {
@@ -715,7 +724,7 @@ class SoundSystem {
         if (!this.ruleset[category]) {
             throw new Error(`unknown category '${category}'.`);
         }
-        let dict = Object.assign(Object.assign({}, this.ruleset[category]), { _weight: undefined });
+        let dict = Object.assign(Object.assign({}, this.ruleset[category]), { [_weight]: undefined });
         if (Object.keys(dict).length === 1) {
             dict = Object.assign({ [category]: 0 }, dict);
         }
@@ -746,13 +755,12 @@ class SoundSystem {
     randomCategory() {
         let weightedCats = {};
         for (let cat in this.ruleset) {
-            weightedCats[cat] = this.ruleset[cat]._weight;
+            weightedCats[cat] = this.ruleset[cat][_weight];
         }
         let catSelector = new WeightedSelector(weightedCats);
         return catSelector.select();
     }
 }
-;
 const textify = (phsys, sentences = 25) => {
     let text = '';
     for (let i = 0; i < sentences; ++i) {

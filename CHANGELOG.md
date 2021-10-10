@@ -8,15 +8,19 @@ All notable changes to this project will be documented in this file.
 
 If a rule consists of only `!` or `?` (or some combination thereof) with no
 letters, the program will display an error message. Similarly, the program
-informs the user if `!!` or `??` appears.
+informs the user if `!!` or `??` appears, or if a rule starts with `?`.
 
 ### Changed
-
-The dependency versions were corrected.
 
 A negative number of words is now rejected.
 
 The conditions under which misplaced `!` is detected are improved.
+
+Eliminated an obscure issue that made `words: _weight` and similar definitions
+invalid.
+
+Even more of the build process is automated, and the dependency versions were
+corrected.
 
 ## v1.1.0
 

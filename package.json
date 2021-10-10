@@ -1,12 +1,18 @@
 {
     "name": "lexifer",
-    "version": "1.1.1-beta+1",
+    "version": "1.1.1-beta.2",
     "devDependencies": {
         "@types/node": "14.17.0",
+        "terser": "^5.9.0",
         "typescript": "^4.1.5"
     },
     "peerDependencies": {
         "typescript": "^4.1.5"
+    },
+    "peerDependenciesMeta": {
+        "typescript": {
+            "optional": true
+        }
     },
     "engines": {
         "node": "14.17.0",

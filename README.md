@@ -6,8 +6,7 @@ This is a TypeScript implementation of William Annis's
 To compile this, run the build shell script. Windows users may NOT use
 powershell, and will have to install a proper shell terminal. You may need to
 install typescript globally (`npm i -g typescript` or
-`yarn global add typescript`). Note that the build script does not include the
-minification step.
+`yarn global add typescript`).
 
 ## About tsconfig
 

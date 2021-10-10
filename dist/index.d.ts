@@ -87,8 +87,9 @@ declare class ArbSorter {
     split(word: string): string[];
     sort(l: string[]): string[];
 }
+declare const _weight: unique symbol;
 interface Rule {
-    _weight: number;
+    [_weight]: number;
     [key: string]: number;
 }
 declare class SoundSystem {

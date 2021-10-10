@@ -61,7 +61,7 @@ const genWords = () => {
         (<HTMLInputElement>document.getElementById('verbose')).checked,
         (<HTMLInputElement>document.getElementById('unsorted')).checked,
         (<HTMLInputElement>document.getElementById('one-per-line')).checked,
-        function stderr(message) {
+        message => {
             document.getElementById('errors')!.innerHTML += message + '<br />';
         }
     ).replace(/\n/gu, '<br />');
