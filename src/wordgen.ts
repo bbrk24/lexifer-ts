@@ -79,13 +79,13 @@ class SoundSystem {
     private runRule(rule: string) {
         let n = rule.length;
         let s: string[] = [];
-
+        
         // guard against improper '!' that the loop won't catch
         if (rule[0] === '!' || rule[1] === '!' || rule.includes('!!')) {
             throw new Error("misplaced '!' option: in non-duplicate "
                 + `environment: '${rule}'.`);
         }
-
+        
         for (let i = 0; i < n; ++i) {
             if ('?!'.includes(rule[i]!)) {
                 continue;

@@ -140,13 +140,13 @@ class PhonologyDefinition {
     private addRules(line: string, cat?: string) {
         let rules = line.split(/\s+/gu);
         let weighted = line.includes(':');
-
+        
         // only warn about this once
         // plus, it can be detected right away
         if (line.includes('??')) {
             this.stderr("'??' is treated as '?'.");
         }
-
+        
         // only warn about this once
         // it can be detected right away, but it's harder to find
         if (line[0] === '?' || line.match(/\s\?[^?!]/u)) {
@@ -170,7 +170,7 @@ class PhonologyDefinition {
                 rule = rules[i]!;
                 weight = 10.0 / Math.pow((i + 1), 0.9);
             }
-
+            
             // inform the user of empty words
             // if it can only produce empty words, error
             // if it will sometimes produce empty words, warn

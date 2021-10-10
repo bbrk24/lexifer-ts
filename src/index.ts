@@ -54,7 +54,7 @@ const main = (
 // Actual code run when you click "generate"
 const genWords = () => {
     document.getElementById('errors')!.innerHTML = '';
-
+    
     document.getElementById('result')!.innerHTML = main(
         (<HTMLTextAreaElement>document.getElementById('def')).value,
         parseInt((<HTMLInputElement>document.getElementById('number')).value) || undefined,
@@ -65,4 +65,4 @@ const genWords = () => {
             document.getElementById('errors')!.innerHTML += message + '<br />';
         }
     ).replace(/\n/gu, '<br />');
-}
+};

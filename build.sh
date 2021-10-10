@@ -22,9 +22,10 @@ else
         "$(grep version package.json | cut -d '"' -f 4)" \
         > ./dist/lexifer.min.js
     # use terser
-    ./node_modules/.bin/terser ./dist/index.js -m reserved=[genWords] -c \
+    ./node_modules/.bin/terser ./dist/index.js -m reserved=['genWords'] -c \
         --mangle-props --ecma 2015 -f wrap_func_args=false \
         >> ./dist/lexifer.min.js
     echo 'Done.'
-    echo "Minified file size: $(wc -c ./dist/lexifer.min.js | cut -d ' ' -f 1) bytes"
+    echo 'Minified file size:' \
+        "$(wc -c ./dist/lexifer.min.js | cut -d ' ' -f 1) bytes"
 fi
