@@ -104,7 +104,13 @@ class PhonologyDefinition {
                 this.parseOption(line.substring(5).trim());
             }
             else if (line.startsWith('random-rate:')) {
-                this.soundsys.randpercent = parseInt(line.substring(12));
+                let randpercent = +line.substring(12);
+                if (randpercent >= 0 && randpercent <= 100) {
+                    this.soundsys.randpercent = randpercent;
+                }
+                else {
+                    throw new Error('Invalid random-rate.');
+                }
             }
             else if (line.startsWith('filter:')) {
                 this.parseFilter(line.substring(7).trim());
@@ -142,7 +148,17 @@ class PhonologyDefinition {
             let letters = new Set(this.letters);
             let phonemes = new Set(this.phClasses);
             if (phonemes.size > letters.size) {
-                let diff = [...phonemes].filter(el => !letters.has(el));
+                let diff = [...phonemes].filter(el => {
+                    if (letters.has(el)) {
+                        return false;
+                    }
+                    else if (letters.has(el.split(':')[0])) {
+                        return false;
+                    }
+                    else {
+                        return true;
+                    }
+                });
                 this.stderr(`A phoneme class contains '${diff.join(' ')}' `
                     + "missing from 'letters'.  Strange word shapes are likely"
                     + ' to result.');

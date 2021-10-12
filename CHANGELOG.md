@@ -10,9 +10,14 @@ If a rule consists of only `!` or `?` (or some combination thereof) with no
 letters, the program will display an error message. Similarly, the program
 informs the user if `!!` or `??` appears, or if a rule starts with `?`.
 
+The program now validates that random-rate is a number between 0 and 100
+(inclusive).
+
 ### Changed
 
 A negative number of words is now rejected.
+
+"Unknown" letters are now recognized better when they are weighted.
 
 The conditions under which misplaced `!` is detected are improved.
 
