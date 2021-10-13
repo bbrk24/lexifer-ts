@@ -25,6 +25,8 @@ else
     ./node_modules/.bin/terser ./dist/index.js -m reserved=['genWords'] -c \
         --mangle-props --ecma 2015 -f wrap_func_args=false \
         >> ./dist/lexifer.min.js
+    # remove the trailing newline
+    perl -pi -e 'chomp if eof' ./dist/lexifer.min.js
     echo 'Done.'
     echo 'Minified file size:' \
         "$(wc -c ./dist/lexifer.min.js | awk '{print $1}') bytes"
