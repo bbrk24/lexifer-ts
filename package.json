@@ -1,10 +1,13 @@
 {
     "name": "lexifer",
-    "version": "1.1.1",
+    "version": "1.1.1+2",
     "devDependencies": {
         "@types/node": "14.17.0",
         "terser": "^5.9.0",
         "typescript": "^4.1.5"
+    },
+    "scripts": {
+        "build": "./build.sh"
     },
     "engines": {
         "node": "14.17.0",

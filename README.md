@@ -3,10 +3,9 @@
 This is a TypeScript implementation of William Annis's
 [Lexifer](https://github.com/wmannis/lexifer).
 
-To compile this, run the build shell script. Windows users may NOT use
-powershell, and will have to install a proper shell terminal. You may need to
-install typescript globally (`npm i -g typescript` or
-`yarn global add typescript`).
+To compile this, run the build shell script. This can be run directly, or with
+`yarn build`. Windows users may NOT use powershell, and will have to install a
+proper shell terminal.
 
 ## About tsconfig
 

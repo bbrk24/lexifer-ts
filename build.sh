@@ -5,7 +5,7 @@
 echo 'Combining files...'
 sed '/export/d;/import/d' src/*.ts > combined.ts
 echo 'Compiling to JS...'
-errors=$(tsc) 
+errors=$(./node_modules/.bin/tsc) 
 if [ -n "$errors" ]
 then
     echo 'Build errors:'
