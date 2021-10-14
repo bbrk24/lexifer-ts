@@ -14,6 +14,9 @@ nasal-trill clusters if both consonants have the same place of articulation.
 The program does not re-parse the input if it is not changed, improving
 performance substantially on repeated runs.
 
+The program now correctly enforces that exactly one featureset is used in a
+`with:` directive.
+
 ## v1.1.2
 
 This version contains very little in the way of functional changes, but

@@ -154,9 +154,6 @@ class ClusterEngine {
     ];
 
     constructor(isIpa: boolean) {
-        if (Segment.index) {
-            throw new Error('Must only choose one featureset.');
-        }
         Segment.index = isIpa ? 'ipa' : 'digraph';
     }
 

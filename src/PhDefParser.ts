@@ -131,6 +131,9 @@ class PhonologyDefinition {
     }
 
     private parseOption(line: string) {
+        if ((line.match(/features/gu) ?? []).length > 1) {
+            throw new Error('Must only choose one featureset.');
+        }
         for (const option of line.split(/\s+/gu)) {
             switch (option) {
             case 'std-ipa-features':

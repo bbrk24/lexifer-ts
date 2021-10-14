@@ -1,6 +1,6 @@
 "use strict";
 /*!
-Lexifer TS v1.2.0-alpha.5+2
+Lexifer TS v1.2.0-alpha.6
 
 Copyright (c) 2021 William Baker
 
@@ -211,6 +211,10 @@ class PhonologyDefinition {
         }
     }
     parseOption(line) {
+        var _a;
+        if (((_a = line.match(/features/gu)) !== null && _a !== void 0 ? _a : []).length > 1) {
+            throw new Error('Must only choose one featureset.');
+        }
         for (const option of line.split(/\s+/gu)) {
             switch (option) {
                 case 'std-ipa-features':
@@ -519,9 +523,6 @@ class Segment {
 }
 class ClusterEngine {
     constructor(isIpa) {
-        if (Segment.index) {
-            throw new Error('Must only choose one featureset.');
-        }
         Segment.index = isIpa ? 'ipa' : 'digraph';
     }
     applyAssimilations(word) {
