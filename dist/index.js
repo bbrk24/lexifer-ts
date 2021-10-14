@@ -1,6 +1,6 @@
 "use strict";
 /*!
-Lexifer TS v1.2.0-alpha.4
+Lexifer TS v1.2.0-alpha.5
 
 Copyright (c) 2021 William Baker
 
@@ -134,7 +134,7 @@ class PhonologyDefinition {
         this.sanityCheck();
     }
     parse() {
-        Rule.Fragment.addOptional = () => this.soundsys.randpercent > Math.random() * 100;
+        Fragment.addOptional = () => this.soundsys.randpercent > Math.random() * 100;
         for (; this.defFileLineNum < this.defFileArr.length; ++this.defFileLineNum) {
             let line = this.defFileArr[this.defFileLineNum];
             line = line.replace(/#.*/u, '').trim();
@@ -445,14 +445,14 @@ class Rule {
                 ++maxReps;
             }
             else {
-                this.parts.push(new Rule.Fragment(letter, minReps, maxReps, allowRepeats));
+                this.parts.push(new Fragment(letter, minReps, maxReps, allowRepeats));
                 letter = rule[i];
                 maxReps = 1;
                 minReps = 1;
                 allowRepeats = undefined;
             }
         }
-        this.parts.push(new Rule.Fragment(letter, minReps, maxReps));
+        this.parts.push(new Fragment(letter, minReps, maxReps));
     }
     generate() {
         return this.parts.map(el => el.generate()).join('');
@@ -461,7 +461,7 @@ class Rule {
         return this.str;
     }
 }
-Rule.Fragment = class Fragment {
+class Fragment {
     constructor(value, minReps, maxReps, allowRepeats) {
         this.value = value;
         this.minReps = minReps;
@@ -497,7 +497,7 @@ Rule.Fragment = class Fragment {
         }
         return retVal;
     }
-};
+}
 class Segment {
     constructor(arr) {
         [this.ipa, this.digraph, this.voiced, this.place, this.manner] = arr;
@@ -796,7 +796,7 @@ class SoundSystem {
         this.useRejections = false;
         this.ruleset = {};
         this.sorter = null;
-        Rule.Fragment.getRandomPhoneme = phoneme => {
+        Fragment.getRandomPhoneme = phoneme => {
             if (phoneme in this.phonemeset) {
                 return this.phonemeset[phoneme].select();
             }

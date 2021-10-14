@@ -283,7 +283,7 @@ class ClusterEngine {
             return false;
         };
 
-        // only apply word-initially
+        // Only apply word-initially
         if (rejectCluster(word[0]!, word[1]!)) {
             return ['REJECT'];
         }

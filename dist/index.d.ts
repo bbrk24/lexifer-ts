@@ -1,5 +1,5 @@
 /*!
-Lexifer TS v1.2.0-alpha.4
+Lexifer TS v1.2.0-alpha.5
 
 Copyright (c) 2021 William Baker
 
@@ -60,24 +60,23 @@ declare class PhonologyDefinition {
     generate(numWords?: number, verbose?: boolean, unsorted?: boolean, onePerLine?: boolean): string;
     paragraph(sentences?: number): string;
 }
-interface IFragment {
-    generate(): string;
-}
-declare var IFragment: {
-    new (value: string, minReps: number, maxReps: number, allowRepeats?: boolean): IFragment;
-    addOptional?(): boolean;
-    getRandomPhoneme?(group: string): string;
-    prototype: IFragment;
-};
-declare namespace Rule {
-}
 declare class Rule {
-    static Fragment: typeof IFragment;
     private readonly parts;
     private readonly str;
     constructor(rule: string);
     generate(): string;
     toString(): string;
+}
+declare class Fragment {
+    private readonly value;
+    private readonly minReps;
+    private readonly maxReps;
+    private readonly allowRepeats?;
+    static addOptional?: () => boolean;
+    static getRandomPhoneme?: (group: string) => string;
+    constructor(value: string, minReps: number, maxReps: number, allowRepeats?: boolean | undefined);
+    private getPhoneme;
+    generate(): string;
 }
 declare const enum Place {
     Bilabial = 0,

@@ -20,7 +20,7 @@
  * IN THE SOFTWARE.
  */
 
-import Rule from './rule';
+import { Fragment } from './rule';
 import Word from './word';
 import { SoundSystem, textify, invalidItemAndWeight } from './wordgen';
 
@@ -54,7 +54,7 @@ class PhonologyDefinition {
          * This isn't really part of parsing, but something that must be done
          * every run.
          */
-        Rule.Fragment.addOptional = () =>
+        Fragment.addOptional = () =>
             this.soundsys.randpercent > Math.random() * 100;
 
         for (;

@@ -24,7 +24,7 @@ import WeightedSelector from './distribution';
 import wrap from './textwrap';
 import Word from './word';
 import { ClusterEngine } from './SmartClusters';
-import Rule from './rule';
+import { Rule, Fragment } from './rule';
 
 const invalidItemAndWeight = (item: string) => {
     const parts = item.split(':');
@@ -105,7 +105,7 @@ class SoundSystem {
     sorter: ArbSorter | null = null;
 
     constructor() {
-        Rule.Fragment.getRandomPhoneme = phoneme => {
+        Fragment.getRandomPhoneme = phoneme => {
             if (phoneme in this.phonemeset) {
                 return this.phonemeset[phoneme]!.select();
             }

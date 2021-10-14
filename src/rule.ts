@@ -1,29 +1,7 @@
 import last from './last';
 
-interface IFragment {
-    generate(): string;
-}
-
-declare var IFragment: {
-    new (
-        value: string,
-        minReps: number,
-        maxReps: number,
-        allowRepeats?: boolean
-    ): IFragment,
-    addOptional?(): boolean,
-    getRandomPhoneme?(group: string): string,
-    prototype: IFragment
-};
-
-namespace Rule {
-    export type Fragment = IFragment & typeof IFragment;
-}
-
 class Rule {
-    static Fragment: typeof IFragment;
-
-    private readonly parts: IFragment[];
+    private readonly parts: Fragment[];
     private readonly str: string;
 
     constructor(rule: string) {
@@ -70,7 +48,7 @@ class Rule {
             } else {
                 // Add a new fragment
                 this.parts.push(
-                    new Rule.Fragment(letter, minReps, maxReps, allowRepeats)
+                    new Fragment(letter, minReps, maxReps, allowRepeats)
                 );
                 letter = rule[i]!;
                 maxReps = 1;
@@ -80,7 +58,7 @@ class Rule {
         }
 
         // Add the very last one
-        this.parts.push(new Rule.Fragment(letter, minReps, maxReps));
+        this.parts.push(new Fragment(letter, minReps, maxReps));
     }
 
     generate() {
@@ -92,16 +70,16 @@ class Rule {
     }
 }
 
-Rule.Fragment = class Fragment implements IFragment {
+class Fragment {
     static addOptional?: () => boolean; // Filled in in PhDefParser
 
     static getRandomPhoneme?: (group: string) => string; // Filled in in wordgen
 
     constructor(
-        readonly value: string,
-        readonly minReps: number,
-        readonly maxReps: number,
-        readonly allowRepeats?: boolean
+        private readonly value: string,
+        private readonly minReps: number,
+        private readonly maxReps: number,
+        private readonly allowRepeats?: boolean
     ) { }
 
     private getPhoneme(word?: string) {
@@ -142,6 +120,6 @@ Rule.Fragment = class Fragment implements IFragment {
 
         return retVal;
     }
-};
+}
 
-export default Rule;
+export { Rule, Fragment };
