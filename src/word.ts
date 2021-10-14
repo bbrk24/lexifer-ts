@@ -21,7 +21,7 @@
  */
 
 import last from './last';
-import ClusterEngine from './SmartClusters';
+import { ClusterEngine } from './SmartClusters';
 import { ArbSorter } from './wordgen';
 
 class Word {

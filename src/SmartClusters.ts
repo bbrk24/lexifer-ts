@@ -153,7 +153,10 @@ class ClusterEngine {
         new Segment(['ɴ',  'nq',  true,  Place.Uvular,      Manner.Nasal])
     ];
 
-    constructor(public isIpa: boolean) {
+    constructor(isIpa: boolean) {
+        if (Segment.index) {
+            throw new Error('Must only choose one featureset.');
+        }
         Segment.index = isIpa ? 'ipa' : 'digraph';
     }
 
@@ -280,14 +283,13 @@ class ClusterEngine {
             return false;
         };
 
-        for (let i = 0; i < word.length - 1; ++i) {
-            if (rejectCluster(word[i]!, word[i + 1]!)) {
-                return ['REJECT'];
-            }
+        // only apply word-initially
+        if (rejectCluster(word[0]!, word[1]!)) {
+            return ['REJECT'];
         }
 
         return word;
     }
 }
 
-export default ClusterEngine;
+export { ClusterEngine, Segment };

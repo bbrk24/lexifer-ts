@@ -3,6 +3,8 @@
 This is a TypeScript implementation of William Annis's
 [Lexifer](https://github.com/wmannis/lexifer).
 
+**For information about using the web app, see [the docs here](./docs.md).**
+
 To compile this, run the build shell script. This can be run directly, or with
 `yarn prepack`. Windows users may NOT use powershell, and will have to install
 a proper shell terminal.

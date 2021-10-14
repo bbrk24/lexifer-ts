@@ -1,5 +1,5 @@
 /*!
-Lexifer TS v1.2.0-alpha.3
+Lexifer TS v1.2.0-alpha.4
 
 Copyright (c) 2021 William Baker
 
@@ -115,7 +115,6 @@ declare class Segment {
     toString(): string;
 }
 declare class ClusterEngine {
-    isIpa: boolean;
     private static readonly segments;
     constructor(isIpa: boolean);
     applyAssimilations(word: string[]): string[];

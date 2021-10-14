@@ -23,7 +23,7 @@
 import WeightedSelector from './distribution';
 import wrap from './textwrap';
 import Word from './word';
-import ClusterEngine from './SmartClusters';
+import { ClusterEngine } from './SmartClusters';
 import Rule from './rule';
 
 const invalidItemAndWeight = (item: string) => {

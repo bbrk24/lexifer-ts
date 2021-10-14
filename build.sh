@@ -40,9 +40,9 @@ echo 'Compiling to JS...'
 node_modules/.bin/tsc || exit $?
 
 # change CRLF to LF (thanks Microsoft)
-sed -e s/^M// dist/index.js > tempfile
+sed -e 's/^M//' dist/index.js > tempfile
 mv tempfile dist/index.js
-sed -e s/^M// dist/index.d.ts > tempfile
+sed -e 's/^M//' dist/index.d.ts > tempfile
 mv tempfile dist/index.d.ts
 
 echo 'Minifying code...'

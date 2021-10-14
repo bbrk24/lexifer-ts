@@ -1,6 +1,6 @@
 "use strict";
 /*!
-Lexifer TS v1.2.0-alpha.3
+Lexifer TS v1.2.0-alpha.4
 
 Copyright (c) 2021 William Baker
 
@@ -178,12 +178,16 @@ class PhonologyDefinition {
                 throw new Error(`parsing error at '${line}'.`);
             }
         }
-        if ((this.soundsys.useAssim
+        if (this.soundsys.useAssim
             || this.soundsys.useCoronalMetathesis
-            || this.soundsys.useRejections)
-            && !this.soundsys.sorter) {
-            this.stderr("Without 'letters:' cannot apply assimilations or "
-                + 'coronal metathesis.');
+            || this.soundsys.useRejections) {
+            if (!Word.clusterEngine) {
+                throw new Error('Must select a featureset.');
+            }
+            else if (!this.soundsys.sorter) {
+                this.stderr("Without 'letters:' cannot apply assimilations, "
+                    + 'rejections, or coronal metathesis.');
+            }
         }
     }
     sanityCheck() {
@@ -515,7 +519,9 @@ class Segment {
 }
 class ClusterEngine {
     constructor(isIpa) {
-        this.isIpa = isIpa;
+        if (Segment.index) {
+            throw new Error('Must only choose one featureset.');
+        }
         Segment.index = isIpa ? 'ipa' : 'digraph';
     }
     applyAssimilations(word) {
@@ -592,10 +598,8 @@ class ClusterEngine {
             }
             return false;
         };
-        for (let i = 0; i < word.length - 1; ++i) {
-            if (rejectCluster(word[i], word[i + 1])) {
-                return ['REJECT'];
-            }
+        if (rejectCluster(word[0], word[1])) {
+            return ['REJECT'];
         }
         return word;
     }

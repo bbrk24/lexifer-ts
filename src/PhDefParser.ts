@@ -21,6 +21,7 @@
  */
 
 import Rule from './rule';
+import Word from './word';
 import { SoundSystem, textify, invalidItemAndWeight } from './wordgen';
 
 class PhonologyDefinition {
@@ -95,15 +96,16 @@ class PhonologyDefinition {
             }
         }
         if (
-            (
-                this.soundsys.useAssim
+            this.soundsys.useAssim
                 || this.soundsys.useCoronalMetathesis
                 || this.soundsys.useRejections
-            )
-            && !this.soundsys.sorter
         ) {
-            this.stderr("Without 'letters:' cannot apply assimilations or "
-                + 'coronal metathesis.');
+            if (!Word.clusterEngine) {
+                throw new Error('Must select a featureset.');
+            } else if (!this.soundsys.sorter) {
+                this.stderr("Without 'letters:' cannot apply assimilations, "
+                    + 'rejections, or coronal metathesis.');
+            }
         }
     }
 
