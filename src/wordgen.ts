@@ -38,9 +38,9 @@ const invalidItemAndWeight = (item: string) => {
 };
 
 class ArbSorter {
-    private splitter: RegExp;
-    private ords: { [key: string]: number };
-    private vals: string[];
+    private readonly splitter: RegExp;
+    private readonly ords: { [key: string]: number };
+    private readonly vals: string[];
 
     constructor(order: string) {
         const graphs = order.split(/\s+/gu);
@@ -88,7 +88,7 @@ class ArbSorter {
 }
 
 class Category extends Map<Rule, number> {
-    constructor(public weight: number) {
+    constructor(readonly weight: number) {
         super();
     }
 }

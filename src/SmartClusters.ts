@@ -49,11 +49,11 @@ const enum Manner {
 class Segment {
     static index: 'digraph' | 'ipa';
 
-    ipa: string;
-    digraph: string;
-    voiced: boolean;
-    place: Place;
-    manner: Manner;
+    readonly ipa: string;
+    readonly digraph: string;
+    readonly voiced: boolean;
+    readonly place: Place;
+    readonly manner: Manner;
 
     constructor(arr: [string, string, boolean, Place, Manner]) {
         [this.ipa, this.digraph, this.voiced, this.place, this.manner] = arr;

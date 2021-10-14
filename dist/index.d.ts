@@ -22,9 +22,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 declare class WeightedSelector<T> {
-    private keys;
-    private weights;
-    private sum;
+    private readonly keys;
+    private readonly weights;
+    private readonly sum;
     constructor(dic: Map<T, number | undefined>);
     select(): T;
 }
@@ -42,8 +42,8 @@ declare class PhonologyDefinition {
     private phClasses;
     private categories;
     private defFileLineNum;
-    private defFileArr;
-    soundsys: SoundSystem;
+    private readonly defFileArr;
+    readonly soundsys: SoundSystem;
     constructor(defFile: string, stderr: (inp: Error | string) => void);
     private parse;
     private sanityCheck;
@@ -73,8 +73,8 @@ declare namespace Rule {
 }
 declare class Rule {
     static Fragment: typeof IFragment;
-    private parts;
-    private str;
+    private readonly parts;
+    private readonly str;
     constructor(rule: string);
     generate(): string;
     toString(): string;
@@ -103,11 +103,11 @@ declare const enum Manner {
 }
 declare class Segment {
     static index: 'digraph' | 'ipa';
-    ipa: string;
-    digraph: string;
-    voiced: boolean;
-    place: Place;
-    manner: Manner;
+    readonly ipa: string;
+    readonly digraph: string;
+    readonly voiced: boolean;
+    readonly place: Place;
+    readonly manner: Manner;
     constructor(arr: [string, string, boolean, Place, Manner]);
     get isStop(): boolean;
     get isPeripheral(): boolean;
@@ -139,9 +139,9 @@ declare class Word {
 }
 declare const invalidItemAndWeight: (item: string) => boolean;
 declare class ArbSorter {
-    private splitter;
-    private ords;
-    private vals;
+    private readonly splitter;
+    private readonly ords;
+    private readonly vals;
     constructor(order: string);
     wordAsValues(word: string): number[];
     valuesAsWord(values: number[]): string;
@@ -149,7 +149,7 @@ declare class ArbSorter {
     sort(list: string[]): string[];
 }
 declare class Category extends Map<Rule, number> {
-    weight: number;
+    readonly weight: number;
     constructor(weight: number);
 }
 declare class SoundSystem {

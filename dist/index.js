@@ -378,9 +378,8 @@ class PhonologyDefinition {
                         + 'weight.');
                 }
                 const [name, weight] = cat.split(':');
-                const weightNum = +weight;
                 this.categories.push(name);
-                this.soundsys.addCategory(name, weightNum);
+                this.soundsys.addCategory(name, +weight);
             }
             else {
                 this.categories.push(cat);
@@ -480,7 +479,7 @@ Rule.Fragment = class Fragment {
             if (this.minReps === 0 && !Fragment.addOptional()) {
                 return '';
             }
-            return Fragment.getRandomPhoneme(this.value);
+            return this.getPhoneme();
         }
         let i;
         let retVal = '';

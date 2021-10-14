@@ -31,9 +31,9 @@ class PhonologyDefinition {
 
     // This is a bit of a hack since the browser doesn't read files directly.
     private defFileLineNum = 0;
-    private defFileArr: string[];
+    private readonly defFileArr: string[];
 
-    soundsys = new SoundSystem();
+    readonly soundsys = new SoundSystem();
 
     constructor(
         defFile: string,
@@ -330,10 +330,9 @@ class PhonologyDefinition {
                 }
 
                 const [name, weight] = <[string, string]>cat.split(':');
-                const weightNum = +weight;
 
                 this.categories.push(name);
-                this.soundsys.addCategory(name, weightNum);
+                this.soundsys.addCategory(name, +weight);
             } else {
                 this.categories.push(cat);
                 this.soundsys.addCategory(cat, 1);

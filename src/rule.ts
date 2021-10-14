@@ -23,8 +23,8 @@ namespace Rule {
 class Rule {
     static Fragment: typeof IFragment;
 
-    private parts: IFragment[];
-    private str: string;
+    private readonly parts: IFragment[];
+    private readonly str: string;
 
     constructor(rule: string) {
         // Guard against improper '!' that the loop won't catch
@@ -98,10 +98,10 @@ Rule.Fragment = class Fragment implements IFragment {
     static getRandomPhoneme?: (group: string) => string; // Filled in in wordgen
 
     constructor(
-        public value: string,
-        public minReps: number,
-        public maxReps: number,
-        public allowRepeats?: boolean
+        readonly value: string,
+        readonly minReps: number,
+        readonly maxReps: number,
+        readonly allowRepeats?: boolean
     ) { }
 
     private getPhoneme(word?: string) {
@@ -124,7 +124,7 @@ Rule.Fragment = class Fragment implements IFragment {
                 return '';
             }
 
-            return Fragment.getRandomPhoneme!(this.value);
+            return this.getPhoneme();
         }
 
         let i: number;
