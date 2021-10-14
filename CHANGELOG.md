@@ -17,6 +17,8 @@ performance substantially on repeated runs.
 The program now correctly enforces that exactly one featureset is used in a
 `with:` directive.
 
+The compilation target is now ES8 rather than ES6.
+
 ## v1.1.2
 
 This version contains very little in the way of functional changes, but

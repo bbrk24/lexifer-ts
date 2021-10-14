@@ -56,10 +56,10 @@ line option is ignored. I recommend using a smaller number of words for this,
 or else the output gets quite long. With the default phonology definition, an
 example output might look like:
 
-> V?CVD?CVD?CVD? – chánanbi
+> V?CVD?CVD?CVD? – chánanbi  
 > std-assimilations – chánambi
 > 
-> V?CVD?CVD?CVD? – nininu
+> V?CVD?CVD?CVD? – nininu  
 > (..+)\1+ > REJECT – REJECT
 
 The more filters and rejections you have, the longer the output tends to be.
@@ -156,10 +156,10 @@ The recognized consonants are as follows:
     superscripts instead.
 -->
 
-¹ These are both bilabial and labiodental. For example, the assimilations
-engine turns `nf` into *mf* and `nɸ` into *mɸ*, even though `f` and `ɸ` have
-different places of articulation.  
-² Yes, I realize that the IPA describes these as dental. However, the IPA does
+¹These are both bilabial and labiodental. For example, the assimilations engine
+turns `nf` into *mf* and `nɸ` into *mɸ*, even though `f` and `ɸ` have different
+places of articulation.  
+²Yes, I realize that the IPA describes these as dental. However, the IPA does
 not make the dental/alveolar distinction elsewhere, so it is simpler to say
 that these are alveolar.
 
@@ -186,14 +186,14 @@ approximants, lateral approximants, and trills. It applies leftward
 assimilation of place of articulation. For example, it would turn `amta` into
 *anta* and `anka` into *aŋka*.
 
-#### `coronal-metathesis`
+##### `coronal-metathesis`
 
 This engine only affects bilabial, alveolar, and velar plosives and nasals. It
 ensures that clusters of these segments have the alveolar element last. For
 example, it would turn `atka` into *akta* and `anma` into *amna*. It does not
 metathesize a nasal with a plosive; `anpa` would not become *apna*.
 
-#### `std-rejections`
+##### `std-rejections`
 
 **Note: This is WIP and subject to change at any time.**
 
