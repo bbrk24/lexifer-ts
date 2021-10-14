@@ -9,6 +9,11 @@ All notable changes to this project will be documented in this file.
 `std-rejections` -- rejects obstruent-approximant and nasal-trill clusters if
 both consonants have the same place of articulation.
 
+### Changed
+
+The program does not re-parse the input if it is not changed, improving
+performance substantially on repeated runs.
+
 ## v1.1.2
 
 This version contains very little in the way of functional changes, but

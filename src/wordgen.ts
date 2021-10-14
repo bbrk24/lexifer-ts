@@ -22,9 +22,9 @@
 
 import WeightedSelector from './distribution';
 import wrap from './textwrap';
-import last from './last';
 import Word from './word';
 import ClusterEngine from './SmartClusters';
+import Rule from './rule';
 
 const invalidItemAndWeight = (item: string) => {
     const parts = item.split(':');
@@ -87,82 +87,31 @@ class ArbSorter {
     }
 }
 
-// To prevent the user from typing whatever key I use to store the weight, I
-// cannot use a string.
-const _weight = Symbol();
-
-interface Rule {
-    [_weight]: number;
-    [key: string]: number;
+class Category extends Map<Rule, number> {
+    constructor(public weight: number) {
+        super();
+    }
 }
 
 class SoundSystem {
-    private phonemeset: { [key: string]: WeightedSelector } = {};
+    private phonemeset: { [key: string]: WeightedSelector<string> } = {};
     private filters: [string, string][] = [];
 
     randpercent = 10;
     useAssim = false;
     useCoronalMetathesis = false;
     useRejections = false;
-    ruleset: { [key: string]: Rule } = {};
+    ruleset: { [key: string]: Category } = {};
     sorter: ArbSorter | null = null;
 
-    private runRule(rule: string) {
-        const ruleLen = rule.length;
-        const segments: string[] = [];
-
-        // Guard against improper '!' that the loop won't catch.
-        if (rule[0] === '!' || rule[1] === '!' || rule.includes('!!')) {
-            throw new Error("misplaced '!' option: in non-duplicate "
-                + `environment: '${rule}'.`);
-        }
-
-        for (let i = 0; i < ruleLen; ++i) {
-            if ('?!'.includes(rule[i]!)) {
-                continue;
+    constructor() {
+        Rule.Fragment.getRandomPhoneme = phoneme => {
+            if (phoneme in this.phonemeset) {
+                return this.phonemeset[phoneme]!.select();
             }
 
-            if (i < ruleLen - 1 && rule[i + 1] === '?') {
-                if (Math.random() * 100 < this.randpercent) {
-                    if (rule[i]! in this.phonemeset) {
-                        segments.push(this.phonemeset[rule[i]!]!.select());
-                    } else {
-                        segments.push(rule[i]!);
-                    }
-                }
-            } else if (
-                i < ruleLen - 1
-                && i > 0
-                && rule[i + 1] === '!'
-            ) {
-                let prevc: string;
-                if (rule[i - 1] === '?' && i > 2) {
-                    prevc = rule[i - 2]!;
-                } else {
-                    prevc = rule[i - 1]!;
-                }
-
-                if (rule[i] !== prevc) {
-                    throw new Error("misplaced '!' option: in non-duplicate"
-                        + ` environment: '${rule}'.`);
-                }
-                if (rule[i]! in this.phonemeset) {
-                    let nph: string;
-
-                    do {
-                        nph = this.phonemeset[rule[i]!]!.select();
-                    } while (nph === last(segments));
-
-                    segments.push(nph);
-                }
-            } else if (rule[i]! in this.phonemeset) {
-                segments.push(this.phonemeset[rule[i]!]!.select());
-            } else {
-                segments.push(rule[i]!);
-            }
-        }
-
-        return segments.join('');
+            return phoneme;
+        };
     }
 
     private applyFilters(word: Word) {
@@ -212,7 +161,7 @@ class SoundSystem {
 
         const ruleToDict = (rule: string) => {
             const items = rule.trim().split(/\s+/gu);
-            const dict: { [key: string]: number } = {};
+            const dict = new Map<string, number>();
 
             for (const item of items) {
                 if (invalidItemAndWeight(item)) {
@@ -221,7 +170,7 @@ class SoundSystem {
                 }
 
                 const [value, weight] = <[string, string]>item.split(':');
-                dict[value] = +weight;
+                dict.set(value, +weight);
             }
 
             return dict;
@@ -236,14 +185,14 @@ class SoundSystem {
 
     addRule(rule: string, weight: number, cat = 'words:') {
         if (this.ruleset[cat]) {
-            this.ruleset[cat]![rule] = weight;
+            this.ruleset[cat]!.set(new Rule(rule), weight);
         } else {
             throw new Error(`uninitialized category '${cat}' referenced.`);
         }
     }
 
     addCategory(name: string, weight: number) {
-        this.ruleset[name] = { [_weight]: weight };
+        this.ruleset[name] = new Category(weight);
     }
 
     addFilter(pat: string, repl: string) {
@@ -281,9 +230,11 @@ class SoundSystem {
             throw new Error(`unknown category '${category}'.`);
         }
 
-        let dict = { ...this.ruleset[category], [_weight]: undefined };
-        if (Object.keys(dict).length === 1) {
-            dict = { [category]: 0, ...dict };
+        const dict = new Map<Rule | string, number | undefined>(
+            this.ruleset[category]!
+        );
+        if (dict.size === 0) {
+            dict.set(category, 0);
         }
 
         const ruleSelector = new WeightedSelector(dict);
@@ -300,8 +251,8 @@ class SoundSystem {
          */
         for (let i = 0; force || i < 3 * numWords; ++i) {
             const rule = ruleSelector.select();
-            const form = this.runRule(rule);
-            const word = new Word(form, rule);
+            const form = (<Rule>rule).generate();
+            const word = new Word(form, rule.toString());
             this.applyFilters(word);
             if (word.toString() !== 'REJECT') {
                 words.add(word.toString());
@@ -324,10 +275,10 @@ class SoundSystem {
     }
 
     randomCategory() {
-        const weightedCats: { [key: string]: number } = {};
+        const weightedCats = new Map<string, number>();
 
         for (const cat in this.ruleset) {
-            weightedCats[cat] = this.ruleset[cat]![_weight];
+            weightedCats.set(cat, this.ruleset[cat]!.weight);
         }
 
         const catSelector = new WeightedSelector(weightedCats);

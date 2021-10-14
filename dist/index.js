@@ -1,6 +1,6 @@
 "use strict";
 /*!
-Lexifer TS v1.2.0-alpha.2
+Lexifer TS v1.2.0-alpha.3
 
 Copyright (c) 2021 William Baker
 
@@ -26,8 +26,7 @@ class WeightedSelector {
     constructor(dic) {
         this.keys = [];
         this.weights = [];
-        for (const key in dic) {
-            const weight = dic[key];
+        for (const [key, weight] of dic) {
             if (typeof weight == 'number') {
                 this.keys.push(key);
                 this.weights.push(weight);
@@ -48,53 +47,69 @@ class WeightedSelector {
             + `'${this.keys.join("', '")}'.`);
     }
 }
-const main = (file, num, verbose = false, unsorted, onePerLine = false, stderr = console.error) => {
-    let ans = '';
-    try {
-        const phonDef = new PhonologyDefinition(file, stderr);
-        if (num) {
-            if (num < 0 || num === Infinity) {
-                stderr(`Cannot generate ${num} words.`);
-                ans = phonDef.paragraph();
+const main = (() => {
+    let hash = 0;
+    let phonDef = null;
+    const hashString = (str) => {
+        let hash = 0;
+        if (str.length === 0) {
+            return hash;
+        }
+        for (let i = 0; i < str.length; ++i) {
+            hash = (hash << 5) - hash + str.charCodeAt(i);
+            hash |= 0;
+        }
+        return hash;
+    };
+    const lexifer = (file, num, verbose = false, unsorted, onePerLine = false, stderr = console.error) => {
+        let ans = '';
+        try {
+            const newHash = hashString(file);
+            if (hash !== newHash || !phonDef) {
+                phonDef = new PhonologyDefinition(file, stderr);
+                hash = newHash;
+            }
+            if (num) {
+                if (num < 0) {
+                    stderr(`Cannot generate ${num} words.`);
+                    ans = phonDef.paragraph();
+                }
+                else {
+                    if (verbose) {
+                        if (unsorted === false) {
+                            stderr("** 'Unsorted' option always enabled in "
+                                + 'verbose mode.');
+                            unsorted = true;
+                        }
+                        if (onePerLine) {
+                            stderr("** 'One per line' option ignored in "
+                                + 'verbose mode.');
+                        }
+                    }
+                    ans = wrap(phonDef.generate(num, verbose, unsorted, onePerLine));
+                }
             }
             else {
-                if (num !== Math.round(num)) {
-                    stderr(`Requested number of words (${num}) is not an `
-                        + `integer. Rounding to ${Math.round(num)}.`);
-                    num = Math.round(num);
-                }
                 if (verbose) {
-                    if (unsorted === false) {
-                        stderr("** 'Unsorted' option always enabled in verbose "
-                            + 'mode.');
-                        unsorted = true;
-                    }
-                    if (onePerLine) {
-                        stderr("** 'One per line' option ignored in verbose "
-                            + 'mode.');
-                    }
+                    stderr("** 'Verbose' option ignored in paragraph mode.");
                 }
-                ans = wrap(phonDef.generate(num, verbose, unsorted, onePerLine));
+                if (unsorted) {
+                    stderr("** 'Unsorted' option ignored in paragraph mode.");
+                }
+                if (onePerLine) {
+                    stderr("** 'One per line' option ignored in paragraph "
+                        + 'mode.');
+                }
+                ans = phonDef.paragraph();
             }
         }
-        else {
-            if (verbose) {
-                stderr("** 'Verbose' option ignored in paragraph mode.");
-            }
-            if (unsorted) {
-                stderr("** 'Unsorted' option ignored in paragraph mode.");
-            }
-            if (onePerLine) {
-                stderr("** 'One per line' option ignored in paragraph mode.");
-            }
-            ans = phonDef.paragraph();
+        catch (e) {
+            stderr(e);
         }
-    }
-    catch (e) {
-        stderr(e);
-    }
-    return ans;
-};
+        return ans;
+    };
+    return lexifer;
+})();
 const genWords = () => {
     document.getElementById('errors').innerHTML = '';
     document.getElementById('result').innerHTML = main(document.getElementById('def').value, parseInt(document.getElementById('number').value), document.getElementById('verbose').checked, document.getElementById('unsorted').checked, document.getElementById('one-per-line').checked, message => {
@@ -119,6 +134,7 @@ class PhonologyDefinition {
         this.sanityCheck();
     }
     parse() {
+        Rule.Fragment.addOptional = () => this.soundsys.randpercent > Math.random() * 100;
         for (; this.defFileLineNum < this.defFileArr.length; ++this.defFileLineNum) {
             let line = this.defFileArr[this.defFileLineNum];
             line = line.replace(/#.*/u, '').trim();
@@ -245,11 +261,11 @@ class PhonologyDefinition {
     addRules(line, cat) {
         const rules = line.split(/\s+/gu);
         const weighted = line.includes(':');
-        if (line.includes('??')) {
-            this.stderr("'??' is treated as '?'.");
-        }
         if (line[0] === '?' || line.match(/\s\?[^?!]/u)) {
-            this.stderr("'?' at the beginning of a rule does nothing.");
+            throw new Error("Rule cannot start with '?'.");
+        }
+        if (line.includes('??')) {
+            this.stderr("'??' may cause unexpected behavior.");
         }
         for (let i = 0; i < rules.length; ++i) {
             let rule;
@@ -394,6 +410,91 @@ class PhonologyDefinition {
         return textify(this.soundsys, sentences);
     }
 }
+class Rule {
+    constructor(rule) {
+        if (rule[0] === '!' || rule.includes('!!')) {
+            throw new Error("misplaced '!' option: in non-duplicate "
+                + `environment: '${rule}'.`);
+        }
+        this.parts = [];
+        this.str = rule;
+        let minReps = 1, maxReps = 1;
+        let letter = rule[0];
+        let allowRepeats;
+        for (let i = 1; i < rule.length; ++i) {
+            if (rule[i] === '?') {
+                --minReps;
+                continue;
+            }
+            else if (rule[i] === '!') {
+                if (maxReps <= 1) {
+                    throw new Error("misplaced '!' option: in non-duplicate "
+                        + `environment: '${rule}'.`);
+                }
+                else if (allowRepeats === undefined) {
+                    allowRepeats = false;
+                }
+                continue;
+            }
+            if (rule[i] === letter
+                && allowRepeats === false === (rule[i + 1] === '!')) {
+                ++minReps;
+                ++maxReps;
+            }
+            else {
+                this.parts.push(new Rule.Fragment(letter, minReps, maxReps, allowRepeats));
+                letter = rule[i];
+                maxReps = 1;
+                minReps = 1;
+                allowRepeats = undefined;
+            }
+        }
+        this.parts.push(new Rule.Fragment(letter, minReps, maxReps));
+    }
+    generate() {
+        return this.parts.map(el => el.generate()).join('');
+    }
+    toString() {
+        return this.str;
+    }
+}
+Rule.Fragment = class Fragment {
+    constructor(value, minReps, maxReps, allowRepeats) {
+        this.value = value;
+        this.minReps = minReps;
+        this.maxReps = maxReps;
+        this.allowRepeats = allowRepeats;
+    }
+    getPhoneme(word) {
+        if (!word || !word.length) {
+            return Fragment.getRandomPhoneme(this.value);
+        }
+        let val = '';
+        do {
+            val = Fragment.getRandomPhoneme(this.value);
+        } while (this.allowRepeats === false && val === last(word));
+        return val;
+    }
+    generate() {
+        if (this.maxReps === 1) {
+            if (this.minReps === 0 && !Fragment.addOptional()) {
+                return '';
+            }
+            return Fragment.getRandomPhoneme(this.value);
+        }
+        let i;
+        let retVal = '';
+        for (i = 0; i < this.minReps; ++i) {
+            retVal += this.getPhoneme(retVal);
+        }
+        for (; i < this.maxReps; ++i) {
+            if (Fragment.addOptional()) {
+                retVal += this.getPhoneme(retVal);
+            }
+        }
+        return retVal;
+    }
+};
 class Segment {
     constructor(arr) {
         [this.ipa, this.digraph, this.voiced, this.place, this.manner] = arr;
@@ -676,7 +777,12 @@ class ArbSorter {
         return l2.map(el => this.valuesAsWord(el));
     }
 }
-const _weight = Symbol();
+class Category extends Map {
+    constructor(weight) {
+        super();
+        this.weight = weight;
+    }
+}
 class SoundSystem {
     constructor() {
         this.phonemeset = {};
@@ -687,58 +793,12 @@ class SoundSystem {
         this.useRejections = false;
         this.ruleset = {};
         this.sorter = null;
-    }
-    runRule(rule) {
-        const ruleLen = rule.length;
-        const segments = [];
-        if (rule[0] === '!' || rule[1] === '!' || rule.includes('!!')) {
-            throw new Error("misplaced '!' option: in non-duplicate "
-                + `environment: '${rule}'.`);
-        }
-        for (let i = 0; i < ruleLen; ++i) {
-            if ('?!'.includes(rule[i])) {
-                continue;
+        Rule.Fragment.getRandomPhoneme = phoneme => {
+            if (phoneme in this.phonemeset) {
+                return this.phonemeset[phoneme].select();
             }
-            if (i < ruleLen - 1 && rule[i + 1] === '?') {
-                if (Math.random() * 100 < this.randpercent) {
-                    if (rule[i] in this.phonemeset) {
-                        segments.push(this.phonemeset[rule[i]].select());
-                    }
-                    else {
-                        segments.push(rule[i]);
-                    }
-                }
-            }
-            else if (i < ruleLen - 1
-                && i > 0
-                && rule[i + 1] === '!') {
-                let prevc;
-                if (rule[i - 1] === '?' && i > 2) {
-                    prevc = rule[i - 2];
-                }
-                else {
-                    prevc = rule[i - 1];
-                }
-                if (rule[i] !== prevc) {
-                    throw new Error("misplaced '!' option: in non-duplicate"
-                        + ` environment: '${rule}'.`);
-                }
-                if (rule[i] in this.phonemeset) {
-                    let nph;
-                    do {
-                        nph = this.phonemeset[rule[i]].select();
-                    } while (nph === last(segments));
-                    segments.push(nph);
-                }
-            }
-            else if (rule[i] in this.phonemeset) {
-                segments.push(this.phonemeset[rule[i]].select());
-            }
-            else {
-                segments.push(rule[i]);
-            }
-        }
-        return segments.join('');
+            return phoneme;
+        };
     }
     applyFilters(word) {
         if (this.useAssim) {
@@ -774,14 +834,14 @@ class SoundSystem {
         };
         const ruleToDict = (rule) => {
             const items = rule.trim().split(/\s+/gu);
-            const dict = {};
+            const dict = new Map();
             for (const item of items) {
                 if (invalidItemAndWeight(item)) {
                     throw new Error(`'${item}' is not a valid phoneme and `
                         + 'weight.');
                 }
                 const [value, weight] = item.split(':');
-                dict[value] = +weight;
+                dict.set(value, +weight);
             }
             return dict;
         };
@@ -792,14 +852,14 @@ class SoundSystem {
     }
     addRule(rule, weight, cat = 'words:') {
         if (this.ruleset[cat]) {
-            this.ruleset[cat][rule] = weight;
+            this.ruleset[cat].set(new Rule(rule), weight);
         }
         else {
             throw new Error(`uninitialized category '${cat}' referenced.`);
         }
     }
     addCategory(name, weight) {
-        this.ruleset[name] = { [_weight]: weight };
+        this.ruleset[name] = new Category(weight);
     }
     addFilter(pat, repl) {
         if (repl === '!') {
@@ -825,15 +885,15 @@ class SoundSystem {
         if (!this.ruleset[category]) {
             throw new Error(`unknown category '${category}'.`);
         }
-        let dict = Object.assign(Object.assign({}, this.ruleset[category]), { [_weight]: undefined });
-        if (Object.keys(dict).length === 1) {
-            dict = Object.assign({ [category]: 0 }, dict);
+        const dict = new Map(this.ruleset[category]);
+        if (dict.size === 0) {
+            dict.set(category, 0);
         }
         const ruleSelector = new WeightedSelector(dict);
         for (let i = 0; force || i < 3 * numWords; ++i) {
             const rule = ruleSelector.select();
-            const form = this.runRule(rule);
-            const word = new Word(form, rule);
+            const form = rule.generate();
+            const word = new Word(form, rule.toString());
             this.applyFilters(word);
             if (word.toString() !== 'REJECT') {
                 words.add(word.toString());
@@ -854,9 +914,9 @@ class SoundSystem {
         return wordList;
     }
     randomCategory() {
-        const weightedCats = {};
+        const weightedCats = new Map();
         for (const cat in this.ruleset) {
-            weightedCats[cat] = this.ruleset[cat][_weight];
+            weightedCats.set(cat, this.ruleset[cat].weight);
         }
         const catSelector = new WeightedSelector(weightedCats);
         return catSelector.select();

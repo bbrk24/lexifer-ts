@@ -20,17 +20,16 @@
  * IN THE SOFTWARE.
  */
 
-class WeightedSelector {
-    private keys: string[];
+class WeightedSelector<T> {
+    private keys: T[];
     private weights: number[];
     private sum: number;
 
-    constructor(dic: { [key: string]: number | undefined }) {
+    constructor(dic: Map<T, number | undefined>) {
         this.keys = [];
         this.weights = [];
 
-        for (const key in dic) {
-            const weight = dic[key];
+        for (const [key, weight] of dic) {
             if (typeof weight == 'number') {
                 this.keys.push(key);
                 this.weights.push(weight);
@@ -47,7 +46,7 @@ class WeightedSelector {
         for (let i = 0; i < this.keys.length; ++i) {
             temp += this.weights[i]!;
             if (pick < temp) {
-                return this.keys[i]!;
+                return <T> this.keys[i];
             }
         }
 

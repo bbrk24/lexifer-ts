@@ -24,62 +24,85 @@ import wrap from './textwrap';
 import PhonologyDefinition from './PhDefParser';
 
 // Original "main" -- returns a string
-const main = (
-    file: string,
-    num?: number,
-    verbose = false,
-    unsorted?: boolean,
-    onePerLine = false,
-    stderr: (inp: Error | string) => void = console.error
-) => {
-    let ans = '';
-    try {
-        const phonDef = new PhonologyDefinition(file, stderr);
-        if (num) {
-            if (num < 0 || num === Infinity) {
-                stderr(`Cannot generate ${num} words.`);
-                ans = phonDef.paragraph();
-            } else {
-                if (num !== Math.round(num)) {
-                    stderr(`Requested number of words (${num}) is not an `
-                        + `integer. Rounding to ${Math.round(num)}.`);
-                    num = Math.round(num);
-                }
-                if (verbose) {
-                    if (unsorted === false) {
-                        stderr("** 'Unsorted' option always enabled in verbose "
-                            + 'mode.');
-                        unsorted = true;
-                    }
-                    if (onePerLine) {
-                        stderr("** 'One per line' option ignored in verbose "
-                            + 'mode.');
-                    }
-                }
+const main = (() => {
+    let hash = 0;
+    let phonDef: PhonologyDefinition | null = null;
 
-                ans = wrap(
-                    phonDef.generate(num, verbose, unsorted, onePerLine)
-                );
-            }
-        } else {
-            if (verbose) {
-                stderr("** 'Verbose' option ignored in paragraph mode.");
-            }
-            if (unsorted) {
-                stderr("** 'Unsorted' option ignored in paragraph mode.");
-            }
-            if (onePerLine) {
-                stderr("** 'One per line' option ignored in paragraph mode.");
-            }
-
-            ans = phonDef.paragraph();
+    const hashString = (str: string) => {
+        let hash = 0;
+        if (str.length === 0) {
+            return hash;
         }
-    } catch (e) {
-        stderr(<Error>e);
-    }
 
-    return ans;
-};
+        for (let i = 0; i < str.length; ++i) {
+            hash = (hash << 5) - hash + str.charCodeAt(i);
+            hash |= 0;
+        }
+
+        return hash;
+    };
+
+    const lexifer = (
+        file: string,
+        num?: number,
+        verbose = false,
+        unsorted?: boolean,
+        onePerLine = false,
+        stderr: (inp: Error | string) => void = console.error
+    ) => {
+        let ans = '';
+        try {
+            // There's no need to re-parse if nothing changed.
+            const newHash = hashString(file);
+            if (hash !== newHash || !phonDef) {
+                phonDef = new PhonologyDefinition(file, stderr);
+                hash = newHash;
+            }
+
+            if (num) {
+                if (num < 0) {
+                    stderr(`Cannot generate ${num} words.`);
+                    ans = phonDef.paragraph();
+                } else {
+                    if (verbose) {
+                        if (unsorted === false) {
+                            stderr("** 'Unsorted' option always enabled in "
+                                + 'verbose mode.');
+                            unsorted = true;
+                        }
+                        if (onePerLine) {
+                            stderr("** 'One per line' option ignored in "
+                                + 'verbose mode.');
+                        }
+                    }
+
+                    ans = wrap(
+                        phonDef.generate(num, verbose, unsorted, onePerLine)
+                    );
+                }
+            } else {
+                if (verbose) {
+                    stderr("** 'Verbose' option ignored in paragraph mode.");
+                }
+                if (unsorted) {
+                    stderr("** 'Unsorted' option ignored in paragraph mode.");
+                }
+                if (onePerLine) {
+                    stderr("** 'One per line' option ignored in paragraph "
+                        + 'mode.');
+                }
+
+                ans = phonDef.paragraph();
+            }
+        } catch (e) {
+            stderr(<Error>e);
+        }
+
+        return ans;
+    };
+
+    return lexifer;
+})();
 
 // Actual code run when you click "generate"
 const genWords = () => {

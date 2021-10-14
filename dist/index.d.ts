@@ -1,5 +1,5 @@
 /*!
-Lexifer TS v1.2.0-alpha.2
+Lexifer TS v1.2.0-alpha.3
 
 Copyright (c) 2021 William Baker
 
@@ -21,14 +21,12 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-declare class WeightedSelector {
+declare class WeightedSelector<T> {
     private keys;
     private weights;
     private sum;
-    constructor(dic: {
-        [key: string]: number | undefined;
-    });
-    select(): string;
+    constructor(dic: Map<T, number | undefined>);
+    select(): T;
 }
 declare const main: (file: string, num?: number | undefined, verbose?: boolean, unsorted?: boolean | undefined, onePerLine?: boolean, stderr?: (inp: Error | string) => void) => string;
 declare const genWords: () => void;
@@ -61,6 +59,25 @@ declare class PhonologyDefinition {
     private parseCategories;
     generate(numWords?: number, verbose?: boolean, unsorted?: boolean, onePerLine?: boolean): string;
     paragraph(sentences?: number): string;
+}
+interface IFragment {
+    generate(): string;
+}
+declare var IFragment: {
+    new (value: string, minReps: number, maxReps: number, allowRepeats?: boolean): IFragment;
+    addOptional?(): boolean;
+    getRandomPhoneme?(group: string): string;
+    prototype: IFragment;
+};
+declare namespace Rule {
+}
+declare class Rule {
+    static Fragment: typeof IFragment;
+    private parts;
+    private str;
+    constructor(rule: string);
+    generate(): string;
+    toString(): string;
 }
 declare const enum Place {
     Bilabial = 0,
@@ -131,10 +148,9 @@ declare class ArbSorter {
     split(word: string): string[];
     sort(list: string[]): string[];
 }
-declare const _weight: unique symbol;
-interface Rule {
-    [_weight]: number;
-    [key: string]: number;
+declare class Category extends Map<Rule, number> {
+    weight: number;
+    constructor(weight: number);
 }
 declare class SoundSystem {
     private phonemeset;
@@ -144,10 +160,10 @@ declare class SoundSystem {
     useCoronalMetathesis: boolean;
     useRejections: boolean;
     ruleset: {
-        [key: string]: Rule;
+        [key: string]: Category;
     };
     sorter: ArbSorter | null;
-    private runRule;
+    constructor();
     private applyFilters;
     addPhUnit(name: string, selection: string): void;
     addRule(rule: string, weight: number, cat?: string): void;

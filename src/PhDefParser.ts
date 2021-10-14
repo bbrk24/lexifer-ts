@@ -20,6 +20,7 @@
  * IN THE SOFTWARE.
  */
 
+import Rule from './rule';
 import { SoundSystem, textify, invalidItemAndWeight } from './wordgen';
 
 class PhonologyDefinition {
@@ -48,6 +49,13 @@ class PhonologyDefinition {
     }
 
     private parse() {
+        /*
+         * This isn't really part of parsing, but something that must be done
+         * every run.
+         */
+        Rule.Fragment.addOptional = () =>
+            this.soundsys.randpercent > Math.random() * 100;
+
         for (;
             this.defFileLineNum < this.defFileArr.length;
             ++this.defFileLineNum
@@ -187,16 +195,14 @@ class PhonologyDefinition {
         const rules = line.split(/\s+/gu);
         const weighted = line.includes(':');
 
-        // Only warn about this once. Besides, it can be detected right away.
-        if (line.includes('??')) {
-            this.stderr("'??' is treated as '?'.");
+        if (line[0] === '?' || line.match(/\s\?[^?!]/u)) {
+            // This doesn't need /g since I'm using it as a boolean test.
+            throw new Error("Rule cannot start with '?'.");
         }
 
-        // Only warn about this once. It can also be detected right away, but
-        // it's harder to find.
-        if (line[0] === '?' || line.match(/\s\?[^?!]/u)) {
-            // That doesn't need /g since I'm using it as a boolean test.
-            this.stderr("'?' at the beginning of a rule does nothing.");
+        // Only warn about this once; it can be detected right away.
+        if (line.includes('??')) {
+            this.stderr("'??' may cause unexpected behavior.");
         }
 
         for (let i = 0; i < rules.length; ++i) {
