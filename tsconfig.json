@@ -10,7 +10,7 @@
         "noEmitOnError": true,
         "outFile": "./dist/index.js",
         "removeComments": true,
-        "target": "ES2015",
-        "lib": ["ES2015", "ES2016.Array.Include", "DOM"]
+        "target": "ES2017",
+        "lib": ["ES2017", "DOM"]
     }
 }

@@ -48,10 +48,11 @@ mv tempfile dist/index.d.ts
 echo 'Minifying code...'
 
 # use terser
-# --mangle-props is more trouble than it's worth
+# Even though --mangle-props shaves off 2kB, it ends up being more trouble
+# than it's worth.
 # -c unsafe replaces `new Error()` with `Error()`
 node_modules/.bin/terser dist/index.js -mo dist/lexifer.min.js -c unsafe \
-    --ecma 2015 -f wrap_func_args=false,semicolons=false
+    --ecma 2017 -f wrap_func_args=false,semicolons=false
 
 # remove the trailing newline
 perl -pi -e 'chomp if eof' dist/lexifer.min.js

@@ -1,6 +1,6 @@
 "use strict";
 /*!
-Lexifer TS v1.2.0-alpha.5
+Lexifer TS v1.2.0-alpha.5+2
 
 Copyright (c) 2021 William Baker
 
@@ -285,7 +285,7 @@ class PhonologyDefinition {
             }
             else {
                 rule = rules[i];
-                weight = 10.0 / Math.pow((i + 1), 0.9);
+                weight = 10.0 / (i + 1) ** 0.9;
             }
             if (!rule.match(/[^?!]/u)) {
                 throw new Error(`'${rules[i]}'`

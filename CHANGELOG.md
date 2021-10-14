@@ -6,8 +6,8 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
-`std-rejections` -- rejects obstruent-approximant and nasal-trill clusters if
-both consonants have the same place of articulation.
+`std-rejections` -- rejects word-initial nonsibilant-approximant and
+nasal-trill clusters if both consonants have the same place of articulation.
 
 ### Changed
 
