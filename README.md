@@ -47,8 +47,8 @@ full text of the file rather than the file name so that it can be used in cases
 where it is infeasible to use a file; the web version uses the text from an
 HTML textarea as the input.
 - `num`: A nonnegative number, or `undefined`. If falsy (`0`, `undefined`, or
-missing), a paragraph will be generated. If not an integer, the behavior is
-undefined, and it will likely cause an error.
+`NaN`), a paragraph will be generated. If not an integer, it will round it with
+a warning.
 - `verbose`: A boolean value indicating whether to display all generation
 steps. Useful for debugging, but `false` by default. If set to `true` without
 specifying a number of words, it is ignored with a warning.

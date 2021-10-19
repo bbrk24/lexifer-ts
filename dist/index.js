@@ -1,6 +1,6 @@
 "use strict";
 /*!
-Lexifer TS v1.1.2-alpha+2
+Lexifer TS v1.1.2-beta
 
 Copyright (c) 2021 William Baker
 
@@ -53,11 +53,16 @@ const main = (file, num, verbose = false, unsorted, onePerLine = false, stderr =
     try {
         let pd = new PhonologyDefinition(file, stderr);
         if (num) {
-            if (num < 0) {
+            if (num < 0 || num === Infinity) {
                 stderr(`Cannot generate ${num} words.`);
                 ans = pd.paragraph();
             }
             else {
+                if (num !== Math.round(num)) {
+                    stderr(`Requested number of words (${num}) is not an `
+                        + `integer. Rounding to ${Math.round(num)}.`);
+                    num = Math.round(num);
+                }
                 if (verbose) {
                     if (unsorted === false) {
                         stderr("** 'Unsorted' option always enabled in verbose "

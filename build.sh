@@ -27,7 +27,7 @@ echo 'Combining files...'
     # the use of `/*!` ensures compilation preserves it
     printf '/*!\nLexifer TS v%s\n\n' \
         "$(grep version package.json | cut -d '"' -f 4)"
-    cat ./LICENSE
+    cat LICENSE
     echo '*/'
     sed '/export/d;/import/d' src/*.ts
 } > combined.ts
@@ -50,20 +50,21 @@ else
     
     # use terser
     # --mangle-props is more trouble than it's worth
-    ./node_modules/.bin/terser ./dist/index.js -cmf wrap_func_args=false \
-        -o dist/lexifer.min.js --ecma 2015
+    # -c unsafe replaces `new Error()` with `Error()`
+    ./node_modules/.bin/terser dist/index.js -mo dist/lexifer.min.js \
+        -c unsafe --ecma 2015 -f wrap_func_args=false,semicolons=false
     
     # remove the trailing newline
-    perl -pi -e 'chomp if eof' ./dist/lexifer.min.js
+    perl -pi -e 'chomp if eof' dist/lexifer.min.js
     
     # prepare for use as a package by declaring exports
     # can't be done earlier because otherwise TSC tries to prepare for a module loader
-    # and ES6 modules can't be used with only one outfile for some reason
+    # ES6 and CommonJS modules can't be used with only one outfile for some reason
     echo 'module.exports = main;' >> dist/index.js
     echo 'export default main;' >> dist/index.d.ts
     
     # and now it's done
     echo 'Done.'
     echo 'Minified file size:' \
-        "$(wc -c ./dist/lexifer.min.js | awk '{print $1}') bytes"
+        "$(wc -c dist/lexifer.min.js | awk '{print $1}') bytes"
 fi
