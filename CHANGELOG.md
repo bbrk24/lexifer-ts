@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## v1.1.2
+
+This version contains very little in the way of functional changes, but
+clarifies licensing and extends the `package.json` so as to be ready for
+release on npm.
+
 ## v1.1.1
 
 ### Added

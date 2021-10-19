@@ -1,16 +1,35 @@
 {
-    "name": "lexifer",
-    "version": "1.1.1+2",
-    "devDependencies": {
-        "@types/node": "14.17.0",
-        "terser": "^5.9.0",
-        "typescript": "^4.1.5"
-    },
-    "scripts": {
-        "build": "./build.sh"
-    },
-    "engines": {
-        "node": "14.17.0",
-        "yarn": "^1.22.0"
+  "name": "lexifer",
+  "version": "1.1.2-alpha",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/bbrk24/lexifer-ts/issues"
+  },
+  "author": "bbrk24",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bbrk24/lexifer-ts.git"
+  },
+  "devDependencies": {
+    "terser": "^5.9.0",
+    "typescript": "^4.1.5"
+  },
+  "scripts": {
+    "build": "./build.sh"
+  },
+  "peerDependencies": {
+    "typescript": ">=3.6.2"
+  },
+  "peerDependenciesMeta": {
+    "typescript": {
+      "optional": true
     }
+  },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist/index.*",
+    "src/*.ts",
+    "build.sh"
+  ]
 }
