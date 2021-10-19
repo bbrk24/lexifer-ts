@@ -20,12 +20,17 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-# TODO, potentially unimportant: Switch this from shell to node, completely
-# removing any dependence on a non-JS system. I already specify that node must
-# be v14.17.0, but shell is system-dependent.
-
 echo 'Combining files...'
-sed '/export/d;/import/d' src/*.ts > combined.ts
+# put the version number and license comment here, so it ends up in all dist/
+# files
+{
+    # the use of `/*!` ensures compilation preserves it
+    printf '/*!\nLexifer TS v%s\n\n' \
+        "$(grep version package.json | cut -d '"' -f 4)"
+    cat ./LICENSE
+    echo '*/'
+    sed '/export/d;/import/d' src/*.ts
+} > combined.ts
 
 echo 'Compiling to JS...'
 errors=$(./node_modules/.bin/tsc) 
@@ -35,35 +40,18 @@ then
     echo 'Build errors:'
     echo "$errors"
 else
-    # change CRLF to LF (thanks Microsoft), and add license text comments
+    # change CRLF to LF (thanks Microsoft)
     sed -e s/^M// dist/index.js > tempfile
-    {
-        echo '/*!' # the '!' causes the comment to be preserved by terser
-        cat ./LICENSE
-        echo '*/'
-        cat tempfile
-    } > dist/index.js
-
+    mv tempfile dist/index.js
     sed -e s/^M// dist/index.d.ts > tempfile
-    {
-        echo '/*!' # the '!' is not necessary here, but just for consistency
-        cat ./LICENSE
-        echo '*/'
-        cat tempfile
-    } > dist/index.d.ts
-    rm tempfile
+    mv tempfile dist/index.d.ts
     
     echo 'Minifying code...'
     
-    # output the version number comment first
-    printf '// Lexifer TS v%s\n' \
-        "$(grep version package.json | cut -d '"' -f 4)" \
-        > ./dist/lexifer.min.js
-    
     # use terser
-    ./node_modules/.bin/terser ./dist/index.js -m reserved=['genWords'] -c \
-        --mangle-props --ecma 2015 -f wrap_func_args=false \
-        >> ./dist/lexifer.min.js
+    # --mangle-props is more trouble than it's worth
+    ./node_modules/.bin/terser ./dist/index.js -cmf wrap_func_args=false \
+        -o dist/lexifer.min.js --ecma 2015
     
     # remove the trailing newline
     perl -pi -e 'chomp if eof' ./dist/lexifer.min.js

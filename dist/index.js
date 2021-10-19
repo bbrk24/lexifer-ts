@@ -1,4 +1,7 @@
+"use strict";
 /*!
+Lexifer TS v1.1.2-alpha+2
+
 Copyright (c) 2021 William Baker
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -18,13 +21,7 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
-====
-
-The `last' function is from Lodash. For their license, see
-<https://lodash.com/license>.
 */
-"use strict";
 class WeightedSelector {
     constructor(dic) {
         this.keys = [];
@@ -99,10 +96,9 @@ const genWords = () => {
         document.getElementById('errors').innerHTML += message + '<br />';
     }).replace(/\n/gu, '<br />');
 };
-function last(array) {
-    var length = array == null ? 0 : array.length;
-    return length ? array[length - 1] : undefined;
-}
+const last = (arr) => {
+    return arr && arr[arr.length - 1];
+};
 class PhonologyDefinition {
     constructor(defFile, stderr) {
         this.stderr = stderr;
