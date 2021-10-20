@@ -1,0 +1,50 @@
+{
+    "env": {
+        "browser": true
+    },
+    "extends": [
+        "eslint:recommended",
+        "plugin:@typescript-eslint/recommended"
+    ],
+    "parser": "@typescript-eslint/parser",
+    "parserOptions": {
+        "ecmaVersion": 7,
+        "sourceType": "module"
+    },
+    "plugins": [
+        "@typescript-eslint"
+    ],
+    "rules": {
+        "indent": [
+            "error",
+            4
+        ],
+        "linebreak-style": [
+            "error",
+            "unix"
+        ],
+        "quotes": [
+            "error",
+            "single",
+            {
+                "avoidEscape": true
+            }
+        ],
+        "semi": [
+            "error",
+            "always"
+        ],
+        "max-len": [
+            "error",
+            {
+                "code": 80,
+                "ignoreComments": false
+            }
+        ],
+        // This warns over silly little things, like `arr[i - 1]`. Not helpful.
+        "no-magic-numbers": "off",
+        // TSC makes me put a lot of these in there, so this is
+        // counterproductive.
+        "@typescript-eslint/no-non-null-assertion": "off"
+    }
+}

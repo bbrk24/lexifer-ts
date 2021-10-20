@@ -4,8 +4,8 @@ This is a TypeScript implementation of William Annis's
 [Lexifer](https://github.com/wmannis/lexifer).
 
 To compile this, run the build shell script. This can be run directly, or with
-`yarn build`. Windows users may NOT use powershell, and will have to install a
-proper shell terminal.
+`yarn prepack`. Windows users may NOT use powershell, and will have to install
+a proper shell terminal.
 
 ## Using Lexifer in your project
 

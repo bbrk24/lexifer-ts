@@ -1,5 +1,5 @@
 /*!
-Lexifer TS v1.1.2-beta
+Lexifer TS v1.1.2-beta.2
 
 Copyright (c) 2021 William Baker
 
@@ -138,4 +138,4 @@ declare class SoundSystem {
     randomCategory(): string;
 }
 declare const textify: (phsys: SoundSystem, sentences?: number) => string;
-export default main;
+export = main;

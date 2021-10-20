@@ -1,6 +1,6 @@
 {
   "name": "lexifer",
-  "version": "1.1.2-beta",
+  "version": "1.1.2-beta.2",
   "description": "A highly customizable wordgen for conlangers",
   "keywords": [
     "wordgen",
@@ -17,11 +17,14 @@
     "url": "https://github.com/bbrk24/lexifer-ts.git"
   },
   "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.0.0",
+    "@typescript-eslint/parser": "^5.0.0",
+    "eslint": "^8.0.0",
     "terser": "^5.9.0",
     "typescript": "^4.1.5"
   },
   "scripts": {
-    "build": "./build.sh"
+    "prepack": "build.sh"
   },
   "peerDependencies": {
     "typescript": ">=3.6.2"

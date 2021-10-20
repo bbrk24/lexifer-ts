@@ -20,8 +20,7 @@
  * IN THE SOFTWARE.
  */
 
-const last = <T>(arr: ArrayLike<T> | null | undefined) => {
-    return arr && arr[arr.length - 1];
-};
+const last = <T>(arr: ArrayLike<T> | null | undefined) =>
+    arr && arr[arr.length - 1];
 
 export default last;

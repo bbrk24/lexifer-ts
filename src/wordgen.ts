@@ -27,13 +27,13 @@ import last from './last';
 import Word from './word';
 
 const invalidItemAndWeight = (item: string) => {
-    let parts = item.split(':');
+    const parts = item.split(':');
     if (parts.length !== 2) {
         return true;
     }
-    let weight = +parts[1]!;
+    const weight = +parts[1]!;
     return isNaN(weight) || weight < 0 || weight === Infinity;
-}
+};
 
 class ArbSorter {
     private splitter: RegExp;
@@ -41,21 +41,21 @@ class ArbSorter {
     private vals: string[];
     
     constructor(order: string) {
-        let graphs = order.split(/\s+/gu);
-        let splitOrder = [...graphs].sort((a, b) => b.length - a.length);
+        const graphs = order.split(/\s+/gu);
+        const splitOrder = [...graphs].sort((a, b) => b.length - a.length);
         this.splitter = new RegExp(`(${splitOrder.join('|')}|.)`, 'gu');
         
         this.ords = {};
         this.vals = [];
-        for (let i in graphs) {
+        for (const i in graphs) {
             this.ords[graphs[i]!] = +i;
             this.vals.push(graphs[i]!);
         }
     }
     
     wordAsValues(word: string) {
-        let w = this.split(word);
-        let arrayedWord = w.map(char => this.ords[char]);
+        const w = this.split(word);
+        const arrayedWord = w.map(char => this.ords[char]);
         if (arrayedWord.includes(undefined)) {
             throw new Error(`word with unknown letter: '${word}'.\n`
                 + 'A filter or assimilation might have caused this.');
@@ -74,7 +74,7 @@ class ArbSorter {
     }
     
     sort(l: string[]) {
-        let l2 = l.filter(el => el !== '').map(el => this.wordAsValues(el));
+        const l2 = l.filter(el => el !== '').map(el => this.wordAsValues(el));
         l2.sort((a, b) => a[0]! - b[0]!);
         return l2.map(el => this.valuesAsWord(el));
     }
@@ -99,8 +99,8 @@ class SoundSystem {
     sorter: ArbSorter | null = null;
     
     private runRule(rule: string) {
-        let n = rule.length;
-        let s: string[] = [];
+        const n = rule.length;
+        const s: string[] = [];
         
         // guard against improper '!' that the loop won't catch
         if (rule[0] === '!' || rule[1] === '!' || rule.includes('!!')) {
@@ -169,20 +169,20 @@ class SoundSystem {
     addPhUnit(name: string, selection: string) {
         const naturalWeights = (phonemes: string) => {
             const jitter = (v: number, percent = 10) => {
-                let move = v * percent / 100;
+                const move = v * percent / 100;
                 return v + move * (Math.random() - 0.5);
             };
             
-            let p = phonemes.split(/\s+/gu);
-            let weighted: { [key: string]: number } = {};
-            let n = p.length;
+            const p = phonemes.split(/\s+/gu);
+            const weighted: { [key: string]: number } = {};
+            const n = p.length;
             for (let i = 0; i < n; ++i) {
                 weighted[p[i]!] = jitter(
                     (Math.log(n + 1) - Math.log(i + 1)) / n
                 );
             }
             let temp = '';
-            for (let k in weighted) {
+            for (const k in weighted) {
                 temp += `${k}:${weighted[k]} `;
             }
             temp.trim();
@@ -190,14 +190,14 @@ class SoundSystem {
         };
         
         const ruleToDict = (rule: string) => {
-            let items = rule.trim().split(/\s+/gu);
-            let d: { [key: string]: number } = {};
-            for (let item of items) {
+            const items = rule.trim().split(/\s+/gu);
+            const d: { [key: string]: number } = {};
+            for (const item of items) {
                 if (invalidItemAndWeight(item)) {
                     throw new Error(`'${item}' is not a valid phoneme and `
                         + 'weight.');
                 }
-                let [value, weight] = <[string, string]>item.split(':');
+                const [value, weight] = <[string, string]>item.split(':');
                 d[value] = +weight;
             }
             return d;
@@ -213,7 +213,7 @@ class SoundSystem {
         if (this.ruleset[cat]) {
             this.ruleset[cat]![rule] = weight;
         } else {
-            throw new Error(`uninitialized category '${cat}' referenced.`)
+            throw new Error(`uninitialized category '${cat}' referenced.`);
         }
     }
     
@@ -248,10 +248,9 @@ class SoundSystem {
         category: string,
         force = false
     ) {
-        let words = new Set<string>();
+        const words = new Set<string>();
         Word.verbose = verbose;
         Word.sorter = this.sorter;
-        let ruleSelector: WeightedSelector;
         
         if (!this.ruleset[category]) {
             throw new Error(`unknown category '${category}'.`);
@@ -260,7 +259,7 @@ class SoundSystem {
         if (Object.keys(dict).length === 1) {
             dict = { [category]: 0, ...dict };
         }
-        ruleSelector = new WeightedSelector(dict);
+        const ruleSelector = new WeightedSelector(dict);
         
         /* If they request more words than are possible, we don't want to lock
            up. Instead, try up to three times as many (note: is this enough?),
@@ -271,9 +270,9 @@ class SoundSystem {
            time. I think it's safe to assume it's always possible to generate
            at least one valid word. */
         for (let i = 0; force || i < 3 * n; ++i) {
-            let rule = ruleSelector.select();
-            let form = this.runRule(rule);
-            let word = new Word(form, rule);
+            const rule = ruleSelector.select();
+            const form = this.runRule(rule);
+            const word = new Word(form, rule);
             this.applyFilters(word);
             if (word.toString() !== 'REJECT') {
                 words.add(word.toString());
@@ -288,18 +287,18 @@ class SoundSystem {
             if (this.sorter) {
                 wordList = this.sorter.sort(wordList);
             } else {
-                wordList.sort()
+                wordList.sort();
             }
         }
         return wordList;
     }
     
     randomCategory() {
-        let weightedCats: { [key: string]: number } = {};
-        for (let cat in this.ruleset) {
+        const weightedCats: { [key: string]: number } = {};
+        for (const cat in this.ruleset) {
             weightedCats[cat] = this.ruleset[cat]![_weight];
         }
-        let catSelector = new WeightedSelector(weightedCats);
+        const catSelector = new WeightedSelector(weightedCats);
         return catSelector.select();
     }
 }
@@ -307,7 +306,7 @@ class SoundSystem {
 const textify = (phsys: SoundSystem, sentences = 25) => {
     let text = '';
     for (let i = 0; i < sentences; ++i) {
-        let sent = Math.floor(Math.random() * 9) + 3;
+        const sent = Math.floor(Math.random() * 9) + 3;
         let comma = -1;
         if (sent >= 7) {
             comma = Math.floor(Math.random() * (sent - 1));

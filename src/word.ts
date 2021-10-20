@@ -50,7 +50,7 @@ class Word {
     }
     
     applyFilters(filters: [string, string][]) {
-        for (let filt of filters) {
+        for (const filt of filters) {
             this.applyFilter(...filt);
             if (last(this.forms) === 'REJECT') {
                 return;
@@ -60,7 +60,7 @@ class Word {
     
     applyAssimilations() {
         if (Word.sorter) {
-            let newWord = applyAssimilations(
+            const newWord = applyAssimilations(
                 Word.sorter.split(
                     last(this.forms)!
                 )
@@ -76,7 +76,7 @@ class Word {
     
     applyCoronalMetathesis() {
         if (Word.sorter) {
-            let newWord = applyCoronalMetathesis(
+            const newWord = applyCoronalMetathesis(
                 Word.sorter.split(
                     last(this.forms)!
                 )
@@ -93,7 +93,7 @@ class Word {
     toString() {
         if (Word.verbose) {
             let ans = '';
-            for (let i in this.forms) {
+            for (const i in this.forms) {
                 ans += `${this.filters[i]} – ${this.forms[i]}\n`;
             }
             return ans;

@@ -61,7 +61,7 @@ class PhonologyDefinition {
             if (line.startsWith('with:')) {
                 this.parseOption(line.substring(5).trim());
             } else if (line.startsWith('random-rate:')) {
-                let randpercent = +line.substring(12);
+                const randpercent = +line.substring(12);
                 if (randpercent >= 0 && randpercent <= 100) {
                     this.soundsys.randpercent = randpercent;
                 } else {
@@ -95,10 +95,10 @@ class PhonologyDefinition {
     
     private sanityCheck() {
         if (this.letters.length) {
-            let letters = new Set(this.letters);
-            let phonemes = new Set(this.phClasses);
+            const letters = new Set(this.letters);
+            const phonemes = new Set(this.phClasses);
             if (phonemes.size > letters.size) {
-                let diff = [...phonemes].filter(el => {
+                const diff = [...phonemes].filter(el => {
                     if (letters.has(el)) {
                         return false;
                     } else if (letters.has(el.split(':')[0]!)) {
@@ -109,28 +109,28 @@ class PhonologyDefinition {
                 });
                 this.stderr(`A phoneme class contains '${diff.join(' ')}' `
                     + "missing from 'letters'.  Strange word shapes are likely"
-                    + ' to result.')
+                    + ' to result.');
             }
         }
     }
     
     private parseOption(line: string) {
-        for (let option of line.split(/\s+/gu)) {
+        for (const option of line.split(/\s+/gu)) {
             switch (option) {
-                case 'std-ipa-features':
-                    this.soundsys.useIpa();
-                    break;
-                case 'std-digraph-features':
-                    this.soundsys.useDigraphs();
-                    break;
-                case 'std-assimilations':
-                    this.soundsys.useAssim = true;
-                    break;
-                case 'coronal-metathesis':
-                    this.soundsys.useCoronalMetathesis = true;
-                    break;
-                default:
-                    throw new Error(`unknown option '${option}'.`);
+            case 'std-ipa-features':
+                this.soundsys.useIpa();
+                break;
+            case 'std-digraph-features':
+                this.soundsys.useDigraphs();
+                break;
+            case 'std-assimilations':
+                this.soundsys.useAssim = true;
+                break;
+            case 'coronal-metathesis':
+                this.soundsys.useCoronalMetathesis = true;
+                break;
+            default:
+                throw new Error(`unknown option '${option}'.`);
             }
         }
     }
@@ -142,20 +142,20 @@ class PhonologyDefinition {
                 continue;
             }
             
-            let filtParts = filt.split('>');
+            const filtParts = filt.split('>');
             if (filtParts.length !== 2) {
                 throw new Error(`malformed filter '${filt}': filters must look`
                     + " like 'old > new'.");
             }
             
-            let pre = filtParts[0]!.trim();
-            let post = filtParts[1]!.trim();
+            const pre = filtParts[0]!.trim();
+            const post = filtParts[1]!.trim();
             this.soundsys.addFilter(pre, post);
         }
     }
     
     private parseReject(line: string) {
-        for (let filt of line.split(/\s+/gu)) {
+        for (const filt of line.split(/\s+/gu)) {
             this.soundsys.addFilter(filt, 'REJECT');
         }
     }
@@ -173,8 +173,8 @@ class PhonologyDefinition {
     }
     
     private addRules(line: string, cat?: string) {
-        let rules = line.split(/\s+/gu);
-        let weighted = line.includes(':');
+        const rules = line.split(/\s+/gu);
+        const weighted = line.includes(':');
         
         // only warn about this once
         // plus, it can be detected right away
@@ -228,7 +228,7 @@ class PhonologyDefinition {
     }
     
     private expandMacros(word: string) {
-        for (let [macro, value] of this.macros) {
+        for (const [macro, value] of this.macros) {
             word = word.replace(macro, value);
         }
         return word;
@@ -240,10 +240,10 @@ class PhonologyDefinition {
     }
     
     private parseClusterfield() {
-        let c2list = this.defFileArr[this.defFileLineNum]!
+        const c2list = this.defFileArr[this.defFileLineNum]!
             .split(/\s+/gu);
         c2list.shift();
-        let n = c2list.length;
+        const n = c2list.length;
         
         while (!['', '\n', undefined].includes(
             this.defFileArr[this.defFileLineNum]
@@ -254,8 +254,8 @@ class PhonologyDefinition {
                 continue;
             }
             
-            let row = line.split(/\s+/gu);
-            let c1 = row.splice(0, 1);
+            const row = line.split(/\s+/gu);
+            const c1 = row.splice(0, 1);
             
             if (row.length === n) {
                 for (let i = 0; i < n; ++i) {
@@ -301,17 +301,17 @@ class PhonologyDefinition {
                 + 'only use one.');
         }
         
-        let splitLine = line.split(/\s+/gu);
-        let weighted = line.includes(':');
+        const splitLine = line.split(/\s+/gu);
+        const weighted = line.includes(':');
         
-        for (let cat of splitLine) {
+        for (const cat of splitLine) {
             if (weighted) {
                 if (invalidItemAndWeight(cat)) {
                     throw new Error(`'${cat}' is not a valid category and `
                         + 'weight.');
                 }
-                let [name, weight] = <[string, string]>cat.split(':');
-                let weightNum = +weight;
+                const [name, weight] = <[string, string]>cat.split(':');
+                const weightNum = +weight;
                 
                 this.categories.push(name);
                 this.soundsys.addCategory(name, weightNum);
@@ -326,7 +326,7 @@ class PhonologyDefinition {
         let words = '';
         let wordList: string[] = [];
         
-        for (let cat of this.categories) {
+        for (const cat of this.categories) {
             wordList = this.soundsys.generate(n, verbose, unsorted, cat);
             if (wordList.length < n) {
                 this.stderr(`Could only generate ${wordList.length} word`
@@ -336,7 +336,7 @@ class PhonologyDefinition {
             }
             
             if (cat !== 'words:') {
-                words += `\n\n${cat}:\n`
+                words += `\n\n${cat}:\n`;
             }
             words += wordList.join(onePerLine || verbose ? '\n' : ' ');
         }

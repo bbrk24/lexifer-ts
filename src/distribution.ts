@@ -26,10 +26,10 @@ class WeightedSelector {
     private sum: number;
     
     constructor(dic: { [key: string]: number | undefined }) {
-        this.keys = []
-        this.weights = []
-        for (let key in dic) {
-            let weight = dic[key];
+        this.keys = [];
+        this.weights = [];
+        for (const key in dic) {
+            const weight = dic[key];
             if (typeof weight == 'number') {
                 this.keys.push(key);
                 this.weights.push(weight);
@@ -39,7 +39,7 @@ class WeightedSelector {
     }
     
     select() {
-        let pick = Math.random() * this.sum;
+        const pick = Math.random() * this.sum;
         let temp = 0;
         for (let i = 0; i < this.keys.length; ++i) {
             temp += this.weights[i]!;

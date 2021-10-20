@@ -107,15 +107,16 @@ const data: [string, string, Voicing, Place, Manner][] = [
     ['ɴ',  'nq',  Voicing.Voiced,    Place.Uvular,       Manner.Nasal]
 ];
 
-let phdb: [string, Voicing, Place, Manner][] = [];
+let phdb: [string, Voicing, Place, Manner][];
 
-const initialize = (isIpa: boolean = true) => {
+const initialize = (isIpa = true) => {
+    phdb = [];
     if (isIpa) {
-        for (let row of data) {
+        for (const row of data) {
             phdb.push([row[0], row[2], row[3], row[4]]);
         }
     } else {
-        for (let row of data) {
+        for (const row of data) {
             phdb.push([row[1], row[2], row[3], row[4]]);
         }
     }
@@ -123,11 +124,11 @@ const initialize = (isIpa: boolean = true) => {
 
 const applyAssimilations = (word: string[]) => {
     const nasalAssimilate = (ph1: string, ph2: string) => {
-        let data1 = phdb.find(el => el[0] === ph1);
+        const data1 = phdb.find(el => el[0] === ph1);
         if (data1 && data1[3] === Manner.Nasal) {
-            let data2 = phdb.find(el => el[0] === ph2);
+            const data2 = phdb.find(el => el[0] === ph2);
             if (data2) {
-                let result = phdb.find(el =>
+                const result = phdb.find(el =>
                     el[2] === data2![2] && el[3] === Manner.Nasal
                 );
                 if (result) {
@@ -139,11 +140,11 @@ const applyAssimilations = (word: string[]) => {
     };
     
     const voiceAssimilate = (ph1: string, ph2: string) => {
-        let data2 = phdb.find(el => el[0] === ph2);
+        const data2 = phdb.find(el => el[0] === ph2);
         if (data2 && data2[3] !== Manner.Nasal) {
-            let data1 = phdb.find(el => el[0] === ph1);
+            const data1 = phdb.find(el => el[0] === ph1);
             if (data1) {
-                let result = phdb.find(el =>
+                const result = phdb.find(el =>
                     el[1] === data2![1]
                     && el[2] === data1![2]
                     && el[3] === data1![3]
@@ -156,7 +157,7 @@ const applyAssimilations = (word: string[]) => {
         return ph1;
     };
     
-    let newArr = [...word];
+    const newArr = [...word];
     for (let i = 0; i < word.length - 1; ++i) {
         newArr[i] = voiceAssimilate(word[i]!, word[i + 1]!);
         newArr[i] = nasalAssimilate(newArr[i]!, word[i + 1]!); // sic
@@ -166,9 +167,9 @@ const applyAssimilations = (word: string[]) => {
 
 const applyCoronalMetathesis = (word: string[]) => {
     const coronalMetathesis = (ph1: string, ph2: string): [string, string] => {
-        let data1 = phdb.filter(el => el[0] === ph1)[0];
+        const data1 = phdb.filter(el => el[0] === ph1)[0];
         if (data1 && data1[2] === Place.Alveolar) {
-            let data2 = phdb.filter(el => el[0] === ph2)[0];
+            const data2 = phdb.filter(el => el[0] === ph2)[0];
             if (
                 data2
                 && [Place.Velar, Place.Bilabial].includes(data2[2])
@@ -181,7 +182,7 @@ const applyCoronalMetathesis = (word: string[]) => {
         return [ph1, ph2];
     };
     
-    let newArr = [...word];
+    const newArr = [...word];
     for (let i = 0; i < word.length - 1; ++i) {
         [newArr[i], newArr[i + 1]] = coronalMetathesis(word[i]!, word[i + 1]!);
     }

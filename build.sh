@@ -20,6 +20,10 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+# run a linter pass
+echo 'Linting...'
+node_modules/.bin/eslint src/*.ts || exit $?
+
 echo 'Combining files...'
 # put the version number and license comment here, so it ends up in all dist/
 # files
@@ -33,7 +37,7 @@ echo 'Combining files...'
 } > combined.ts
 
 echo 'Compiling to JS...'
-errors=$(./node_modules/.bin/tsc) 
+errors=$(node_modules/.bin/tsc) 
 
 if [ -n "$errors" ]
 then
@@ -51,7 +55,7 @@ else
     # use terser
     # --mangle-props is more trouble than it's worth
     # -c unsafe replaces `new Error()` with `Error()`
-    ./node_modules/.bin/terser dist/index.js -mo dist/lexifer.min.js \
+    node_modules/.bin/terser dist/index.js -mo dist/lexifer.min.js \
         -c unsafe --ecma 2015 -f wrap_func_args=false,semicolons=false
     
     # remove the trailing newline
@@ -61,7 +65,7 @@ else
     # can't be done earlier because otherwise TSC tries to prepare for a module loader
     # ES6 and CommonJS modules can't be used with only one outfile for some reason
     echo 'module.exports = main;' >> dist/index.js
-    echo 'export default main;' >> dist/index.d.ts
+    echo 'export = main;' >> dist/index.d.ts
     
     # and now it's done
     echo 'Done.'

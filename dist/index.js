@@ -1,6 +1,6 @@
 "use strict";
 /*!
-Lexifer TS v1.1.2-beta
+Lexifer TS v1.1.2-beta.2
 
 Copyright (c) 2021 William Baker
 
@@ -26,8 +26,8 @@ class WeightedSelector {
     constructor(dic) {
         this.keys = [];
         this.weights = [];
-        for (let key in dic) {
-            let weight = dic[key];
+        for (const key in dic) {
+            const weight = dic[key];
             if (typeof weight == 'number') {
                 this.keys.push(key);
                 this.weights.push(weight);
@@ -36,7 +36,7 @@ class WeightedSelector {
         this.sum = this.weights.reduce((a, b) => a + b, 0);
     }
     select() {
-        let pick = Math.random() * this.sum;
+        const pick = Math.random() * this.sum;
         let temp = 0;
         for (let i = 0; i < this.keys.length; ++i) {
             temp += this.weights[i];
@@ -51,7 +51,7 @@ class WeightedSelector {
 const main = (file, num, verbose = false, unsorted, onePerLine = false, stderr = console.error) => {
     let ans = '';
     try {
-        let pd = new PhonologyDefinition(file, stderr);
+        const pd = new PhonologyDefinition(file, stderr);
         if (num) {
             if (num < 0 || num === Infinity) {
                 stderr(`Cannot generate ${num} words.`);
@@ -96,14 +96,13 @@ const main = (file, num, verbose = false, unsorted, onePerLine = false, stderr =
     return ans;
 };
 const genWords = () => {
+    var _a;
     document.getElementById('errors').innerHTML = '';
-    document.getElementById('result').innerHTML = main(document.getElementById('def').value, parseInt(document.getElementById('number').value) || undefined, document.getElementById('verbose').checked, document.getElementById('unsorted').checked, document.getElementById('one-per-line').checked, message => {
+    document.getElementById('result').innerHTML = main(document.getElementById('def').value, (_a = parseInt(document.getElementById('number').value)) !== null && _a !== void 0 ? _a : undefined, document.getElementById('verbose').checked, document.getElementById('unsorted').checked, document.getElementById('one-per-line').checked, message => {
         document.getElementById('errors').innerHTML += message + '<br />';
     }).replace(/\n/gu, '<br />');
 };
-const last = (arr) => {
-    return arr && arr[arr.length - 1];
-};
+const last = (arr) => arr && arr[arr.length - 1];
 class PhonologyDefinition {
     constructor(defFile, stderr) {
         this.stderr = stderr;
@@ -131,7 +130,7 @@ class PhonologyDefinition {
                 this.parseOption(line.substring(5).trim());
             }
             else if (line.startsWith('random-rate:')) {
-                let randpercent = +line.substring(12);
+                const randpercent = +line.substring(12);
                 if (randpercent >= 0 && randpercent <= 100) {
                     this.soundsys.randpercent = randpercent;
                 }
@@ -172,10 +171,10 @@ class PhonologyDefinition {
     }
     sanityCheck() {
         if (this.letters.length) {
-            let letters = new Set(this.letters);
-            let phonemes = new Set(this.phClasses);
+            const letters = new Set(this.letters);
+            const phonemes = new Set(this.phClasses);
             if (phonemes.size > letters.size) {
-                let diff = [...phonemes].filter(el => {
+                const diff = [...phonemes].filter(el => {
                     if (letters.has(el)) {
                         return false;
                     }
@@ -193,7 +192,7 @@ class PhonologyDefinition {
         }
     }
     parseOption(line) {
-        for (let option of line.split(/\s+/gu)) {
+        for (const option of line.split(/\s+/gu)) {
             switch (option) {
                 case 'std-ipa-features':
                     this.soundsys.useIpa();
@@ -218,18 +217,18 @@ class PhonologyDefinition {
             if (filt === '') {
                 continue;
             }
-            let filtParts = filt.split('>');
+            const filtParts = filt.split('>');
             if (filtParts.length !== 2) {
                 throw new Error(`malformed filter '${filt}': filters must look`
                     + " like 'old > new'.");
             }
-            let pre = filtParts[0].trim();
-            let post = filtParts[1].trim();
+            const pre = filtParts[0].trim();
+            const post = filtParts[1].trim();
             this.soundsys.addFilter(pre, post);
         }
     }
     parseReject(line) {
-        for (let filt of line.split(/\s+/gu)) {
+        for (const filt of line.split(/\s+/gu)) {
             this.soundsys.addFilter(filt, 'REJECT');
         }
     }
@@ -245,8 +244,8 @@ class PhonologyDefinition {
         this.addRules(line);
     }
     addRules(line, cat) {
-        let rules = line.split(/\s+/gu);
-        let weighted = line.includes(':');
+        const rules = line.split(/\s+/gu);
+        const weighted = line.includes(':');
         if (line.includes('??')) {
             this.stderr("'??' is treated as '?'.");
         }
@@ -284,7 +283,7 @@ class PhonologyDefinition {
         }
     }
     expandMacros(word) {
-        for (let [macro, value] of this.macros) {
+        for (const [macro, value] of this.macros) {
             word = word.replace(macro, value);
         }
         return word;
@@ -295,18 +294,18 @@ class PhonologyDefinition {
     }
     parseClusterfield() {
         var _a;
-        let c2list = this.defFileArr[this.defFileLineNum]
+        const c2list = this.defFileArr[this.defFileLineNum]
             .split(/\s+/gu);
         c2list.shift();
-        let n = c2list.length;
+        const n = c2list.length;
         while (!['', '\n', undefined].includes(this.defFileArr[this.defFileLineNum])) {
             let line = (_a = this.defFileArr[++this.defFileLineNum]) !== null && _a !== void 0 ? _a : '';
             line = line.replace(/#.*/, '').trim();
             if (line === '') {
                 continue;
             }
-            let row = line.split(/\s+/gu);
-            let c1 = row.splice(0, 1);
+            const row = line.split(/\s+/gu);
+            const c1 = row.splice(0, 1);
             if (row.length === n) {
                 for (let i = 0; i < n; ++i) {
                     if (row[i] === '+') {
@@ -355,16 +354,16 @@ class PhonologyDefinition {
             throw new Error("both 'words:' and 'categories:' found. Please "
                 + 'only use one.');
         }
-        let splitLine = line.split(/\s+/gu);
-        let weighted = line.includes(':');
-        for (let cat of splitLine) {
+        const splitLine = line.split(/\s+/gu);
+        const weighted = line.includes(':');
+        for (const cat of splitLine) {
             if (weighted) {
                 if (invalidItemAndWeight(cat)) {
                     throw new Error(`'${cat}' is not a valid category and `
                         + 'weight.');
                 }
-                let [name, weight] = cat.split(':');
-                let weightNum = +weight;
+                const [name, weight] = cat.split(':');
+                const weightNum = +weight;
                 this.categories.push(name);
                 this.soundsys.addCategory(name, weightNum);
             }
@@ -377,7 +376,7 @@ class PhonologyDefinition {
     generate(n = 1, verbose = false, unsorted = verbose, onePerLine = false) {
         let words = '';
         let wordList = [];
-        for (let cat of this.categories) {
+        for (const cat of this.categories) {
             wordList = this.soundsys.generate(n, verbose, unsorted, cat);
             if (wordList.length < n) {
                 this.stderr(`Could only generate ${wordList.length} word`
@@ -449,26 +448,27 @@ const data = [
     ['ʁ', 'gqh', 1, 7, 1],
     ['ɴ', 'nq', 1, 7, 2]
 ];
-let phdb = [];
+let phdb;
 const initialize = (isIpa = true) => {
+    phdb = [];
     if (isIpa) {
-        for (let row of data) {
+        for (const row of data) {
             phdb.push([row[0], row[2], row[3], row[4]]);
         }
     }
     else {
-        for (let row of data) {
+        for (const row of data) {
             phdb.push([row[1], row[2], row[3], row[4]]);
         }
     }
 };
 const applyAssimilations = (word) => {
     const nasalAssimilate = (ph1, ph2) => {
-        let data1 = phdb.find(el => el[0] === ph1);
+        const data1 = phdb.find(el => el[0] === ph1);
         if (data1 && data1[3] === 2) {
-            let data2 = phdb.find(el => el[0] === ph2);
+            const data2 = phdb.find(el => el[0] === ph2);
             if (data2) {
-                let result = phdb.find(el => el[2] === data2[2] && el[3] === 2);
+                const result = phdb.find(el => el[2] === data2[2] && el[3] === 2);
                 if (result) {
                     return result[0];
                 }
@@ -477,11 +477,11 @@ const applyAssimilations = (word) => {
         return ph1;
     };
     const voiceAssimilate = (ph1, ph2) => {
-        let data2 = phdb.find(el => el[0] === ph2);
+        const data2 = phdb.find(el => el[0] === ph2);
         if (data2 && data2[3] !== 2) {
-            let data1 = phdb.find(el => el[0] === ph1);
+            const data1 = phdb.find(el => el[0] === ph1);
             if (data1) {
-                let result = phdb.find(el => el[1] === data2[1]
+                const result = phdb.find(el => el[1] === data2[1]
                     && el[2] === data1[2]
                     && el[3] === data1[3]);
                 if (result) {
@@ -491,7 +491,7 @@ const applyAssimilations = (word) => {
         }
         return ph1;
     };
-    let newArr = [...word];
+    const newArr = [...word];
     for (let i = 0; i < word.length - 1; ++i) {
         newArr[i] = voiceAssimilate(word[i], word[i + 1]);
         newArr[i] = nasalAssimilate(newArr[i], word[i + 1]);
@@ -500,9 +500,9 @@ const applyAssimilations = (word) => {
 };
 const applyCoronalMetathesis = (word) => {
     const coronalMetathesis = (ph1, ph2) => {
-        let data1 = phdb.filter(el => el[0] === ph1)[0];
+        const data1 = phdb.filter(el => el[0] === ph1)[0];
         if (data1 && data1[2] === 2) {
-            let data2 = phdb.filter(el => el[0] === ph2)[0];
+            const data2 = phdb.filter(el => el[0] === ph2)[0];
             if (data2
                 && [6, 0].includes(data2[2])
                 && [0, 2].includes(data2[3])
@@ -512,7 +512,7 @@ const applyCoronalMetathesis = (word) => {
         }
         return [ph1, ph2];
     };
-    let newArr = [...word];
+    const newArr = [...word];
     for (let i = 0; i < word.length - 1; ++i) {
         [newArr[i], newArr[i + 1]] = coronalMetathesis(word[i], word[i + 1]);
     }
@@ -536,7 +536,7 @@ class Word {
         }
     }
     applyFilters(filters) {
-        for (let filt of filters) {
+        for (const filt of filters) {
             this.applyFilter(...filt);
             if (last(this.forms) === 'REJECT') {
                 return;
@@ -545,7 +545,7 @@ class Word {
     }
     applyAssimilations() {
         if (Word.sorter) {
-            let newWord = applyAssimilations(Word.sorter.split(last(this.forms)))
+            const newWord = applyAssimilations(Word.sorter.split(last(this.forms)))
                 .join('');
             if (newWord !== last(this.forms)) {
                 this.forms.push(newWord);
@@ -555,7 +555,7 @@ class Word {
     }
     applyCoronalMetathesis() {
         if (Word.sorter) {
-            let newWord = applyCoronalMetathesis(Word.sorter.split(last(this.forms)))
+            const newWord = applyCoronalMetathesis(Word.sorter.split(last(this.forms)))
                 .join('');
             if (newWord !== last(this.forms)) {
                 this.forms.push(newWord);
@@ -566,7 +566,7 @@ class Word {
     toString() {
         if (Word.verbose) {
             let ans = '';
-            for (let i in this.forms) {
+            for (const i in this.forms) {
                 ans += `${this.filters[i]} – ${this.forms[i]}\n`;
             }
             return ans;
@@ -579,28 +579,28 @@ class Word {
 Word.verbose = false;
 Word.sorter = null;
 const invalidItemAndWeight = (item) => {
-    let parts = item.split(':');
+    const parts = item.split(':');
     if (parts.length !== 2) {
         return true;
     }
-    let weight = +parts[1];
+    const weight = +parts[1];
     return isNaN(weight) || weight < 0 || weight === Infinity;
 };
 class ArbSorter {
     constructor(order) {
-        let graphs = order.split(/\s+/gu);
-        let splitOrder = [...graphs].sort((a, b) => b.length - a.length);
+        const graphs = order.split(/\s+/gu);
+        const splitOrder = [...graphs].sort((a, b) => b.length - a.length);
         this.splitter = new RegExp(`(${splitOrder.join('|')}|.)`, 'gu');
         this.ords = {};
         this.vals = [];
-        for (let i in graphs) {
+        for (const i in graphs) {
             this.ords[graphs[i]] = +i;
             this.vals.push(graphs[i]);
         }
     }
     wordAsValues(word) {
-        let w = this.split(word);
-        let arrayedWord = w.map(char => this.ords[char]);
+        const w = this.split(word);
+        const arrayedWord = w.map(char => this.ords[char]);
         if (arrayedWord.includes(undefined)) {
             throw new Error(`word with unknown letter: '${word}'.\n`
                 + 'A filter or assimilation might have caused this.');
@@ -616,7 +616,7 @@ class ArbSorter {
             .filter((_, i) => i % 2);
     }
     sort(l) {
-        let l2 = l.filter(el => el !== '').map(el => this.wordAsValues(el));
+        const l2 = l.filter(el => el !== '').map(el => this.wordAsValues(el));
         l2.sort((a, b) => a[0] - b[0]);
         return l2.map(el => this.valuesAsWord(el));
     }
@@ -633,8 +633,8 @@ class SoundSystem {
         this.sorter = null;
     }
     runRule(rule) {
-        let n = rule.length;
-        let s = [];
+        const n = rule.length;
+        const s = [];
         if (rule[0] === '!' || rule[1] === '!' || rule.includes('!!')) {
             throw new Error("misplaced '!' option: in non-duplicate "
                 + `environment: '${rule}'.`);
@@ -697,31 +697,31 @@ class SoundSystem {
     addPhUnit(name, selection) {
         const naturalWeights = (phonemes) => {
             const jitter = (v, percent = 10) => {
-                let move = v * percent / 100;
+                const move = v * percent / 100;
                 return v + move * (Math.random() - 0.5);
             };
-            let p = phonemes.split(/\s+/gu);
-            let weighted = {};
-            let n = p.length;
+            const p = phonemes.split(/\s+/gu);
+            const weighted = {};
+            const n = p.length;
             for (let i = 0; i < n; ++i) {
                 weighted[p[i]] = jitter((Math.log(n + 1) - Math.log(i + 1)) / n);
             }
             let temp = '';
-            for (let k in weighted) {
+            for (const k in weighted) {
                 temp += `${k}:${weighted[k]} `;
             }
             temp.trim();
             return temp;
         };
         const ruleToDict = (rule) => {
-            let items = rule.trim().split(/\s+/gu);
-            let d = {};
-            for (let item of items) {
+            const items = rule.trim().split(/\s+/gu);
+            const d = {};
+            for (const item of items) {
                 if (invalidItemAndWeight(item)) {
                     throw new Error(`'${item}' is not a valid phoneme and `
                         + 'weight.');
                 }
-                let [value, weight] = item.split(':');
+                const [value, weight] = item.split(':');
                 d[value] = +weight;
             }
             return d;
@@ -760,10 +760,9 @@ class SoundSystem {
         initialize(false);
     }
     generate(n, verbose, unsorted, category, force = false) {
-        let words = new Set();
+        const words = new Set();
         Word.verbose = verbose;
         Word.sorter = this.sorter;
-        let ruleSelector;
         if (!this.ruleset[category]) {
             throw new Error(`unknown category '${category}'.`);
         }
@@ -771,11 +770,11 @@ class SoundSystem {
         if (Object.keys(dict).length === 1) {
             dict = Object.assign({ [category]: 0 }, dict);
         }
-        ruleSelector = new WeightedSelector(dict);
+        const ruleSelector = new WeightedSelector(dict);
         for (let i = 0; force || i < 3 * n; ++i) {
-            let rule = ruleSelector.select();
-            let form = this.runRule(rule);
-            let word = new Word(form, rule);
+            const rule = ruleSelector.select();
+            const form = this.runRule(rule);
+            const word = new Word(form, rule);
             this.applyFilters(word);
             if (word.toString() !== 'REJECT') {
                 words.add(word.toString());
@@ -796,18 +795,18 @@ class SoundSystem {
         return wordList;
     }
     randomCategory() {
-        let weightedCats = {};
-        for (let cat in this.ruleset) {
+        const weightedCats = {};
+        for (const cat in this.ruleset) {
             weightedCats[cat] = this.ruleset[cat][_weight];
         }
-        let catSelector = new WeightedSelector(weightedCats);
+        const catSelector = new WeightedSelector(weightedCats);
         return catSelector.select();
     }
 }
 const textify = (phsys, sentences = 25) => {
     let text = '';
     for (let i = 0; i < sentences; ++i) {
-        let sent = Math.floor(Math.random() * 9) + 3;
+        const sent = Math.floor(Math.random() * 9) + 3;
         let comma = -1;
         if (sent >= 7) {
             comma = Math.floor(Math.random() * (sent - 1));
