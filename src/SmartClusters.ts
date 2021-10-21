@@ -46,33 +46,55 @@ const enum Manner {
     Trill
 }
 
+/**
+ * This class represents a single consonant phone, including features and
+ * notations.
+ */
 class Segment {
     static index: 'digraph' | 'ipa';
 
+    /** The IPA representation of the consonant. */
     readonly ipa: string;
+    /** An ASCII representation of the consonant. */
     readonly digraph: string;
+    /** Whether or not the consonant is voiced. */
     readonly voiced: boolean;
+    /** The place of articulation of the consonant. */
     readonly place: Place;
+    /** The manner of articulation of the consonant. */
     readonly manner: Manner;
 
+    /**
+     * Create a new Segment.
+     * @param arr The properties of the segment -- `ipa`, `digraph`, `voiced`,
+     * `place`, and `manner` respectively.
+     */
     constructor(arr: [string, string, boolean, Place, Manner]) {
         [this.ipa, this.digraph, this.voiced, this.place, this.manner] = arr;
     }
 
+    /** `true` iff the phoneme is a plosive or nasal. */
     get isStop() {
         return this.manner === Manner.Nasal || this.manner === Manner.Plosive;
     }
 
+    /** `true` iff the phoneme is bilabial or velar. */
     get isPeripheral() {
         return this.place === Place.Bilabial || this.place === Place.Velar;
     }
 
+    /** 
+     * `true` iff the phoneme is an approximant, lateral approximant, or trill.
+     */
     get isApprox() {
         return this.manner === Manner.Approx
             || this.manner === Manner.LatApprox
             || this.manner === Manner.Trill;
     }
 
+    /**
+     * The string representation of the phoneme under the current featureset.
+     */
     toString() {
         return this[Segment.index];
     }
@@ -82,6 +104,11 @@ class ClusterEngine {
     /*
      * Using a constructor from a tuple might be slower at runtime, but it only
      * runs once, and takes up fewer characters.
+     */
+    /**
+     * The list of all recognized consonant segments. This is an array for a
+     * reason: in order for the labial-and-labiodental phonemes to work
+     * properly, this must be ordered.
      */
     private static readonly segments = [
         // Bilabial, labio-dental
@@ -153,10 +180,19 @@ class ClusterEngine {
         new Segment(['ɴ',  'nq',  true,  Place.Uvular,      Manner.Nasal])
     ];
 
+    /**
+     * Initialize the cluster engine.
+     * @param isIpa Whether the current featureset is IPA.
+     */
     constructor(isIpa: boolean) {
         Segment.index = isIpa ? 'ipa' : 'digraph';
     }
 
+    /**
+     * Apply `std-assimilations` to a word.
+     * @param word The word, as an array of graphs.
+     * @returns A copy of the word that has assimilations applied to it.
+     */
     applyAssimilations(word: string[]) {
         const nasalAssimilate = (ph1: string, ph2: string) => {
             const data1 = ClusterEngine.segments.find(el =>
@@ -213,6 +249,11 @@ class ClusterEngine {
         return newArr;
     }
 
+    /**
+     * Apply `coronal-metathesis` to a word.
+     * @param word The word, as an array of graphs.
+     * @returns A copy of the word that has coronal metathesis applied to it.
+     */
     applyCoronalMetathesis(word: string[]) {
         const coronalMetathesis = (
             ph1: string,
@@ -250,6 +291,11 @@ class ClusterEngine {
         return newArr;
     }
 
+    /**
+     * Apply `std-rejections` to a word.
+     * @param word The word, as an array of graphs.
+     * @returns Either the original word, or `['REJECT']`.
+     */
     applyRejections(word: string[]) {
         const rejectCluster = (ph1: string, ph2: string) => {
             const data1 = ClusterEngine.segments.find(
@@ -264,6 +310,7 @@ class ClusterEngine {
                 if (
                     data2
                     && data2.isApprox
+                    && data1.manner !== Manner.Trill
                     && data2.place === data1.place
                 ) {
                     // Trills are allowed a bit more generously

@@ -22,7 +22,7 @@
 
 import last from './last';
 import { ClusterEngine } from './SmartClusters';
-import { ArbSorter } from './wordgen';
+import ArbSorter from './ArbSorter';
 
 class Word {
     static verbose = false;

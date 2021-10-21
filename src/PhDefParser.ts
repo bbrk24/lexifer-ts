@@ -30,7 +30,12 @@ class PhonologyDefinition {
     private phClasses: string[] = [];
     private categories: string[] = [];
 
-    // This is a bit of a hack since the browser doesn't read files directly.
+    /*
+     * The parser reads one line at a time. I can't just keep the index in a
+     * for loop, since the cluster field parser also reads lines. Hence, I
+     * split the file into an array at newlines, and keep the index on the
+     * parser as a whole.
+     */
     private defFileLineNum = 0;
     private readonly defFileArr: string[];
 

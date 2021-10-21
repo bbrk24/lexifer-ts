@@ -1,5 +1,5 @@
 /*!
-Lexifer TS v1.2.0-alpha.6
+Lexifer TS v1.2.0-alpha.7
 
 Copyright (c) 2021 William Baker
 
@@ -21,12 +21,15 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-declare class WeightedSelector<T> {
-    private readonly keys;
-    private readonly weights;
-    private readonly sum;
-    constructor(dic: Map<T, number | undefined>);
-    select(): T;
+declare class ArbSorter {
+    private readonly splitter;
+    private readonly ords;
+    private readonly vals;
+    constructor(order: string);
+    private wordAsValues;
+    private valuesAsWord;
+    split(word: string): string[];
+    sort(list: string[]): string[];
 }
 declare const main: (file: string, num?: number | undefined, verbose?: boolean, unsorted?: boolean | undefined, onePerLine?: boolean, stderr?: (inp: Error | string) => void) => string;
 declare const genWords: () => void;
@@ -120,7 +123,13 @@ declare class ClusterEngine {
     applyCoronalMetathesis(word: string[]): string[];
     applyRejections(word: string[]): string[];
 }
-declare const wrap: (str: string) => string;
+declare class WeightedSelector<T> {
+    private readonly keys;
+    private readonly weights;
+    private readonly sum;
+    constructor(dic: Map<T, number | undefined>);
+    select(): T;
+}
 declare class Word {
     static verbose: boolean;
     static sorter: ArbSorter | null;
@@ -136,16 +145,6 @@ declare class Word {
     toString(): string;
 }
 declare const invalidItemAndWeight: (item: string) => boolean;
-declare class ArbSorter {
-    private readonly splitter;
-    private readonly ords;
-    private readonly vals;
-    constructor(order: string);
-    wordAsValues(word: string): number[];
-    valuesAsWord(values: number[]): string;
-    split(word: string): string[];
-    sort(list: string[]): string[];
-}
 declare class Category extends Map<Rule, number> {
     readonly weight: number;
     constructor(weight: number);
@@ -174,4 +173,5 @@ declare class SoundSystem {
     randomCategory(): string;
 }
 declare const textify: (phsys: SoundSystem, sentences?: number) => string;
+declare const wrap: (str: string) => string;
 export = main;

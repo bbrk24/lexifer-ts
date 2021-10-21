@@ -20,7 +20,7 @@
  * IN THE SOFTWARE.
  */
 
-import wrap from './textwrap';
+import wrap from './wrap';
 import PhonologyDefinition from './PhDefParser';
 
 // Original "main" -- returns a string

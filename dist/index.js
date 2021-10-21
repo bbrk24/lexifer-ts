@@ -1,6 +1,6 @@
 "use strict";
 /*!
-Lexifer TS v1.2.0-alpha.6
+Lexifer TS v1.2.0-alpha.7
 
 Copyright (c) 2021 William Baker
 
@@ -22,29 +22,39 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-class WeightedSelector {
-    constructor(dic) {
-        this.keys = [];
-        this.weights = [];
-        for (const [key, weight] of dic) {
-            if (typeof weight == 'number') {
-                this.keys.push(key);
-                this.weights.push(weight);
-            }
+class ArbSorter {
+    constructor(order) {
+        const graphs = order.split(/\s+/gu);
+        const splitOrder = [...graphs].sort((a, b) => b.length - a.length);
+        this.splitter = new RegExp(`(${splitOrder.join('|')}|.)`, 'gu');
+        this.ords = {};
+        this.vals = [];
+        for (const i in graphs) {
+            this.ords[graphs[i]] = +i;
+            this.vals.push(graphs[i]);
         }
-        this.sum = this.weights.reduce((a, b) => a + b, 0);
     }
-    select() {
-        const pick = Math.random() * this.sum;
-        let temp = 0;
-        for (let i = 0; i < this.keys.length; ++i) {
-            temp += this.weights[i];
-            if (pick < temp) {
-                return this.keys[i];
-            }
+    wordAsValues(word) {
+        const splitWord = this.split(word);
+        const arrayedWord = splitWord.map(char => this.ords[char]);
+        if (arrayedWord.includes(undefined)) {
+            throw new Error(`word with unknown letter: '${word}'.\n`
+                + 'A filter or assimilation might have caused this.');
         }
-        throw new Error('failed to choose options from '
-            + `'${this.keys.join("', '")}'.`);
+        return arrayedWord;
+    }
+    valuesAsWord(values) {
+        return values.map(el => this.vals[el])
+            .join('');
+    }
+    split(word) {
+        return word.split(this.splitter)
+            .filter((_, i) => i % 2);
+    }
+    sort(list) {
+        const l2 = list.filter(el => el !== '').map(this.wordAsValues);
+        l2.sort((a, b) => a[0] - b[0]);
+        return l2.map(this.valuesAsWord);
     }
 }
 const main = (() => {
@@ -589,6 +599,7 @@ class ClusterEngine {
                 const data2 = ClusterEngine.segments.find(el => el.toString() === ph2);
                 if (data2
                     && data2.isApprox
+                    && data1.manner !== 9
                     && data2.place === data1.place) {
                     if (data2.manner === 9) {
                         return data1.isApprox
@@ -668,7 +679,31 @@ ClusterEngine.segments = [
     new Segment(['ʁ', 'gqh', true, 7, 1]),
     new Segment(['ɴ', 'nq', true, 7, 2])
 ];
-const wrap = (str) => str.replace(/(?![^\n]{1,70}$)([^\n]{1,70})\s/gu, '$1\n');
+class WeightedSelector {
+    constructor(dic) {
+        this.keys = [];
+        this.weights = [];
+        for (const [key, weight] of dic) {
+            if (typeof weight == 'number') {
+                this.keys.push(key);
+                this.weights.push(weight);
+            }
+        }
+        this.sum = this.weights.reduce((a, b) => a + b, 0);
+    }
+    select() {
+        const pick = Math.random() * this.sum;
+        let temp = 0;
+        for (let i = 0; i < this.keys.length; ++i) {
+            temp += this.weights[i];
+            if (pick < temp) {
+                return this.keys[i];
+            }
+        }
+        throw new Error('failed to choose options from '
+            + `'${this.keys.join("', '")}'.`);
+    }
+}
 class Word {
     constructor(form, rule) {
         this.forms = [form];
@@ -745,42 +780,6 @@ const invalidItemAndWeight = (item) => {
     const weight = +parts[1];
     return isNaN(weight) || weight < 0 || weight === Infinity;
 };
-class ArbSorter {
-    constructor(order) {
-        const graphs = order.split(/\s+/gu);
-        const splitOrder = [...graphs].sort((a, b) => b.length - a.length);
-        this.splitter = new RegExp(`(${splitOrder.join('|')}|.)`, 'gu');
-        this.ords = {};
-        this.vals = [];
-        for (const i in graphs) {
-            this.ords[graphs[i]] = +i;
-            this.vals.push(graphs[i]);
-        }
-    }
-    wordAsValues(word) {
-        const splitWord = this.split(word);
-        const arrayedWord = splitWord.map(char => this.ords[char]);
-        if (arrayedWord.includes(undefined)) {
-            throw new Error(`word with unknown letter: '${word}'.\n`
-                + 'A filter or assimilation might have caused this.');
-        }
-        return arrayedWord;
-    }
-    valuesAsWord(values) {
-        return values.map(el => this.vals[el])
-            .join('');
-    }
-    split(word) {
-        return word.split(this.splitter)
-            .filter((_, i) => i % 2);
-    }
-    sort(list) {
-        const l2 = list.filter(el => el !== '')
-            .map(el => this.wordAsValues(el));
-        l2.sort((a, b) => a[0] - b[0]);
-        return l2.map(el => this.valuesAsWord(el));
-    }
-}
 class Category extends Map {
     constructor(weight) {
         super();
@@ -951,4 +950,5 @@ const textify = (phsys, sentences = 25) => {
     }
     return wrap(text.trim());
 };
+const wrap = (str) => str.replace(/(?![^\n]{1,70}$)([^\n]{1,70})\s/gu, '$1\n');
 module.exports = main;
