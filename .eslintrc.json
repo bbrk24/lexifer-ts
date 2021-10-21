@@ -342,6 +342,13 @@
          * than good in this project.
          */
         "@typescript-eslint/no-non-null-assertion": "off",
+        "@typescript-eslint/no-unused-vars": [
+            // genWords is used externally -- ONLY disable that.
+            "warn",
+            {
+                "varsIgnorePattern": "^genWords$"
+            }
+        ],
         "no-magic-numbers": "off"
     }
 }

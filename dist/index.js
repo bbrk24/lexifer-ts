@@ -1,6 +1,6 @@
 "use strict";
 /*!
-Lexifer TS v1.1.2-beta.3+2
+Lexifer TS v1.1.2-beta.4
 
 Copyright (c) 2021 William Baker
 
@@ -96,9 +96,8 @@ const main = (file, num, verbose = false, unsorted, onePerLine = false, stderr =
     return ans;
 };
 const genWords = () => {
-    var _a;
     document.getElementById('errors').innerHTML = '';
-    document.getElementById('result').innerHTML = main(document.getElementById('def').value, (_a = parseInt(document.getElementById('number').value)) !== null && _a !== void 0 ? _a : undefined, document.getElementById('verbose').checked, document.getElementById('unsorted').checked, document.getElementById('one-per-line').checked, message => {
+    document.getElementById('result').innerHTML = main(document.getElementById('def').value, parseInt(document.getElementById('number').value), document.getElementById('verbose').checked, document.getElementById('unsorted').checked, document.getElementById('one-per-line').checked, message => {
         document.getElementById('errors').innerHTML += message + '<br />';
     }).replace(/\n/gu, '<br />');
 };

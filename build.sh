@@ -23,6 +23,13 @@
 # run a linter pass
 echo 'Linting...'
 node_modules/.bin/eslint src/*.ts --fix || exit $?
+for filename in src/*.ts
+do
+    if grep -q 'eslint-disable' "$filename"
+    then
+        echo "Found eslint-disable comment in ${filename}."
+    fi
+done
 
 echo 'Combining files...'
 # put the version number and license comment here, so it ends up in all dist/

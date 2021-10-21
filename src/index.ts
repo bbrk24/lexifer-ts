@@ -82,14 +82,12 @@ const main = (
 };
 
 // Actual code run when you click "generate"
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const genWords = () => {
     document.getElementById('errors')!.innerHTML = '';
 
     document.getElementById('result')!.innerHTML = main(
         (<HTMLTextAreaElement>document.getElementById('def')).value,
-        parseInt((<HTMLInputElement>document.getElementById('number')).value)
-            ?? undefined,
+        parseInt((<HTMLInputElement>document.getElementById('number')).value),
         (<HTMLInputElement>document.getElementById('verbose')).checked,
         (<HTMLInputElement>document.getElementById('unsorted')).checked,
         (<HTMLInputElement>document.getElementById('one-per-line')).checked,
