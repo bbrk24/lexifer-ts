@@ -1,6 +1,6 @@
 {
   "name": "lexifer",
-  "version": "1.2.0-alpha.7",
+  "version": "1.2.0-alpha.8",
   "description": "A highly customizable wordgen for conlangers",
   "keywords": [
     "wordgen",
@@ -15,6 +15,9 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/bbrk24/lexifer-ts.git"
+  },
+  "dependencies": {
+    "yargs": "^17.2.0"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.0.0",
@@ -39,5 +42,11 @@
   "files": [
     "dist/index.*",
     "src/*.ts"
-  ]
+  ],
+  "bin": {
+      "lexifer": "bin/lexifer"
+  },
+  "engines": {
+      "node": "^12.13.0 || ^14.15.0 || >=16.0.0"
+  }
 }

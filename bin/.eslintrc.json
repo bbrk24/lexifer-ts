@@ -1,0 +1,116 @@
+{
+    // This file contains environment information and rules that conflict with
+    // TypeScript.
+    "env": {
+        "node": true,
+        "es6": true
+    },
+    "extends": [
+        "eslint:recommended"
+    ],
+    "parserOptions": {
+        "ecmaVersion": 10 // compatible with Node 12
+    },
+    "rules": {
+        /*
+         * SPACING ERRORS
+         * Spacing inconsistencies can cause problems with git and should be
+         * avoided.
+         */
+        "padding-line-between-statements": [
+            "error",
+            // In order of precedence:
+            // Never leave a blank line after a switch label
+            {
+                "blankLine": "never",
+                "prev": [
+                    "case",
+                    "default"
+                ],
+                "next": "*"
+            },
+            // Always leave a blank line before these things
+            {
+                "blankLine": "always",
+                "prev": "*",
+                "next": [
+                    "return",
+                    "throw",
+                    "break",
+                    "continue",
+                    "class",
+                    "export",
+                    "iife"
+                ]
+            },
+            // Always leave a blank line between assignment and a loop
+            {
+                "blankLine": "always",
+                "prev": [
+                    "const",
+                    "let",
+                    "var",
+                    "expression"
+                ],
+                "next": [
+                    "for",
+                    "while",
+                    "do"
+                ]
+            },
+            // Always leave a blank line after a do-while statement
+            {
+                "blankLine": "always",
+                "prev": "do",
+                "next": "*"
+            },
+            // Always leave a blank line between a brace group and assignment
+            {
+                "blankLine": "always",
+                "prev": "block-like",
+                "next": [
+                    "const",
+                    "let",
+                    "var",
+                    "expression"
+                ]
+            }
+        ],
+        /*
+         * SYNTAX ERRORS
+         * These are generally undesirable patterns that are to be avoided,
+         * even though most of them are technically not wrong. They could
+         * indicate mistaken intent.
+         */
+        "comma-dangle": "error",
+        "func-call-spacing": "error",
+        "no-duplicate-imports": "error",
+        "no-extra-parens": "error",
+        "no-useless-constructor": "error",
+        "semi": "error",
+        "space-before-function-paren": [
+            "error",
+            "never"
+        ],
+        "space-infix-ops": "error",
+        /*
+         * STYLE WARNINGS
+         * These are dispreffered styles that do not relate to git issues and
+         * are not severe enough to be errors.
+         */
+        "brace-style": "warn",
+        "comma-spacing": "warn",
+        "keyword-spacing": "warn",
+        "object-curly-spacing": [
+            "warn",
+            "always"
+        ],
+        "quotes": [
+            "warn",
+            "single",
+            {
+                "avoidEscape": true
+            }
+        ]
+    }
+}
