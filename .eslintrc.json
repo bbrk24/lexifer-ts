@@ -15,24 +15,89 @@
         "@typescript-eslint"
     ],
     "rules": {
+        /*
+         * CODE ERRORS
+         * These are things that will affect the runtime and must be avoided.
+         */
+        "@typescript-eslint/method-signature-style": [
+            "error",
+            "method"
+        ],
+        "@typescript-eslint/prefer-for-of": "error",
+        "default-case": "error",
+        "default-case-last": "error",
+        "eqeqeq": [
+            "error",
+            "smart"
+        ],
+        "no-eq-null": "error",
+        /*
+         * SPACING ERRORS
+         * Spacing inconsistencies can cause problems with git and should be
+         * avoided.
+         */
+        "@typescript-eslint/padding-line-between-statements": [
+            "error",
+            // In order of precedence:
+            // Never leave a blank line after a switch label
+            {
+                "blankLine": "never",
+                "prev": [
+                    "case",
+                    "default"
+                ],
+                "next": "*"
+            },
+            // Always leave a blank line before these things
+            {
+                "blankLine": "always",
+                "prev": "*",
+                "next": [
+                    "return",
+                    "throw",
+                    "break",
+                    "continue",
+                    "class",
+                    "export",
+                    "iife",
+                    "interface",
+                    "type"
+                ]
+            },
+            // Always leave a blank line between assignment and a loop
+            {
+                "blankLine": "always",
+                "prev": [
+                    "const",
+                    "let",
+                    "var",
+                    "expression"
+                ],
+                "next": [
+                    "for",
+                    "while",
+                    "do"
+                ]
+            },
+            // Always leave a blank line after a do-while statement
+            {
+                "blankLine": "always",
+                "prev": "do",
+                "next": "*"
+            }
+        ],
+        "comma-style": "error", // only affects multiline statements
+        "eol-last": "error",
         "indent": [
+            // I am intentionally using the core ESLint one rather than the
+            // TypeScript ESLint one. They differ for how to indent `case`
+            // labels and I prefer ESLint's style.
             "error",
             4
         ],
         "linebreak-style": [
             "error",
             "unix"
-        ],
-        "quotes": [
-            "error",
-            "single",
-            {
-                "avoidEscape": true
-            }
-        ],
-        "semi": [
-            "error",
-            "always"
         ],
         "max-len": [
             "error",
@@ -41,10 +106,242 @@
                 "ignoreComments": false
             }
         ],
-        // This warns over silly little things, like `arr[i - 1]`. Not helpful.
-        "no-magic-numbers": "off",
-        // TSC makes me put a lot of these in there, so this is
-        // counterproductive.
-        "@typescript-eslint/no-non-null-assertion": "off"
+        "no-multi-str": "error",
+        "no-multiple-empty-lines": [
+            "error",
+            {
+                "max": 1
+            }
+        ],
+        "no-trailing-spaces": [
+            "error",
+            {
+                "ignoreComments": true
+            }
+        ],
+        "padded-blocks": [
+            "error",
+            "never"
+        ],
+        "unicode-bom": "error",
+        /*
+         * SYNTAX ERRORS
+         * These are generally undesirable patterns that are to be avoided,
+         * even though most of them are technically not wrong. They could
+         * indicate mistaken intent.
+         */
+        "@typescript-eslint/comma-dangle": "error",
+        "@typescript-eslint/consistent-type-assertions": [
+            "error",
+            {
+                "assertionStyle": "angle-bracket",
+                "objectLiteralTypeAssertions": "allow-as-parameter"
+            }
+        ],
+        "@typescript-eslint/func-call-spacing": "error",
+        "@typescript-eslint/no-confusing-non-null-assertion": "error",
+        "@typescript-eslint/no-extra-parens": "error",
+        "@typescript-eslint/no-duplicate-imports": "error",
+        "@typescript-eslint/no-invalid-void-type": "error",
+        "@typescript-eslint/no-non-null-asserted-nullish-coalescing": "error",
+        "@typescript-eslint/no-useless-constructor": "error",
+        "@typescript-eslint/semi": "error",
+        "@typescript-eslint/space-before-function-paren": [
+            "error",
+            "never"
+        ],
+        "@typescript-eslint/space-infix-ops": "error",
+        "curly": "error", // missing braces after if, for, etc
+        "dot-location": [
+            "error",
+            "property"
+        ],
+        "max-statements-per-line": "error",
+        "new-cap": "error",
+        "new-parens": "error",
+        "no-alert": "error",
+        "no-eval": "error",
+        "no-extra-bind": "error",
+        "no-floating-decimal": "error",
+        "no-labels": "error",
+        "no-lone-blocks": "error",
+        "no-self-compare": "error",
+        "no-sequences": "error",
+        "no-throw-literal": "error",
+        "no-useless-escape": "error",
+        "no-useless-rename": "error",
+        "operator-linebreak": [
+            "error",
+            "before"
+        ],
+        "prefer-regex-literals": "error",
+        "require-unicode-regexp": "error",
+        "semi-spacing": "error",
+        "space-unary-ops": "error",
+        "wrap-iife": [
+            "error",
+            "inside"
+        ],
+        /*
+         * STYLE WARNINGS
+         * These are dispreffered styles that do not relate to git issues and
+         * are not severe enough to be errors.
+         */
+        "@typescript-eslint/array-type": "warn",
+        "@typescript-eslint/brace-style": "warn",
+        "@typescript-eslint/class-literal-property-style": "warn",
+        "@typescript-eslint/comma-spacing": "warn",
+        "@typescript-eslint/consistent-indexed-object-style": [
+            "warn",
+            "index-signature"
+        ],
+        "@typescript-eslint/keyword-spacing": "warn",
+        "@typescript-eslint/member-delimiter-style": [
+            "warn",
+            {
+                // Require commas for type literals and semicolons for
+                // interface declarations
+                "overrides": {
+                    "typeLiteral": {
+                        "multiline": {
+                            "delimiter": "comma",
+                            "requireLast": false
+                        },
+                        "singleline": {
+                            "delimiter": "comma"
+                        }
+                    },
+                    "interface": {
+                        "singleline": {
+                            "requireLast": true
+                        }
+                    }
+                }
+            }
+        ],
+        "@typescript-eslint/member-ordering": [
+            "warn",
+            {
+                "default": {
+                    "memberTypes": [
+                        "static-field",
+                        "private-instance-field",
+                        "public-instance-field",
+                        "constructor",
+                        "private-method",
+                        "public-method"
+                    ]
+                }
+            }
+        ],
+        "@typescript-eslint/object-curly-spacing": [
+            "warn",
+            "always"
+        ],
+        "@typescript-eslint/prefer-function-type": "warn",
+        "@typescript-eslint/sort-type-union-intersection-members": "warn",
+        "@typescript-eslint/type-annotation-spacing": "warn",
+        "@typescript-eslint/quotes": [
+            "warn",
+            "single",
+            {
+                "avoidEscape": true
+            }
+        ],
+        "arrow-body-style": [
+            "warn",
+            "as-needed",
+            {
+                "requireReturnForObjectLiteral": true
+            }
+        ],
+        "array-bracket-newline": [
+            "warn",
+            {
+                "multiline": true
+            }
+        ],
+        "array-bracket-spacing": "warn",
+        "arrow-parens": [
+            "warn",
+            "as-needed"
+        ],
+        "arrow-spacing": "warn",
+        "block-spacing": "warn",
+        "func-names": [
+            "warn",
+            "never"
+        ],
+        "function-call-argument-newline": [
+            "warn",
+            "consistent"
+        ],
+        "function-paren-newline": [
+            "warn",
+            "multiline-arguments"
+        ],
+        "grouped-accessor-pairs": [
+            "warn",
+            "getBeforeSet"
+        ],
+        "id-length": [
+            "warn",
+            {
+                "min": 3,
+                "max": 25,
+                "exceptions": [
+                    "i", "j", // `for` loop indices
+                    "el", // `.map()` argument
+                    "_", // unused argument
+                    "e", // caught error
+                    "a", "b" // `.reduce()` arguments
+                ],
+                "exceptionPatterns": [
+                    "[a-z]\\d" // one letter followed by a number
+                ]
+            }
+        ],
+        "key-spacing": [
+            "warn",
+            {
+                "align": "value"
+            }
+        ],
+        "multiline-ternary": [
+            "warn",
+            "always-multiline" // this is actually the middle option
+        ],
+        "newline-per-chained-call": "warn",
+        "no-useless-concat": "warn",
+        "no-whitespace-before-property": "warn",
+        "object-curly-newline": "warn",
+        "operator-assignment": "warn",
+        "prefer-arrow-callback": "warn",
+        "prefer-exponentiation-operator": "warn",
+        "prefer-numeric-literals": "warn",
+        "prefer-object-spread": "warn",
+        "space-in-parens": "warn",
+        "spaced-comment": "warn",
+        "switch-colon-spacing": "warn",
+        "template-curly-spacing": "warn",
+        "yoda": "warn",
+        /*
+         * CODE WARNINGS
+         * These do not break anything, but should be avoided. If possible, the
+         * build script will fix them, but if not it will just log a warning
+         * and continue anyways.
+         */
+        "accessor-pairs": "warn",
+        "no-else-return": "warn",
+        "no-lonely-if": "warn",
+        "no-negated-condition": "warn",
+        "no-return-assign": "warn",
+        /*
+         * NON-PROBLEMS
+         * These are things that are enabled by default that cause more harm
+         * than good in this project.
+         */
+        "@typescript-eslint/no-non-null-assertion": "off",
+        "no-magic-numbers": "off"
     }
 }

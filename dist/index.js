@@ -1,6 +1,6 @@
 "use strict";
 /*!
-Lexifer TS v1.1.2-beta.2
+Lexifer TS v1.1.2-beta.3
 
 Copyright (c) 2021 William Baker
 
@@ -51,11 +51,11 @@ class WeightedSelector {
 const main = (file, num, verbose = false, unsorted, onePerLine = false, stderr = console.error) => {
     let ans = '';
     try {
-        const pd = new PhonologyDefinition(file, stderr);
+        const phonDef = new PhonologyDefinition(file, stderr);
         if (num) {
             if (num < 0 || num === Infinity) {
                 stderr(`Cannot generate ${num} words.`);
-                ans = pd.paragraph();
+                ans = phonDef.paragraph();
             }
             else {
                 if (num !== Math.round(num)) {
@@ -74,7 +74,7 @@ const main = (file, num, verbose = false, unsorted, onePerLine = false, stderr =
                             + 'mode.');
                     }
                 }
-                ans = wrap(pd.generate(num, verbose, unsorted, onePerLine));
+                ans = wrap(phonDef.generate(num, verbose, unsorted, onePerLine));
             }
         }
         else {
@@ -87,7 +87,7 @@ const main = (file, num, verbose = false, unsorted, onePerLine = false, stderr =
             if (onePerLine) {
                 stderr("** 'One per line' option ignored in paragraph mode.");
             }
-            ans = pd.paragraph();
+            ans = phonDef.paragraph();
         }
     }
     catch (e) {
@@ -181,9 +181,7 @@ class PhonologyDefinition {
                     else if (letters.has(el.split(':')[0])) {
                         return false;
                     }
-                    else {
-                        return true;
-                    }
+                    return true;
                 });
                 this.stderr(`A phoneme class contains '${diff.join(' ')}' `
                     + "missing from 'letters'.  Strange word shapes are likely"
@@ -270,12 +268,12 @@ class PhonologyDefinition {
             }
             if (!rule.match(/[^?!]/u)) {
                 throw new Error(`'${rules[i]}'`
-                    + `${(cat ? ` (in category ${cat})` : '')} will only `
+                    + `${cat ? ` (in category ${cat})` : ''} will only `
                     + 'produce empty words.');
             }
             else if (rule.match(/^\?*[^?!]!?\?+!?$/u)) {
                 this.stderr(`'${rules[i]}'`
-                    + `${(cat ? ` (in category ${cat})` : '')} may produce `
+                    + `${cat ? ` (in category ${cat})` : ''} may produce `
                     + 'empty words.');
             }
             rule = this.expandMacros(rule);
@@ -297,17 +295,17 @@ class PhonologyDefinition {
         const c2list = this.defFileArr[this.defFileLineNum]
             .split(/\s+/gu);
         c2list.shift();
-        const n = c2list.length;
+        const rowLength = c2list.length;
         while (!['', '\n', undefined].includes(this.defFileArr[this.defFileLineNum])) {
             let line = (_a = this.defFileArr[++this.defFileLineNum]) !== null && _a !== void 0 ? _a : '';
-            line = line.replace(/#.*/, '').trim();
+            line = line.replace(/#.*/u, '').trim();
             if (line === '') {
                 continue;
             }
             const row = line.split(/\s+/gu);
             const c1 = row.splice(0, 1);
-            if (row.length === n) {
-                for (let i = 0; i < n; ++i) {
+            if (row.length === rowLength) {
+                for (let i = 0; i < rowLength; ++i) {
                     if (row[i] === '+') {
                         continue;
                     }
@@ -319,7 +317,7 @@ class PhonologyDefinition {
                     }
                 }
             }
-            else if (row.length > n) {
+            else if (row.length > rowLength) {
                 throw new Error(`cluster field row too long: '${line}'.`);
             }
             else {
@@ -373,16 +371,16 @@ class PhonologyDefinition {
             }
         }
     }
-    generate(n = 1, verbose = false, unsorted = verbose, onePerLine = false) {
+    generate(numWords = 1, verbose = false, unsorted = verbose, onePerLine = false) {
         let words = '';
         let wordList = [];
         for (const cat of this.categories) {
-            wordList = this.soundsys.generate(n, verbose, unsorted, cat);
-            if (wordList.length < n) {
+            wordList = this.soundsys.generate(numWords, verbose, unsorted, cat);
+            if (wordList.length < numWords) {
                 this.stderr(`Could only generate ${wordList.length} word`
                     + `${wordList.length === 1 ? '' : 's'} `
                     + (cat === 'words:' ? '' : `of category '${cat}' `)
-                    + `(${n} requested).`);
+                    + `(${numWords} requested).`);
             }
             if (cat !== 'words:') {
                 words += `\n\n${cat}:\n`;
@@ -518,7 +516,7 @@ const applyCoronalMetathesis = (word) => {
     }
     return newArr;
 };
-const wrap = (s) => s.replace(/(?![^\n]{1,70}$)([^\n]{1,70})\s/gu, '$1\n');
+const wrap = (str) => str.replace(/(?![^\n]{1,70}$)([^\n]{1,70})\s/gu, '$1\n');
 class Word {
     constructor(form, rule) {
         this.forms = [form];
@@ -571,9 +569,7 @@ class Word {
             }
             return ans;
         }
-        else {
-            return last(this.forms);
-        }
+        return last(this.forms);
     }
 }
 Word.verbose = false;
@@ -599,8 +595,8 @@ class ArbSorter {
         }
     }
     wordAsValues(word) {
-        const w = this.split(word);
-        const arrayedWord = w.map(char => this.ords[char]);
+        const splitWord = this.split(word);
+        const arrayedWord = splitWord.map(char => this.ords[char]);
         if (arrayedWord.includes(undefined)) {
             throw new Error(`word with unknown letter: '${word}'.\n`
                 + 'A filter or assimilation might have caused this.');
@@ -608,15 +604,16 @@ class ArbSorter {
         return arrayedWord;
     }
     valuesAsWord(values) {
-        return values.map(v => this.vals[v])
+        return values.map(el => this.vals[el])
             .join('');
     }
     split(word) {
         return word.split(this.splitter)
             .filter((_, i) => i % 2);
     }
-    sort(l) {
-        const l2 = l.filter(el => el !== '').map(el => this.wordAsValues(el));
+    sort(list) {
+        const l2 = list.filter(el => el !== '')
+            .map(el => this.wordAsValues(el));
         l2.sort((a, b) => a[0] - b[0]);
         return l2.map(el => this.valuesAsWord(el));
     }
@@ -633,27 +630,27 @@ class SoundSystem {
         this.sorter = null;
     }
     runRule(rule) {
-        const n = rule.length;
-        const s = [];
+        const ruleLen = rule.length;
+        const segments = [];
         if (rule[0] === '!' || rule[1] === '!' || rule.includes('!!')) {
             throw new Error("misplaced '!' option: in non-duplicate "
                 + `environment: '${rule}'.`);
         }
-        for (let i = 0; i < n; ++i) {
+        for (let i = 0; i < ruleLen; ++i) {
             if ('?!'.includes(rule[i])) {
                 continue;
             }
-            if (i < n - 1 && rule[i + 1] === '?') {
+            if (i < ruleLen - 1 && rule[i + 1] === '?') {
                 if (Math.random() * 100 < this.randpercent) {
                     if (rule[i] in this.phonemeset) {
-                        s.push(this.phonemeset[rule[i]].select());
+                        segments.push(this.phonemeset[rule[i]].select());
                     }
                     else {
-                        s.push(rule[i]);
+                        segments.push(rule[i]);
                     }
                 }
             }
-            else if (i < n - 1
+            else if (i < ruleLen - 1
                 && i > 0
                 && rule[i + 1] === '!') {
                 let prevc;
@@ -671,18 +668,18 @@ class SoundSystem {
                     let nph;
                     do {
                         nph = this.phonemeset[rule[i]].select();
-                    } while (nph === last(s));
-                    s.push(nph);
+                    } while (nph === last(segments));
+                    segments.push(nph);
                 }
             }
             else if (rule[i] in this.phonemeset) {
-                s.push(this.phonemeset[rule[i]].select());
+                segments.push(this.phonemeset[rule[i]].select());
             }
             else {
-                s.push(rule[i]);
+                segments.push(rule[i]);
             }
         }
-        return s.join('');
+        return segments.join('');
     }
     applyFilters(word) {
         if (this.useAssim) {
@@ -696,35 +693,35 @@ class SoundSystem {
     }
     addPhUnit(name, selection) {
         const naturalWeights = (phonemes) => {
-            const jitter = (v, percent = 10) => {
-                const move = v * percent / 100;
-                return v + move * (Math.random() - 0.5);
+            const jitter = (val, percent = 10) => {
+                const move = val * percent / 100;
+                return val + move * (Math.random() - 0.5);
             };
-            const p = phonemes.split(/\s+/gu);
+            const phons = phonemes.split(/\s+/gu);
             const weighted = {};
-            const n = p.length;
-            for (let i = 0; i < n; ++i) {
-                weighted[p[i]] = jitter((Math.log(n + 1) - Math.log(i + 1)) / n);
+            const numPhons = phons.length;
+            for (let i = 0; i < numPhons; ++i) {
+                weighted[phons[i]] = jitter((Math.log(numPhons + 1) - Math.log(i + 1)) / numPhons);
             }
             let temp = '';
-            for (const k in weighted) {
-                temp += `${k}:${weighted[k]} `;
+            for (const key in weighted) {
+                temp += `${key}:${weighted[key]} `;
             }
             temp.trim();
             return temp;
         };
         const ruleToDict = (rule) => {
             const items = rule.trim().split(/\s+/gu);
-            const d = {};
+            const dict = {};
             for (const item of items) {
                 if (invalidItemAndWeight(item)) {
                     throw new Error(`'${item}' is not a valid phoneme and `
                         + 'weight.');
                 }
                 const [value, weight] = item.split(':');
-                d[value] = +weight;
+                dict[value] = +weight;
             }
-            return d;
+            return dict;
         };
         if (!selection.includes(':')) {
             selection = naturalWeights(selection);
@@ -759,7 +756,7 @@ class SoundSystem {
     useDigraphs() {
         initialize(false);
     }
-    generate(n, verbose, unsorted, category, force = false) {
+    generate(numWords, verbose, unsorted, category, force = false) {
         const words = new Set();
         Word.verbose = verbose;
         Word.sorter = this.sorter;
@@ -771,14 +768,14 @@ class SoundSystem {
             dict = Object.assign({ [category]: 0 }, dict);
         }
         const ruleSelector = new WeightedSelector(dict);
-        for (let i = 0; force || i < 3 * n; ++i) {
+        for (let i = 0; force || i < 3 * numWords; ++i) {
             const rule = ruleSelector.select();
             const form = this.runRule(rule);
             const word = new Word(form, rule);
             this.applyFilters(word);
             if (word.toString() !== 'REJECT') {
                 words.add(word.toString());
-                if (words.size === n) {
+                if (words.size === numWords) {
                     break;
                 }
             }

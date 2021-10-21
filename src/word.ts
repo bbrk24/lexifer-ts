@@ -27,28 +27,28 @@ import { ArbSorter } from './wordgen';
 class Word {
     static verbose = false;
     static sorter: ArbSorter | null = null;
-    
+
     private forms: string[];
     private filters: string[];
-    
+
     constructor(form: string, rule: string) {
         this.forms = [form];
         this.filters = [rule];
     }
-    
+
     private applyFilter(pat: string, repl: string) {
         let newWord = last(this.forms)!;
         newWord = newWord.replace(new RegExp(pat, 'gu'), repl);
         if (newWord.includes('REJECT')) {
             newWord = 'REJECT';
         }
-        
+
         if (newWord !== last(this.forms)) {
             this.forms.push(newWord);
             this.filters.push(`${pat} > ${repl || '!'}`);
         }
     }
-    
+
     applyFilters(filters: [string, string][]) {
         for (const filt of filters) {
             this.applyFilter(...filt);
@@ -57,7 +57,7 @@ class Word {
             }
         }
     }
-    
+
     applyAssimilations() {
         if (Word.sorter) {
             const newWord = applyAssimilations(
@@ -66,14 +66,14 @@ class Word {
                 )
             )
                 .join('');
-            
+
             if (newWord !== last(this.forms)) {
                 this.forms.push(newWord);
                 this.filters.push('std-assimilations');
             }
         }
     }
-    
+
     applyCoronalMetathesis() {
         if (Word.sorter) {
             const newWord = applyCoronalMetathesis(
@@ -82,24 +82,26 @@ class Word {
                 )
             )
                 .join('');
-            
+
             if (newWord !== last(this.forms)) {
                 this.forms.push(newWord);
                 this.filters.push('coronal-metathesis');
             }
         }
     }
-    
+
     toString() {
         if (Word.verbose) {
             let ans = '';
+
             for (const i in this.forms) {
                 ans += `${this.filters[i]} – ${this.forms[i]}\n`;
             }
+
             return ans;
-        } else {
-            return last(this.forms)!;
         }
+
+        return last(this.forms)!;
     }
 }
 

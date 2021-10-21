@@ -30,16 +30,16 @@ const main = (
     verbose = false,
     unsorted?: boolean,
     onePerLine = false,
-    stderr: (inp: string | Error) => void = console.error
+    stderr: (inp: Error | string) => void = console.error
 ) => {
     let ans = '';
     try {
-        const pd = new PhonologyDefinition(file, stderr);
+        const phonDef = new PhonologyDefinition(file, stderr);
         if (num) {
             // wordlist mode
             if (num < 0 || num === Infinity) {
                 stderr(`Cannot generate ${num} words.`);
-                ans = pd.paragraph();
+                ans = phonDef.paragraph();
             } else {
                 if (num !== Math.round(num)) {
                     stderr(`Requested number of words (${num}) is not an `
@@ -57,7 +57,9 @@ const main = (
                             + 'mode.');
                     }
                 }
-                ans = wrap(pd.generate(num, verbose, unsorted, onePerLine));
+                ans = wrap(
+                    phonDef.generate(num, verbose, unsorted, onePerLine)
+                );
             }
         } else {
             // paragraph mode
@@ -70,11 +72,12 @@ const main = (
             if (onePerLine) {
                 stderr("** 'One per line' option ignored in paragraph mode.");
             }
-            ans = pd.paragraph();
+            ans = phonDef.paragraph();
         }
     } catch (e) {
         stderr(<Error>e);
     }
+
     return ans;
 };
 
@@ -82,7 +85,7 @@ const main = (
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const genWords = () => {
     document.getElementById('errors')!.innerHTML = '';
-    
+
     document.getElementById('result')!.innerHTML = main(
         (<HTMLTextAreaElement>document.getElementById('def')).value,
         parseInt((<HTMLInputElement>document.getElementById('number')).value)

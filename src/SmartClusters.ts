@@ -129,16 +129,16 @@ const applyAssimilations = (word: string[]) => {
             const data2 = phdb.find(el => el[0] === ph2);
             if (data2) {
                 const result = phdb.find(el =>
-                    el[2] === data2![2] && el[3] === Manner.Nasal
-                );
+                    el[2] === data2![2] && el[3] === Manner.Nasal);
                 if (result) {
                     return result[0];
                 }
             }
         }
+
         return ph1;
     };
-    
+
     const voiceAssimilate = (ph1: string, ph2: string) => {
         const data2 = phdb.find(el => el[0] === ph2);
         if (data2 && data2[3] !== Manner.Nasal) {
@@ -147,21 +147,23 @@ const applyAssimilations = (word: string[]) => {
                 const result = phdb.find(el =>
                     el[1] === data2![1]
                     && el[2] === data1![2]
-                    && el[3] === data1![3]
-                );
+                    && el[3] === data1![3]);
                 if (result) {
                     return result[0];
                 }
             }
         }
+
         return ph1;
     };
-    
+
     const newArr = [...word];
+
     for (let i = 0; i < word.length - 1; ++i) {
         newArr[i] = voiceAssimilate(word[i]!, word[i + 1]!);
         newArr[i] = nasalAssimilate(newArr[i]!, word[i + 1]!); // sic
     }
+
     return newArr;
 };
 
@@ -179,13 +181,16 @@ const applyCoronalMetathesis = (word: string[]) => {
                 return [ph2, ph1];
             }
         }
+
         return [ph1, ph2];
     };
-    
+
     const newArr = [...word];
+
     for (let i = 0; i < word.length - 1; ++i) {
         [newArr[i], newArr[i + 1]] = coronalMetathesis(word[i]!, word[i + 1]!);
     }
+
     return newArr;
 };
 

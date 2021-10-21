@@ -36,7 +36,7 @@ declare const lexifer: (
     verbose?: boolean,
     unsorted?: boolean | undefined,
     onePerLine?: boolean,
-    stderr?: (inp: string | Error) => void
+    stderr?: (inp: Error | string) => void
 ) => string;
 ```
 

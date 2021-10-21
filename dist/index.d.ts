@@ -1,5 +1,5 @@
 /*!
-Lexifer TS v1.1.2-beta.2
+Lexifer TS v1.1.2-beta.3
 
 Copyright (c) 2021 William Baker
 
@@ -30,7 +30,7 @@ declare class WeightedSelector {
     });
     select(): string;
 }
-declare const main: (file: string, num?: number | undefined, verbose?: boolean, unsorted?: boolean | undefined, onePerLine?: boolean, stderr?: (inp: string | Error) => void) => string;
+declare const main: (file: string, num?: number | undefined, verbose?: boolean, unsorted?: boolean | undefined, onePerLine?: boolean, stderr?: (inp: Error | string) => void) => string;
 declare const genWords: () => void;
 declare const last: <T>(arr: ArrayLike<T> | null | undefined) => T | null | undefined;
 declare class PhonologyDefinition {
@@ -42,7 +42,7 @@ declare class PhonologyDefinition {
     private defFileLineNum;
     private defFileArr;
     soundsys: SoundSystem;
-    constructor(defFile: string, stderr: (inp: string | Error) => void);
+    constructor(defFile: string, stderr: (inp: Error | string) => void);
     private parse;
     private sanityCheck;
     private parseOption;
@@ -55,7 +55,7 @@ declare class PhonologyDefinition {
     private parseClusterfield;
     private parseClass;
     private parseCategories;
-    generate(n?: number, verbose?: boolean, unsorted?: boolean, onePerLine?: boolean): string;
+    generate(numWords?: number, verbose?: boolean, unsorted?: boolean, onePerLine?: boolean): string;
     paragraph(sentences?: number): string;
 }
 declare const enum Voicing {
@@ -86,7 +86,7 @@ declare let phdb: [string, Voicing, Place, Manner][];
 declare const initialize: (isIpa?: boolean) => void;
 declare const applyAssimilations: (word: string[]) => string[];
 declare const applyCoronalMetathesis: (word: string[]) => string[];
-declare const wrap: (s: string) => string;
+declare const wrap: (str: string) => string;
 declare class Word {
     static verbose: boolean;
     static sorter: ArbSorter | null;
@@ -108,7 +108,7 @@ declare class ArbSorter {
     wordAsValues(word: string): number[];
     valuesAsWord(values: number[]): string;
     split(word: string): string[];
-    sort(l: string[]): string[];
+    sort(list: string[]): string[];
 }
 declare const _weight: unique symbol;
 interface Rule {
@@ -134,7 +134,7 @@ declare class SoundSystem {
     addSortOrder(order: string): void;
     useIpa(): void;
     useDigraphs(): void;
-    generate(n: number, verbose: boolean, unsorted: boolean, category: string, force?: boolean): string[];
+    generate(numWords: number, verbose: boolean, unsorted: boolean, category: string, force?: boolean): string[];
     randomCategory(): string;
 }
 declare const textify: (phsys: SoundSystem, sentences?: number) => string;
