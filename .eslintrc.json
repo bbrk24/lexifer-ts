@@ -14,6 +14,7 @@
     "plugins": [
         "@typescript-eslint"
     ],
+    "noInlineConfig": true,
     "rules": {
         /*
          * CODE ERRORS
@@ -165,6 +166,8 @@
         "no-floating-decimal": "error",
         "no-labels": "error",
         "no-lone-blocks": "error",
+        "no-new-func": "error",
+        "no-proto": "error",
         "no-self-compare": "error",
         "no-sequences": "error",
         "no-throw-literal": "error",
@@ -268,6 +271,8 @@
         ],
         "arrow-spacing": "warn",
         "block-spacing": "warn",
+        "camelcase": "warn",
+        "capitalized-comments": "warn",
         "func-names": [
             "warn",
             "never"
@@ -307,6 +312,10 @@
                 "align": "value"
             }
         ],
+        "multiline-comment-style": [
+            "warn",
+            "starred-block"
+        ],
         "multiline-ternary": [
             "warn",
             "always-multiline" // this is actually the middle option
@@ -315,6 +324,14 @@
         "no-useless-concat": "warn",
         "no-whitespace-before-property": "warn",
         "object-curly-newline": "warn",
+        "object-shorthand": [
+            "warn",
+            "always",
+            {
+                "avoidExplicitReturnArrows": true
+            }
+        ],
+        "one-var-declaration-per-line": "warn",
         "operator-assignment": "warn",
         "prefer-arrow-callback": "warn",
         "prefer-exponentiation-operator": "warn",
@@ -334,8 +351,10 @@
         "accessor-pairs": "warn",
         "no-else-return": "warn",
         "no-lonely-if": "warn",
+        "no-multi-assign": "warn",
         "no-negated-condition": "warn",
         "no-return-assign": "warn",
+        "no-unreachable-loop": "warn",
         /*
          * NON-PROBLEMS
          * These are things that are enabled by default that cause more harm

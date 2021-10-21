@@ -6,7 +6,7 @@ All notable changes to this project will be documented in this file.
 
 This version contains very little in the way of functional changes, but
 clarifies licensing and extends the `package.json` so as to be ready for
-release on npm.
+release on npm. Code style is now enforced by ESLint.
 
 ## v1.1.1
 

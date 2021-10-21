@@ -86,7 +86,10 @@ class ArbSorter {
     }
 }
 
-// to prevent the user from typing whatever key I use to store the weight
+/*
+ * To prevent the user from typing whatever key I use to store the weight, I
+ * cannot use a string.
+ */
 const _weight = Symbol();
 
 interface Rule {
@@ -108,7 +111,7 @@ class SoundSystem {
         const ruleLen = rule.length;
         const segments: string[] = [];
 
-        // guard against improper '!' that the loop won't catch
+        // Guard against improper '!' that the loop won't catch.
         if (rule[0] === '!' || rule[1] === '!' || rule.includes('!!')) {
             throw new Error("misplaced '!' option: in non-duplicate "
                 + `environment: '${rule}'.`);

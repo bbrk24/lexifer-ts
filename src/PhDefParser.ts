@@ -28,7 +28,7 @@ class PhonologyDefinition {
     private phClasses: string[] = [];
     private categories: string[] = [];
 
-    // a bit of a hack since JS can't read files directly
+    // This is a bit of a hack since the browser doesn't read files directly.
     private defFileLineNum = 0;
     private defFileArr: string[];
 
@@ -180,16 +180,17 @@ class PhonologyDefinition {
         const rules = line.split(/\s+/gu);
         const weighted = line.includes(':');
 
-        // only warn about this once
-        // plus, it can be detected right away
+        // Only warn about this once. Besides, it can be detected right away.
         if (line.includes('??')) {
             this.stderr("'??' is treated as '?'.");
         }
 
-        // only warn about this once
-        // it can be detected right away, but it's harder to find
+        /*
+         * Only warn about this once. It can also be detected right away, but
+         * it's harder to find.
+         */
         if (line[0] === '?' || line.match(/\s\?[^?!]/u)) {
-            // doesn't need /g since I'm using it as a boolean test
+            // That doesn't need /g since I'm using it as a boolean test.
             this.stderr("'?' at the beginning of a rule does nothing.");
         }
 
@@ -210,16 +211,20 @@ class PhonologyDefinition {
                 weight = 10.0 / (i + 1) ** 0.9;
             }
 
-            // inform the user of empty words
-            // if it can only produce empty words, error
-            // if it will sometimes produce empty words, warn
+            /*
+             * Inform the user of empty words. Error if it will only produce
+             * empty words, but if it only sometimes produces empty words, only
+             * warn them.
+             */
             if (!rule.match(/[^?!]/u)) {
                 throw new Error(`'${rules[i]}'`
                     + `${cat ? ` (in category ${cat})` : ''} will only `
                     + 'produce empty words.');
             } else if (rule.match(/^\?*[^?!]!?\?+!?$/u)) {
-                // don't know what random-rate or category weight is
-                // so this may not even be an issue
+                /*
+                 * Here, we don't know what random-rate or category weight is,
+                 * so this may not even be an issue.
+                 */
                 this.stderr(`'${rules[i]}'`
                     + `${cat ? ` (in category ${cat})` : ''} may produce `
                     + 'empty words.');

@@ -36,7 +36,6 @@ const main = (
     try {
         const phonDef = new PhonologyDefinition(file, stderr);
         if (num) {
-            // wordlist mode
             if (num < 0 || num === Infinity) {
                 stderr(`Cannot generate ${num} words.`);
                 ans = phonDef.paragraph();
@@ -62,7 +61,6 @@ const main = (
                 );
             }
         } else {
-            // paragraph mode
             if (verbose) {
                 stderr("** 'Verbose' option ignored in paragraph mode.");
             }

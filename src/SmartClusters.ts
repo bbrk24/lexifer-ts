@@ -40,8 +40,10 @@ const enum Manner {
     Fricative,
     Nasal,
     Sibilant,
-    // LateralFricative and LateralAffricate are too long
-    // they don't let the data array items fit in 80 chars when indented
+    /*
+     * `LateralFricative` and `LateralAffricate` are too long -- they don't let
+     * the data array items fit in 80 chars when indented.
+     */
     LatFric,
     LatAffric,
     Affricate
@@ -161,7 +163,7 @@ const applyAssimilations = (word: string[]) => {
 
     for (let i = 0; i < word.length - 1; ++i) {
         newArr[i] = voiceAssimilate(word[i]!, word[i + 1]!);
-        newArr[i] = nasalAssimilate(newArr[i]!, word[i + 1]!); // sic
+        newArr[i] = nasalAssimilate(newArr[i]!, word[i + 1]!);
     }
 
     return newArr;
