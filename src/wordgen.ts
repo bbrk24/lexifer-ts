@@ -31,6 +31,7 @@ const invalidItemAndWeight = (item: string) => {
     if (parts.length !== 2) {
         return true;
     }
+
     const weight = +parts[1]!;
 
     return isNaN(weight) || weight < 0 || weight === Infinity;
@@ -86,10 +87,8 @@ class ArbSorter {
     }
 }
 
-/*
- * To prevent the user from typing whatever key I use to store the weight, I
- * cannot use a string.
- */
+// To prevent the user from typing whatever key I use to store the weight, I
+// cannot use a string.
 const _weight = Symbol();
 
 interface Rule {
@@ -195,11 +194,13 @@ class SoundSystem {
                     (Math.log(numPhons + 1) - Math.log(i + 1)) / numPhons
                 );
             }
+
             let temp = '';
 
             for (const key in weighted) {
                 temp += `${key}:${weighted[key]} `;
             }
+
             temp.trim();
 
             return temp;
@@ -214,6 +215,7 @@ class SoundSystem {
                     throw new Error(`'${item}' is not a valid phoneme and `
                         + 'weight.');
                 }
+
                 const [value, weight] = <[string, string]>item.split(':');
                 dict[value] = +weight;
             }
@@ -224,6 +226,7 @@ class SoundSystem {
         if (!selection.includes(':')) {
             selection = naturalWeights(selection);
         }
+
         this.phonemeset[name] = new WeightedSelector(ruleToDict(selection));
     }
 
@@ -273,10 +276,12 @@ class SoundSystem {
         if (!this.ruleset[category]) {
             throw new Error(`unknown category '${category}'.`);
         }
+
         let dict = { ...this.ruleset[category], [_weight]: undefined };
         if (Object.keys(dict).length === 1) {
             dict = { [category]: 0, ...dict };
         }
+
         const ruleSelector = new WeightedSelector(dict);
 
         /*
@@ -320,6 +325,7 @@ class SoundSystem {
         for (const cat in this.ruleset) {
             weightedCats[cat] = this.ruleset[cat]![_weight];
         }
+
         const catSelector = new WeightedSelector(weightedCats);
 
         return catSelector.select();

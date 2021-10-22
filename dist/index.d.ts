@@ -1,5 +1,5 @@
 /*!
-Lexifer TS v1.1.2-beta.4+2
+Lexifer TS v1.1.2-rc.0
 
 Copyright (c) 2021 William Baker
 
@@ -32,7 +32,11 @@ declare class WeightedSelector {
 }
 declare const main: (file: string, num?: number | undefined, verbose?: boolean, unsorted?: boolean | undefined, onePerLine?: boolean, stderr?: (inp: Error | string) => void) => string;
 declare const genWords: () => void;
-declare const last: <T>(arr: ArrayLike<T> | null | undefined) => T | null | undefined;
+declare const last: {
+    (arr: null): null;
+    <T = never>(arr: ArrayLike<T> | undefined): T | undefined;
+    <T>(arr: ArrayLike<T> | null | undefined): T | null | undefined;
+};
 declare class PhonologyDefinition {
     private stderr;
     private macros;

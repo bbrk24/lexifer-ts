@@ -56,6 +56,7 @@ const main = (
                             + 'mode.');
                     }
                 }
+
                 ans = wrap(
                     phonDef.generate(num, verbose, unsorted, onePerLine)
                 );
@@ -70,6 +71,7 @@ const main = (
             if (onePerLine) {
                 stderr("** 'One per line' option ignored in paragraph mode.");
             }
+
             ans = phonDef.paragraph();
         }
     } catch (e) {

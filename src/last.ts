@@ -20,7 +20,12 @@
  * IN THE SOFTWARE.
  */
 
-const last = <T>(arr: ArrayLike<T> | null | undefined) =>
+// Why is it so difficult to avoid return type pollution?
+const last: {
+    (arr: null): null,
+    <T = never>(arr: ArrayLike<T> | undefined): T | undefined,
+    <T>(arr: ArrayLike<T> | null | undefined): T | null | undefined
+} = <T>(arr: ArrayLike<T> | null | undefined) =>
     arr && arr[arr.length - 1];
 
 export default last;

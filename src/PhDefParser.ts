@@ -41,6 +41,7 @@ class PhonologyDefinition {
         if (defFile.trim() === '') {
             throw new Error('Please include a definition.');
         }
+
         this.defFileArr = defFile.split('\n');
         this.parse();
         this.sanityCheck();
@@ -171,6 +172,7 @@ class PhonologyDefinition {
         } else if (this.categories.length === 0) {
             this.soundsys.addCategory('words:', 1);
         }
+
         this.categories = ['words:'];
 
         this.addRules(line);
@@ -185,10 +187,8 @@ class PhonologyDefinition {
             this.stderr("'??' is treated as '?'.");
         }
 
-        /*
-         * Only warn about this once. It can also be detected right away, but
-         * it's harder to find.
-         */
+        // Only warn about this once. It can also be detected right away, but
+        // it's harder to find.
         if (line[0] === '?' || line.match(/\s\?[^?!]/u)) {
             // That doesn't need /g since I'm using it as a boolean test.
             this.stderr("'?' at the beginning of a rule does nothing.");
@@ -203,6 +203,7 @@ class PhonologyDefinition {
                     throw new Error(`'${rules[i]}' is not a valid pattern and `
                         + 'weight.');
                 }
+
                 let weightStr: string;
                 [rule, weightStr] = <[string, string]>rules[i]!.split(':');
                 weight = +weightStr;
@@ -211,20 +212,16 @@ class PhonologyDefinition {
                 weight = 10.0 / (i + 1) ** 0.9;
             }
 
-            /*
-             * Inform the user of empty words. Error if it will only produce
-             * empty words, but if it only sometimes produces empty words, only
-             * warn them.
-             */
+            // Inform the user of empty words. Error if it will only produce
+            // empty words, but if it only sometimes produces empty words, only
+            // warn them.
             if (!rule.match(/[^?!]/u)) {
                 throw new Error(`'${rules[i]}'`
                     + `${cat ? ` (in category ${cat})` : ''} will only `
                     + 'produce empty words.');
             } else if (rule.match(/^\?*[^?!]!?\?+!?$/u)) {
-                /*
-                 * Here, we don't know what random-rate or category weight is,
-                 * so this may not even be an issue.
-                 */
+                // Here, we don't know what random-rate or category weight is,
+                // so this may not even be an issue.
                 this.stderr(`'${rules[i]}'`
                     + `${cat ? ` (in category ${cat})` : ''} may produce `
                     + 'empty words.');
@@ -320,6 +317,7 @@ class PhonologyDefinition {
                     throw new Error(`'${cat}' is not a valid category and `
                         + 'weight.');
                 }
+
                 const [name, weight] = <[string, string]>cat.split(':');
                 const weightNum = +weight;
 
@@ -353,6 +351,7 @@ class PhonologyDefinition {
             if (cat !== 'words:') {
                 words += `\n\n${cat}:\n`;
             }
+
             words += wordList.join(onePerLine || verbose ? '\n' : ' ');
         }
 

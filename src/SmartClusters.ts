@@ -40,10 +40,8 @@ const enum Manner {
     Fricative,
     Nasal,
     Sibilant,
-    /*
-     * `LateralFricative` and `LateralAffricate` are too long -- they don't let
-     * the data array items fit in 80 chars when indented.
-     */
+    // `LateralFricative` and `LateralAffricate` are too long -- they don't let
+    // the data array items fit in 80 chars when indented.
     LatFric,
     LatAffric,
     Affricate

@@ -36,6 +36,7 @@ class WeightedSelector {
                 this.weights.push(weight);
             }
         }
+
         this.sum = this.weights.reduce((a, b) => a + b, 0);
     }
 
