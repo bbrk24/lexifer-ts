@@ -1,4 +1,8 @@
-// https://stackoverflow.com/a/51506718/
+/*
+ * This work is not my own. Rather, it is adapted from
+ * https://stackoverflow.com/a/51506718/
+ */
+
 /**
  * Strategically replace spaces with line breaks, allowing no more than 70
  * chars per line.

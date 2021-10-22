@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2021 William Baker
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
  * deal in the Software without restriction, including without limitation the
@@ -83,7 +83,7 @@ class Segment {
         return this.place === Place.Bilabial || this.place === Place.Velar;
     }
 
-    /** 
+    /**
      * `true` iff the phoneme is an approximant, lateral approximant, or trill.
      */
     get isApprox() {
@@ -327,7 +327,7 @@ class ClusterEngine {
             return false;
         };
 
-        // Only apply word-initially
+        // Only apply rejections word-initially.
         if (rejectCluster(word[0]!, word[1]!)) {
             return ['REJECT'];
         }

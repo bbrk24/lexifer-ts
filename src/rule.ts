@@ -5,7 +5,7 @@ class Rule {
     private readonly str: string;
 
     constructor(rule: string) {
-        // Guard against improper '!' that the loop won't catch
+        // Guard against improper '!' that the loop won't catch.
         if (rule[0] === '!' || rule.includes('!!')) {
             throw new Error("misplaced '!' option: in non-duplicate "
                 + `environment: '${rule}'.`);
@@ -41,7 +41,7 @@ class Rule {
                  * Note: thoroughly test this. I'm not convinced I got this
                  * part right the first time around.
                  */
-                && allowRepeats === false === (rule[i + 1] === '!')
+                && allowRepeats === false == (rule[i + 1] === '!')
             ) {
                 ++minReps;
                 ++maxReps;

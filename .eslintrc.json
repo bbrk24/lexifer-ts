@@ -8,10 +8,6 @@
          */
         "default-case": "error",
         "default-case-last": "error",
-        "eqeqeq": [
-            "error",
-            "smart"
-        ],
         "no-eq-null": "error",
         /*
          * SPACING ERRORS
@@ -45,12 +41,7 @@
                 "max": 1
             }
         ],
-        "no-trailing-spaces": [
-            "error",
-            {
-                "ignoreComments": true
-            }
-        ],
+        "no-trailing-spaces": "error",
         "padded-blocks": [
             "error",
             "never"

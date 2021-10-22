@@ -9,9 +9,19 @@
         "eslint:recommended"
     ],
     "parserOptions": {
-        "ecmaVersion": 10 // compatible with Node 12
+        "ecmaVersion": 10, // compatible with Node 12
+        "requireConfigFile": false
     },
+    "parser": "@babel/eslint-parser",
     "rules": {
+        /*
+         * CODE ERRORS
+         * These are things that will affect the runtime and must be avoided.
+         */
+        "eqeqeq": [
+            "error",
+            "smart"
+        ],
         /*
          * SPACING ERRORS
          * Spacing inconsistencies can cause problems with git and should be
@@ -87,6 +97,7 @@
         "no-duplicate-imports": "error",
         "no-extra-parens": "error",
         "no-useless-constructor": "error",
+        "prefer-const": "error",
         "semi": "error",
         "space-before-function-paren": [
             "error",

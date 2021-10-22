@@ -8,10 +8,10 @@
 # to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 # copies of the Software, and to permit persons to whom the Software is
 # furnished to do so, subject to the following conditions:
-# 
+#
 # The above copyright notice and this permission notice shall be included in
 # all copies or substantial portions of the Software.
-# 
+#
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 # FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -23,6 +23,7 @@
 # run a linter pass
 echo 'Linting...'
 node_modules/.bin/eslint src/*.ts --fix || exit $?
+node_modules/.bin/eslint bin/index.js --fix || exit $?
 
 echo 'Combining files...'
 # put the version number and license comment here, so it ends up in all dist/
@@ -50,9 +51,13 @@ echo 'Minifying code...'
 # use terser
 # Even though --mangle-props shaves off 2kB, it ends up being more trouble
 # than it's worth.
-# -c unsafe replaces `new Error()` with `Error()`
+# -c unsafe replaces `new Error()` with `Error()`.
+# The mixture of semicolons=true/false was chosen to minimize file size after
+# gzip.
 node_modules/.bin/terser dist/index.js -mo dist/lexifer.min.js -c unsafe \
-    --ecma 2017 -f wrap_func_args=false,semicolons=false
+    -f wrap_func_args=false --ecma 2017
+node_modules/.bin/terser bin/index.js -mo bin/lexifer -c unsafe --ecma 2019 \
+    -f wrap_func_args=false,semicolons=false 
 
 # remove the trailing newline
 perl -pi -e 'chomp if eof' dist/lexifer.min.js

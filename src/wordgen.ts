@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2021 William Baker
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
  * deal in the Software without restriction, including without limitation the
@@ -198,7 +198,7 @@ class SoundSystem {
          * it to generate that many words, or freeze if it can't. It's
          * currently only used in paragraph mode, which chooses one word at a
          * time. I think it's safe to assume it's always possible to generate
-         * at least one valid word. 
+         * at least one valid word.
          */
         for (let i = 0; force || i < 3 * numWords; ++i) {
             const rule = ruleSelector.select();

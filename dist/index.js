@@ -1,6 +1,6 @@
 "use strict";
 /*!
-Lexifer TS v1.2.0-alpha.8
+Lexifer TS v1.2.0-alpha.9
 
 Copyright (c) 2021 William Baker
 
@@ -80,11 +80,16 @@ const main = (() => {
                 hash = newHash;
             }
             if (num) {
-                if (num < 0) {
+                if (num < 0 || num === Infinity) {
                     stderr(`Cannot generate ${num} words.`);
                     ans = phonDef.paragraph();
                 }
                 else {
+                    if (num !== Math.round(num)) {
+                        stderr(`Requested number of words (${num}) is not an `
+                            + `integer. Rounding to ${Math.round(num)}.`);
+                        num = Math.round(num);
+                    }
                     if (verbose) {
                         if (unsorted === false) {
                             stderr("** 'Unsorted' option always enabled in "
@@ -454,7 +459,7 @@ class Rule {
                 continue;
             }
             if (rule[i] === letter
-                && allowRepeats === false === (rule[i + 1] === '!')) {
+                && allowRepeats === false == (rule[i + 1] === '!')) {
                 ++minReps;
                 ++maxReps;
             }

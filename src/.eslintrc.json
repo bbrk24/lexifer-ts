@@ -131,7 +131,17 @@
             "warn",
             "index-signature"
         ],
-        "@typescript-eslint/keyword-spacing": "warn",
+        "@typescript-eslint/keyword-spacing": [
+            "warn",
+            {
+                // Allow `<T>this` etc
+                "overrides": {
+                    "this": {
+                        "before": false
+                    }
+                }
+            }
+        ],
         "@typescript-eslint/member-delimiter-style": [
             "warn",
             {
