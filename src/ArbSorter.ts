@@ -70,10 +70,11 @@ class ArbSorter {
      * @returns A sorted copy of the list.
      */
     sort(list: string[]) {
-        const l2 = list.filter(el => el !== '').map(this.wordAsValues);
+        const l2 = list.filter(el => el !== '').map(this.wordAsValues, this);
+
         l2.sort((a, b) => a[0]! - b[0]!);
 
-        return l2.map(this.valuesAsWord);
+        return l2.map(this.valuesAsWord, this);
     }
 }
 

@@ -1,6 +1,6 @@
 "use strict";
 /*!
-Lexifer TS v1.2.0-alpha.9
+Lexifer TS v1.2.0-alpha.10
 
 Copyright (c) 2021 William Baker
 
@@ -52,9 +52,9 @@ class ArbSorter {
             .filter((_, i) => i % 2);
     }
     sort(list) {
-        const l2 = list.filter(el => el !== '').map(this.wordAsValues);
+        const l2 = list.filter(el => el !== '').map(this.wordAsValues, this);
         l2.sort((a, b) => a[0] - b[0]);
-        return l2.map(this.valuesAsWord);
+        return l2.map(this.valuesAsWord, this);
     }
 }
 const main = (() => {
