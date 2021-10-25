@@ -1,5 +1,5 @@
 /*!
-Lexifer TS v1.1.2-rc.0
+Lexifer TS v1.1.2
 
 Copyright (c) 2021 William Baker
 
