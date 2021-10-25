@@ -1,9 +1,7 @@
 # lexifer
 
-![version](https://img.shields.io/npm/v/lexifer)
-![license](https://img.shields.io/npm/l/lexifer)
-![issue count](https://img.shields.io/github/issues-raw/bbrk24/lexifer-ts)
-![git activity](https://img.shields.io/github/commit-activity/m/bbrk24/lexifer-ts)
+[![version][1]][2] [![license][3]][4] [![issue count][5]][6]
+[![git activity][7]][8]
 
 This is a TypeScript implementation of William Annis's
 [Lexifer](https://github.com/wmannis/lexifer).
@@ -80,3 +78,12 @@ online version. If a fatal error is hit, this may be empty string.
 The main-level `tsconfig.json` is the one actually used during compilation.
 `src/tsconfig.json` is only used to aid the IDE, as otherwise unexpected errors
 may occur when the build script is run.
+
+[1]: https://img.shields.io/npm/v/lexifer
+[2]: https://www.npmjs.com/package/lexifer "npm package"
+[3]: https://img.shields.io/npm/l/lexifer
+[4]: https://github.com/bbrk24/lexifer-ts/blob/master/LICENSE "license text"
+[5]: https://img.shields.io/github/issues-raw/bbrk24/lexifer-ts
+[6]: https://github.com/bbrk24/lexifer-ts/issues "issues page"
+[7]: https://img.shields.io/github/commit-activity/m/bbrk24/lexifer-ts
+[8]: https://github.com/bbrk24/lexifer-ts/commits "commit log"
