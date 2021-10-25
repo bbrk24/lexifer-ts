@@ -42,7 +42,7 @@ const encodings: readonly BufferEncoding[] = [
 const argv: {
     [x: string]: unknown,
     'one-per-line'?: boolean,
-    unsorted: boolean,
+    unsorted?: boolean,
     'number-of-words'?: number,
     verbose?: boolean,
     encoding: BufferEncoding,
@@ -70,19 +70,39 @@ const argv: {
     .option('verbose', {
         alias:    'V',
         describe: 'Display all generation steps',
-        type:     'boolean'
+        type:     'boolean',
+        implies:  'unsorted'
     })
     .option('encoding', {
         alias:    'e',
         describe: 'What file encoding to use',
-        type:     'string',
-        default:  'utf-8'
+        default:  'utf-8',
+        choices:  encodings,
+        coerce:   (enc: string) => {
+            // ignore case, and allow 'utf-16le' as a synonym for 'utf16le'
+            let littleEnc = enc.toLowerCase();
+
+            if (littleEnc === 'utf-16le') {
+                littleEnc = 'utf16le';
+            } else if (!(<string[]>encodings).includes(littleEnc)) {
+                let errorString = 'Invalid values:\n  Argument: encoding, '
+                    + `Given: "${enc}", Choices: `;
+
+                for (let i = 0; i < encodings.length; ++i) {
+                    if (i !== 0) {
+                        errorString += ', ';
+                    }
+
+                    errorString += `"${encodings[i]}"`;
+                }
+
+                throw new Error(errorString);
+            }
+
+            return littleEnc;
+        }
     })
-    // verbose means unsorted
-    .implies('verbose', 'unsorted')
-    // list of valid encodings
-    .choices('encoding', encodings)
-    // validate arguments
+    // ensure that they don't pass in multiple files
     .check(argv => {
         const length = argv._.length;
 
@@ -101,19 +121,35 @@ const argv: {
 // If no filename is provided, read from stdin -- support piping
 const fileDescriptor = argv._[0] ?? 0;
 
-console.log(
-    main(
-        readFileSync(fileDescriptor, argv.encoding),
-        argv['number-of-words'],
-        argv.verbose,
-        argv.unsorted,
-        argv['one-per-line'],
-        error => {
-            if (error instanceof Error) {
-                throw error;
-            } else {
-                console.warn(error);
+try {
+    const fileText = readFileSync(fileDescriptor, argv.encoding);
+
+    console.log(
+        main(
+            fileText,
+            argv['number-of-words'],
+            argv.verbose,
+            argv.unsorted,
+            argv['one-per-line'],
+            e => {
+                if (e instanceof Error) {
+                    process.exitCode = 1;
+                }
+
+                console.error(e);
             }
-        }
-    )
-);
+        )
+    );
+} catch (e) {
+    /*
+     * For some reason, on Windows, if no pipe is provided then stdin is a
+     * directory. Obviously, you can't read a directory as a file, so the
+     * readFileSync() call errors.
+     * As for why that is, I'm baffled too. All I know is that somewhere down
+     * the line readFileSync() attempts to stat the file, and doing so with
+     * file descriptor 0 results in EISDIR.
+     */
+    console.error('Error: No input or pipe provided; cannot read from stdin on'
+        + ' Windows.');
+    process.exitCode = 1;
+}

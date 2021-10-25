@@ -1,11 +1,13 @@
 # Documentation
 
-This file explains the usage of the web app.
+This file explains the usage of Lexifer.
 
 ## Table of contents
 
 > - [Inputs](#inputs)
+>     - [Online](#online)
 >     - [API](#api)
+>     - [CLI](#cli)
 > - [The Phonology Definition](#the-phonology-definition)
 >     - [Comments](#comments)
 >     - [Options – the `with:` directive](#options--the-with-directive)
@@ -25,6 +27,8 @@ This file explains the usage of the web app.
 >     - [Cluster Fields](#cluster-fields)
 
 ## Inputs
+
+### Online
 
 The web app has five inputs.
 
@@ -93,6 +97,16 @@ lexifer(
     }
 )
 ```
+
+### CLI
+
+The CLI for this version of Lexifer was designed to be compatible with the
+original Python version. The `-o`, `-u`, and `-n` flags work practically the
+same as for that version. If, for some reason, you wanted to specify `-o` or
+`-u` as false (rather than implying that by leaving it out), you may say
+`-o false` and `-u false` respectively. Verbose mode is enabled with `-V`,
+and you may specify the encoding with `-e`. If not given, the default
+encoding is UTF-8. Note that `-u false -V` is not valid.
 
 ## The Phonology Definition
 
