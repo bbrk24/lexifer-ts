@@ -5,6 +5,7 @@ This file explains the usage of the web app.
 ## Table of contents
 
 > - [Inputs](#inputs)
+>     - [API](#api)
 > - [The Phonology Definition](#the-phonology-definition)
 >     - [Comments](#comments)
 >     - [Options – the `with:` directive](#options--the-with-directive)
@@ -63,6 +64,35 @@ example output might look like:
 > (..+)\1+ > REJECT – REJECT
 
 The more filters and rejections you have, the longer the output tends to be.
+
+### API
+
+The inputs to the API are generally the same as for the web app. The first
+input represents the definition, the second input is an optional number for
+the number of words, and the next three inputs are optional booleans
+corresponding to the checkboxes, although not in the same order. There is a
+final parameter, however, which is used to capture errors.
+
+If the main function simply threw its errors, they would be logged to the
+console without the end user ever seeing them. The last argument to the API
+function call is the error handler. In the web app, this puts the error message
+on the page so the user can see it. In the API, it defaults to `console.error`
+if not provided. I expect a common callback to look something like this:
+
+```js
+lexifer(
+    // other arguments
+    err => {
+        if (err instanceof Error) {
+            // Lexifer encountered a problem and stopped.
+            throw err;
+        } else {
+            // Lexifer has a concern but may proceed.
+            console.warn(err);
+        }
+    }
+)
+```
 
 ## The Phonology Definition
 
@@ -217,16 +247,20 @@ If you have a `with:` directive, there must also be `letters:`. If not,
 It also affects how digraphs are parsed, even if `std-ipa-features` was chosen.
 For example, consider the following statements:
 
-    with: std-ipa-features
-    letters: t ʃ
+```
+with: std-ipa-features
+letters: t ʃ
+```
 
 In this case, if `tʃ` occurs, it will not be treated as an affricate *tʃ*, but
 as a plosive *t* followed by a sibilant *ʃ*. Additionally, words starting with
 *t* will be sorted alphabetically above words starting with *ʃ*.  
 Contrast this with the following statements:
 
-    with: std-ipa-features
-    letters: tʃ t ʃ
+```
+with: std-ipa-features
+letters: tʃ t ʃ
+```
 
 In this case, `tʃ` is treated as an affricate. Additionally, words starting
 with *tʃ* will be sorted above words starting with *tt*, even though *t* by
@@ -241,15 +275,19 @@ This is the main purpose of the def file. There are many parts to this.
 These are groupings of phonemes that have one-letter names. For example, here
 are the classes from the default definition:
 
-    C = t n k m ch l ʔ s r d h w b y p g
-    D = n l ʔ t k r p
-    V = a i e á u o
+```
+C = t n k m ch l ʔ s r d h w b y p g
+D = n l ʔ t k r p
+V = a i e á u o
+```
 
 This creates three groupings. `C` is the group of all consonants, `V` is the
 group of all vowels, and `D` is a group of some of the consonants. A class
 cannot contain another class; this is not legal:
 
-    C = D m ch s d h w b y g
+```
+C = D m ch s d h w b y g
+```
 
 If you do this, and you have a `letters:` directive, Lexifer will warn you:
 
@@ -262,12 +300,14 @@ above example, when Lexifer needs to choose a `C`, it will choose `t` the most,
 with the frequencies, you can use a colon (`:`) to specify the weight for each
 phoneme, like so:
 
-    V = a e i o u
-    # V has approximately the following probabilities:
-    # a: 43%, e: 26%, i: 17%, o:10%, u: 4%
-    U = a:5 e:4 i:3 o:2 u:1
-    # U has approximately the following probabilities:
-    # a: 33%, e: 27%, i: 20%, o: 13%, u: 7%
+```
+V = a e i o u
+# V has approximately the following probabilities:
+# a: 43%, e: 26%, i: 17%, o: 10%, u: 4%
+U = a:5 e:4 i:3 o:2 u:1
+# U has approximately the following probabilities:
+# a: 33%, e: 27%, i: 20%, o: 13%, u: 7%
+```
 
 Weights are relative, so `a:5 e:4 i:3 o:2 u:1` is the same as
 `a:50 e:40 i:30 o:20 u:10`. Changing the order or weights of phonemes is a good
@@ -290,12 +330,16 @@ Phonemes or classes that are optional can be indicated by a `?`. For example,
 different. The `random-rate:` directive specifies how common these are. For
 example, 
 
-    random-rate: 25
-    words: CVD?
+```
+random-rate: 25
+words: CVD?
+```
 
 is equivalent to
 
-    words: CV:75 CVD:25
+```
+words: CV:75 CVD:25
+```
 
 The default random-rate is 10%.
 
@@ -318,13 +362,17 @@ way you may think.
 
 The default definition has one macro:
 
-    $S = CVD?
+```
+$S = CVD?
 
-    words: V?$S$S V?$S V?$S$S$S
+words: V?$S$S V?$S V?$S$S$S
+```
 
 This is exactly equivalent to the following definition:
 
-    words: V?CVD?CVD? V?CVD? V?CVD?CVD?CVD?
+```
+words: V?CVD?CVD? V?CVD? V?CVD?CVD?CVD?
+```
 
 However, since most syllables are `CVD?`, it is quicker to use a macro.
 
@@ -335,9 +383,11 @@ both directives in the same definition.
 
 `categories:` lets you define multiple types of words. The general syntax is:
 
-    categories: cat1 cat2 # ...etc
-    cat1 = # word shapes for cat1
-    cat2 = # word shapes for cat2
+```
+categories: cat1 cat2 # ...etc
+cat1 = # word shapes for cat1
+cat2 = # word shapes for cat2
+```
 
 The categories themselves can also be weighted, but these weights only apply in
 paragraph mode. If you give a number of words, that is the number of words
@@ -345,8 +395,10 @@ generated per category. This is where a weight of 0 could be helpful. If you
 want to generate parts of a word when you enter a number, but only show
 complete words in paragraph mode, you could have something like:
 
-    categories: root:0 prefix:0 suffix:0 full-word:1
-    # ...definitions of each category...
+```
+categories: root:0 prefix:0 suffix:0 full-word:1
+# ...definitions of each category...
+```
 
 The order that the categories are declared is the order they are presented when
 generating a specific number of words.
@@ -361,19 +413,25 @@ Filters are expressed as `filter: pattern > replacement`, and run in the order
 they are encountered. For example, if you want to spell \[ŋ\] the same as
 \[n\], you would say:
 
-    filter: ŋ > n
+```
+filter: ŋ > n
+```
 
 This will probably be common in files that use `std-assimilations`.
 
 Multiple filters on one line are separated by semicolons:
 
-    filter: pattern1 > replacement1; pattern2 > replacement2
+```
+filter: pattern1 > replacement1; pattern2 > replacement2
+```
 
 This does not mean that the two filters are run at the same time. It is
 identical to:
 
-    filter: pattern1 > replacement1
-    filter: pattern2 > replacement2
+```
+filter: pattern1 > replacement1
+filter: pattern2 > replacement2
+```
 
 If the replacement is `!`, the pattern is removed from the word, but the rest
 of the word is left alone.
@@ -381,12 +439,16 @@ of the word is left alone.
 To outright forbid a sequence from occurring, use the `reject:` directive. The
 default definition contains a few of these. The first two are:
 
-    reject: wu yi
+```
+reject: wu yi
+```
 
 This prevents any word from having *wu* or *yi*. In reality, `reject:` is an
 abbreviation, and that statement is equivalent to:
 
-    filter: wu > REJECT; yi > REJECT
+```
+filter: wu > REJECT; yi > REJECT
+```
 
 As such, you can intersperse filters and rejections, and they will be performed
 in order.
@@ -416,10 +478,12 @@ Cluster fields are a way to put a lot of related filters or rejections in a
 smaller space. They are laid out like tables, and must start with `%`. For
 example, a cluster field could look like:
 
-    % a  i  u
-    a +  +  o
-    i -  +  uu
-    u -  -  +
+```
+% a  i  u
+a +  +  o
+i -  +  uu
+u -  -  +
+```
 
 The first character is the row, and the second character is the column. In this
 example, `au` becomes *o* and `iu` becomes *uu*. `+` means to leave the

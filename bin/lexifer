@@ -1,5 +1,7 @@
 #! /usr/bin/env node
-/*!
+"use strict"
+
+;/*!
  * Copyright (c) 2021 William Baker
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -19,8 +21,10 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
- */
-const main=require("../dist"),argv=require("yargs/yargs")(process.argv.slice(2)).alias({help:"?",version:"v"}).option("one-per-line",{alias:"o",describe:"Display one word per line",type:"boolean"}).option("unsorted",{alias:"u",describe:"Leave output unsorted",type:"boolean"}).option("number-of-words",{alias:"n",describe:"How many words to generate",type:"number"}).option("verbose",{alias:"V",describe:"Display all generation steps",type:"boolean"}).option("encoding",{alias:"e",describe:"What file encoding to use",type:"string",default:"utf-8"}).implies("verbose","unsorted").choices("encoding",["ascii","base64","base64url","binary","hex","latin1","ucs-2","ucs2","utf-8","utf16le","utf8"]).check(e=>{const r=e._.length
+ */var _a,__importDefault=this&&this.__importDefault||function(e){return e&&e.__esModule?e:{default:e}}
+Object.defineProperty(exports,"__esModule",{value:!0})
+const fs_1=require("fs"),yargs_1=__importDefault(require("yargs/yargs")),dist_1=__importDefault(require("../dist")),encodings=["ascii","base64","binary","hex","latin1","ucs-2","ucs2","utf-8","utf16le","utf8"],argv=(0,yargs_1.default)(process.argv.slice(2)).alias({help:"?",version:"v"}).option("one-per-line",{alias:"o",describe:"Display one word per line",type:"boolean"}).option("unsorted",{alias:"u",describe:"Leave output unsorted",type:"boolean"}).option("number-of-words",{alias:"n",describe:"How many words to generate",type:"number"}).option("verbose",{alias:"V",describe:"Display all generation steps",type:"boolean"}).option("encoding",{alias:"e",describe:"What file encoding to use",type:"string",default:"utf-8"}).implies("verbose","unsorted").choices("encoding",encodings).check(e=>{const r=e._.length
 if(r>1)throw Error(`Expected 1 file (saw ${r}).`)
-return 0===e["number-of-words"]&&console.error("Cannot generate 0 words."),!0}).argv,{readFileSync}=require("fs"),fileDescriptor=argv._[0]??0
-console.log(main(readFileSync(fileDescriptor,argv.encoding),argv["number-of-words"],argv.verbose,argv.unsorted,argv["one-per-line"]))
+return 0===e["number-of-words"]&&console.error("Cannot generate 0 words."),!0}).argv,fileDescriptor=null!==(_a=argv._[0])&&void 0!==_a?_a:0
+console.log((0,dist_1.default)((0,fs_1.readFileSync)(fileDescriptor,argv.encoding),argv["number-of-words"],argv.verbose,argv.unsorted,argv["one-per-line"],e=>{if(e instanceof Error)throw e
+console.warn(e)}))

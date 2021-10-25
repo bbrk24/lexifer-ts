@@ -1,5 +1,5 @@
 #! /usr/bin/env node
-
+"use strict";
 /*!
  * Copyright (c) 2021 William Baker
  *
@@ -21,94 +21,73 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
-
-const main = require('../dist');
-
-/**
- * @type {{
- *     [x: string]: unknown,
- *     'one-per-line'?: boolean,
- *     unsorted: boolean,
- *     'number-of-words'?: number,
- *     verbose?: boolean,
- *     encoding?: string,
- *     _: string[],
- *     $0: string
- * }}
- */
-const argv = require('yargs/yargs')(process.argv.slice(2))
-    // aliases for default flags
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+var _a;
+Object.defineProperty(exports, "__esModule", { value: true });
+const fs_1 = require("fs");
+const yargs_1 = __importDefault(require("yargs/yargs"));
+const dist_1 = __importDefault(require("../dist"));
+const encodings = [
+    'ascii',
+    'base64',
+    'binary',
+    'hex',
+    'latin1',
+    'ucs-2',
+    'ucs2',
+    'utf-8',
+    'utf16le',
+    'utf8'
+];
+const argv = (0, yargs_1.default)(process.argv.slice(2))
     .alias({ help: '?', version: 'v' })
-    // custom options
     .option('one-per-line', {
-        alias:    'o',
-        describe: 'Display one word per line',
-        type:     'boolean'
-    })
+    alias: 'o',
+    describe: 'Display one word per line',
+    type: 'boolean'
+})
     .option('unsorted', {
-        alias:    'u',
-        describe: 'Leave output unsorted',
-        type:     'boolean'
-    })
+    alias: 'u',
+    describe: 'Leave output unsorted',
+    type: 'boolean'
+})
     .option('number-of-words', {
-        alias:    'n',
-        describe: 'How many words to generate',
-        type:     'number'
-    })
+    alias: 'n',
+    describe: 'How many words to generate',
+    type: 'number'
+})
     .option('verbose', {
-        alias:    'V',
-        describe: 'Display all generation steps',
-        type:     'boolean'
-    })
+    alias: 'V',
+    describe: 'Display all generation steps',
+    type: 'boolean'
+})
     .option('encoding', {
-        alias:    'e',
-        describe: 'What file encoding to use',
-        type:     'string',
-        default:  'utf-8'
-    })
-    // verbose means unsorted
+    alias: 'e',
+    describe: 'What file encoding to use',
+    type: 'string',
+    default: 'utf-8'
+})
     .implies('verbose', 'unsorted')
-    // list of valid encodings
-    .choices('encoding', [
-        'ascii',
-        'base64',
-        'base64url',
-        'binary',
-        'hex',
-        'latin1',
-        'ucs-2',
-        'ucs2',
-        'utf-8',
-        'utf16le',
-        'utf8'
-    ])
-    // validate arguments
+    .choices('encoding', encodings)
     .check(argv => {
-        const length = argv._.length;
-
-        if (length > 1) {
-            throw new Error(`Expected 1 file (saw ${length}).`);
-        }
-
-        if (argv['number-of-words'] === 0) {
-            console.error('Cannot generate 0 words.');
-        }
-
-        return true;
-    })
+    const length = argv._.length;
+    if (length > 1) {
+        throw new Error(`Expected 1 file (saw ${length}).`);
+    }
+    if (argv['number-of-words'] === 0) {
+        console.error('Cannot generate 0 words.');
+    }
+    return true;
+})
     .argv;
-
-const { readFileSync } = require('fs');
-
-// If no filename is provided, read from stdin -- support piping
-const fileDescriptor = argv._[0] ?? 0;
-
-console.log(
-    main(
-        readFileSync(fileDescriptor, argv.encoding),
-        argv['number-of-words'],
-        argv.verbose,
-        argv.unsorted,
-        argv['one-per-line']
-    )
-);
+const fileDescriptor = (_a = argv._[0]) !== null && _a !== void 0 ? _a : 0;
+console.log((0, dist_1.default)((0, fs_1.readFileSync)(fileDescriptor, argv.encoding), argv['number-of-words'], argv.verbose, argv.unsorted, argv['one-per-line'], error => {
+    if (error instanceof Error) {
+        throw error;
+    }
+    else {
+        console.warn(error);
+    }
+}));

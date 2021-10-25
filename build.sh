@@ -23,7 +23,7 @@
 # run a linter pass
 echo 'Linting...'
 node_modules/.bin/eslint src/*.ts --fix || exit $?
-node_modules/.bin/eslint bin/index.js --fix || exit $?
+node_modules/.bin/eslint bin/index.ts --fix || exit $?
 
 echo 'Combining files...'
 # put the version number and license comment here, so it ends up in all dist/
@@ -39,6 +39,16 @@ echo 'Combining files...'
 
 echo 'Compiling to JS...'
 node_modules/.bin/tsc || exit $?
+
+# prepare for use as a package by declaring exports
+# ES6 and CommonJS modules can't be used with only one outfile for some reason
+echo 'module.exports = main;' >> dist/index.js
+echo 'export = main;' >> dist/index.d.ts
+
+(
+    cd bin 
+    ../node_modules/.bin/tsc
+) || exit $?
 
 # change CRLF to LF (thanks Microsoft)
 sed -e 's/^M//' dist/index.js > tempfile
@@ -61,12 +71,6 @@ node_modules/.bin/terser bin/index.js -mo bin/lexifer -c unsafe --ecma 2019 \
 
 # remove the trailing newline
 perl -pi -e 'chomp if eof' dist/lexifer.min.js
-
-# prepare for use as a package by declaring exports
-# can't be done earlier because otherwise TSC tries to prepare for a module loader
-# ES6 and CommonJS modules can't be used with only one outfile for some reason
-echo 'module.exports = main;' >> dist/index.js
-echo 'export = main;' >> dist/index.d.ts
 
 # and now it's done
 echo 'Done.'

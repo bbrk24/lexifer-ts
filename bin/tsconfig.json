@@ -1,0 +1,17 @@
+{
+    "files": ["./index.ts"],
+    "compilerOptions": {
+        "allowUnreachableCode": false,
+        "allowUnusedLabels": false,
+        "noImplicitReturns": true,
+        "noUncheckedIndexedAccess": true,
+        "strict": true,
+        "noEmitOnError": true,
+        "outDir": ".",
+        "removeComments": true,
+        "target": "ES2019",
+        "lib": ["ES2019"],
+        "module": "commonjs",
+        "esModuleInterop": true
+    }
+}
