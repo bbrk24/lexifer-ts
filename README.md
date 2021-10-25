@@ -1,5 +1,10 @@
 # lexifer
 
+![version](https://img.shields.io/npm/v/lexifer)
+![license](https://img.shields.io/npm/l/lexifer)
+![issue count](https://img.shields.io/github/issues-raw/bbrk24/lexifer-ts)
+![git activity](https://img.shields.io/github/commit-activity/m/bbrk24/lexifer-ts)
+
 This is a TypeScript implementation of William Annis's
 [Lexifer](https://github.com/wmannis/lexifer).
 
