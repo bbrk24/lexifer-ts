@@ -25,7 +25,7 @@ import Word from './word';
 import { SoundSystem, textify, invalidItemAndWeight } from './wordgen';
 
 class PhonologyDefinition {
-    private macros: [RegExp, string][] = [];
+    private readonly macros: [RegExp, string][] = [];
     private letters: string[] = [];
     private phClasses: string[] = [];
     private categories: string[] = [];
@@ -43,7 +43,7 @@ class PhonologyDefinition {
 
     constructor(
         defFile: string,
-        private stderr: (inp: Error | string) => void
+        private readonly stderr: (inp: Error | string) => void
     ) {
         if (defFile.trim() === '') {
             throw new Error('Please include a definition.');
@@ -205,7 +205,7 @@ class PhonologyDefinition {
         const rules = line.split(/\s+/gu);
         const weighted = line.includes(':');
 
-        if (line[0] === '?' || line.match(/\s\?[^?!]/u)) {
+        if (line[0] === '?' || /\s\?[^?!]/u.exec(line)) {
             // This doesn't need /g since I'm using it as a boolean test.
             throw new Error("Rule cannot start with '?'.");
         }
@@ -236,11 +236,11 @@ class PhonologyDefinition {
             // Inform the user of empty words. Error if it will only produce
             // empty words, but if it only sometimes produces empty words, only
             // warn them.
-            if (!rule.match(/[^?!]/u)) {
+            if (!/[^?!]/u.exec(rule)) {
                 throw new Error(`'${rules[i]}'`
                     + `${cat ? ` (in category ${cat})` : ''} will only `
                     + 'produce empty words.');
-            } else if (rule.match(/^\?*[^?!]!?\?+!?$/u)) {
+            } else if (/^\?*[^?!]!?\?+!?$/u.exec(rule)) {
                 // Here, we don't know what random-rate or category weight is,
                 // so this may not even be an issue.
                 this.stderr(`'${rules[i]}'`

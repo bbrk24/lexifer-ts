@@ -45,14 +45,14 @@ class Category extends Map<Rule, number> {
 }
 
 class SoundSystem {
+    private readonly filters: [string, string][] = [];
     private phonemeset: { [key: string]: WeightedSelector<string> } = {};
-    private filters: [string, string][] = [];
+    private ruleset: { [key: string]: Category } = {};
 
     randpercent = 10;
     useAssim = false;
     useCoronalMetathesis = false;
     useRejections = false;
-    ruleset: { [key: string]: Category } = {};
     sorter: ArbSorter | null = null;
 
     constructor() {
@@ -65,7 +65,7 @@ class SoundSystem {
         };
     }
 
-    private applyFilters(word: Word) {
+    private applyFilters(word: Readonly<Word>) {
         if (this.useAssim) {
             word.applyAssimilations();
         }
@@ -238,7 +238,7 @@ class SoundSystem {
     }
 }
 
-const textify = (phsys: SoundSystem, sentences = 25) => {
+const textify = (phsys: Readonly<SoundSystem>, sentences = 25) => {
     let text = '';
 
     for (let i = 0; i < sentences; ++i) {

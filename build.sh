@@ -28,10 +28,10 @@ node_modules/.bin/eslint bin/index.ts --fix || exit $?
 echo 'Combining files...'
 # put the version number and license comment here, so it ends up in all dist/
 # files
+version=$(grep version package.json | cut -d '"' -f 4)
 {
     # the use of `/*!` ensures compilation preserves it
-    printf '/*!\nLexifer TS v%s\n\n' \
-        "$(grep version package.json | cut -d '"' -f 4)"
+    printf '/*!\nLexifer TS v%s\n\n' "$version"
     cat LICENSE
     echo '*/'
     sed '/export/d;/import/d' src/*.ts
@@ -66,13 +66,32 @@ echo 'Minifying code...'
 # gzip.
 node_modules/.bin/terser dist/index.js -mo dist/lexifer.min.js -c unsafe \
     -f wrap_func_args=false --ecma 2017
-node_modules/.bin/terser bin/index.js -mo bin/lexifer -c unsafe --ecma 2019 \
-    -f wrap_func_args=false,semicolons=false 
+node_modules/.bin/terser bin/index.js -mc unsafe --ecma 2019 \
+    -f wrap_func_args=false,semicolons=false > bin/lexifer
 
-# remove the trailing newline
-perl -pi -e 'chomp if eof' dist/lexifer.min.js
+# We never put the version number in the CLI file!
+# Somewhat fortunately, due to a bug in terser, `-f semicolons=false` leaves a
+# blank line near the top of the file. Replace that with the version number
+# comment.
+sed "s|^$|/*! Lexifer TS v${version} */|" bin/lexifer > tempfile
+mv tempfile bin/lexifer
+
+# If only the version number changed, the new version didn't actually change
+# anything.
+for filename in dist/* bin/lexifer
+do
+    # POSIX sh doesn't have arrays, so I can't just `| read -ra`
+    diffstr=$(git diff --numstat "$filename")
+    diffins=$(echo "$diffstr" | awk '{print $1}')
+    diffdel=$(echo "$diffstr" | awk '{print $2}')
+
+    if [ "$diffins" = '1' ] && [ "$diffdel" = '1' ]
+    then
+        git restore "$filename"
+    fi
+done
 
 # and now it's done
 echo 'Done.'
-echo 'Minified file size:' \
-    "$(wc -c dist/lexifer.min.js | awk '{print $1}') bytes"
+echo 'Minified file sizes:'
+wc -c dist/lexifer.min.js bin/lexifer

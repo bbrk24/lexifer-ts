@@ -43,7 +43,7 @@ const argv: {
     [x: string]: unknown,
     'one-per-line'?: boolean,
     unsorted?: boolean,
-    'number-of-words'?: number,
+    number?: number,
     verbose?: boolean,
     encoding: BufferEncoding,
     _: string[],
@@ -62,7 +62,7 @@ const argv: {
         describe: 'Leave output unsorted',
         type:     'boolean'
     })
-    .option('number-of-words', {
+    .option('number', {
         alias:    'n',
         describe: 'How many words to generate',
         type:     'number'
@@ -70,8 +70,7 @@ const argv: {
     .option('verbose', {
         alias:    'V',
         describe: 'Display all generation steps',
-        type:     'boolean',
-        implies:  'unsorted'
+        type:     'boolean'
     })
     .option('encoding', {
         alias:    'e',
@@ -85,6 +84,7 @@ const argv: {
             if (littleEnc === 'utf-16le') {
                 littleEnc = 'utf16le';
             } else if (!(<string[]>encodings).includes(littleEnc)) {
+                // throw an error indicating an invalid encoding
                 let errorString = 'Invalid values:\n  Argument: encoding, '
                     + `Given: "${enc}", Choices: `;
 
@@ -110,7 +110,7 @@ const argv: {
             throw new Error(`Expected 1 file (saw ${length}).`);
         }
 
-        if (argv['number-of-words'] === 0) {
+        if (argv.number === 0) {
             console.error('Cannot generate 0 words.');
         }
 
@@ -127,7 +127,7 @@ try {
     console.log(
         main(
             fileText,
-            argv['number-of-words'],
+            argv.number,
             argv.verbose,
             argv.unsorted,
             argv['one-per-line'],

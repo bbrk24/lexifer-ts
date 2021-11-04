@@ -25,7 +25,7 @@ class WeightedSelector<T> {
     private readonly weights: number[];
     private readonly sum: number;
 
-    constructor(dic: Map<T, number | undefined>) {
+    constructor(dic: Readonly<Map<T, number | undefined>>) {
         this.keys = [];
         this.weights = [];
 

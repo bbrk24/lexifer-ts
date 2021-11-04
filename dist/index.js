@@ -1,6 +1,6 @@
 "use strict";
 /*!
-Lexifer TS v1.2.0-alpha.11
+Lexifer TS v1.2.0-alpha.12
 
 Copyright (c) 2021 William Baker
 
@@ -284,7 +284,7 @@ class PhonologyDefinition {
     addRules(line, cat) {
         const rules = line.split(/\s+/gu);
         const weighted = line.includes(':');
-        if (line[0] === '?' || line.match(/\s\?[^?!]/u)) {
+        if (line[0] === '?' || /\s\?[^?!]/u.exec(line)) {
             throw new Error("Rule cannot start with '?'.");
         }
         if (line.includes('??')) {
@@ -306,12 +306,12 @@ class PhonologyDefinition {
                 rule = rules[i];
                 weight = 10.0 / (i + 1) ** 0.9;
             }
-            if (!rule.match(/[^?!]/u)) {
+            if (!/[^?!]/u.exec(rule)) {
                 throw new Error(`'${rules[i]}'`
                     + `${cat ? ` (in category ${cat})` : ''} will only `
                     + 'produce empty words.');
             }
-            else if (rule.match(/^\?*[^?!]!?\?+!?$/u)) {
+            else if (/^\?*[^?!]!?\?+!?$/u.exec(rule)) {
                 this.stderr(`'${rules[i]}'`
                     + `${cat ? ` (in category ${cat})` : ''} may produce `
                     + 'empty words.');
@@ -582,8 +582,7 @@ class ClusterEngine {
             const data1 = ClusterEngine.segments.find(el => el.toString() === ph1);
             if (data1 && data1.place === 2) {
                 const data2 = ClusterEngine.segments.find(el => el.toString() === ph2);
-                if (data2
-                    && data2.isPeripheral
+                if ((data2 === null || data2 === void 0 ? void 0 : data2.isPeripheral)
                     && data2.isStop
                     && data2.manner === data1.manner) {
                     return [ph2, ph1];
@@ -602,8 +601,7 @@ class ClusterEngine {
             const data1 = ClusterEngine.segments.find(el => el.toString() === ph1);
             if (data1 && data1.manner !== 3) {
                 const data2 = ClusterEngine.segments.find(el => el.toString() === ph2);
-                if (data2
-                    && data2.isApprox
+                if ((data2 === null || data2 === void 0 ? void 0 : data2.isApprox)
                     && data1.manner !== 9
                     && data2.place === data1.place) {
                     if (data2.manner === 9) {
@@ -793,13 +791,13 @@ class Category extends Map {
 }
 class SoundSystem {
     constructor() {
-        this.phonemeset = {};
         this.filters = [];
+        this.phonemeset = {};
+        this.ruleset = {};
         this.randpercent = 10;
         this.useAssim = false;
         this.useCoronalMetathesis = false;
         this.useRejections = false;
-        this.ruleset = {};
         this.sorter = null;
         Fragment.getRandomPhoneme = phoneme => {
             if (phoneme in this.phonemeset) {

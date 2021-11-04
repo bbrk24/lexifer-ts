@@ -69,7 +69,7 @@ class Segment {
      * @param arr The properties of the segment -- `ipa`, `digraph`, `voiced`,
      * `place`, and `manner` respectively.
      */
-    constructor(arr: [string, string, boolean, Place, Manner]) {
+    constructor(arr: readonly [string, string, boolean, Place, Manner]) {
         [this.ipa, this.digraph, this.voiced, this.place, this.manner] = arr;
     }
 
@@ -193,7 +193,7 @@ class ClusterEngine {
      * @param word The word, as an array of graphs.
      * @returns A copy of the word that has assimilations applied to it.
      */
-    applyAssimilations(word: string[]) {
+    applyAssimilations(word: readonly string[]) {
         const nasalAssimilate = (ph1: string, ph2: string) => {
             const data1 = ClusterEngine.segments.find(el =>
                 el.toString() === ph1);
@@ -254,7 +254,7 @@ class ClusterEngine {
      * @param word The word, as an array of graphs.
      * @returns A copy of the word that has coronal metathesis applied to it.
      */
-    applyCoronalMetathesis(word: string[]) {
+    applyCoronalMetathesis(word: readonly string[]) {
         const coronalMetathesis = (
             ph1: string,
             ph2: string
@@ -267,8 +267,7 @@ class ClusterEngine {
                     el.toString() === ph2);
 
                 if (
-                    data2
-                    && data2.isPeripheral
+                    data2?.isPeripheral
                     && data2.isStop
                     && data2.manner === data1.manner
                 ) {
@@ -296,7 +295,7 @@ class ClusterEngine {
      * @param word The word, as an array of graphs.
      * @returns Either the original word, or `['REJECT']`.
      */
-    applyRejections(word: string[]) {
+    applyRejections(word: readonly string[]) {
         const rejectCluster = (ph1: string, ph2: string) => {
             const data1 = ClusterEngine.segments.find(
                 el => el.toString() === ph1
@@ -308,8 +307,7 @@ class ClusterEngine {
                 );
 
                 if (
-                    data2
-                    && data2.isApprox
+                    data2?.isApprox
                     && data1.manner !== Manner.Trill
                     && data2.place === data1.place
                 ) {

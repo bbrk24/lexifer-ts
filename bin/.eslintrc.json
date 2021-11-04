@@ -12,6 +12,7 @@
          * CODE ERRORS
          * These are things that will affect the runtime and must be avoided.
          */
+        "@typescript-eslint/no-base-to-string": "error",
         "eqeqeq": [
             "error",
             "smart"

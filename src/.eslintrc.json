@@ -9,6 +9,43 @@
     },
     "rules": {
         /*
+         * STYLE WARNINGS
+         * These are dispreffered styles that do not relate to git issues and
+         * are not severe enough to be errors.
+         */
+        "@typescript-eslint/naming-convention": [
+            "warn",
+            // require most things to be camelCase
+            {
+                "format": [
+                    "strictCamelCase"
+                ],
+                "selector": "default"
+            },
+            // require type names to be PascalCase
+            {
+                "format": [
+                    "PascalCase"
+                ],
+                "selector": [
+                    "typeLike",
+                    "enumMember"
+                ]
+            },
+            // require unused parameters to start with an underscore
+            {
+                "format": [
+                    "strictCamelCase"
+                ],
+                "leadingUnderscore": "require",
+                "trailingUnderscore": "allow",
+                "selector": "parameter",
+                "modifiers": [
+                    "unused"
+                ]
+            }
+        ],
+        /*
          * NON-PROBLEMS
          * These are things that are enabled by default that cause more harm
          * than good in this project.

@@ -48,7 +48,7 @@ class ArbSorter {
      * @param values The list of numbers based on the sord order.
      * @returns The original word, as a string.
      */
-    private valuesAsWord(values: number[]) {
+    private valuesAsWord(values: readonly number[]) {
         return values.map(el => this.vals[el])
             .join('');
     }
@@ -69,7 +69,7 @@ class ArbSorter {
      * @param list The list of words to be sorted.
      * @returns A sorted copy of the list.
      */
-    sort(list: string[]) {
+    sort(list: readonly string[]) {
         const l2 = list.filter(el => el !== '').map(this.wordAsValues, this);
 
         l2.sort((a, b) => a[0]! - b[0]!);

@@ -108,8 +108,8 @@ Flags are as follows:
 - `-v` or `--version`: Print the version number then exit.
 - `-o` or `--one-per-line`: Equivalent to `onePerLine` argument above.
 - `-u` or `--unsorted`: Equivalent to the `unsorted` argument above.
-- `-n` or `--number-of-words`: Specify the number of words. Unlike above, this
-does not accept `0`. Example usage: `lexifer example.def -n 15`
+- `-n` or `--number`: Specify the number of words. Example usage:
+`lexifer example.def -n 15`
 - `-V` or `--verbose`: Equivalent to the `verbose` argument above.
 - `-e` or `--encoding`: The input encoding. If not given, defaults to utf-8.
 Valid values: `ascii`; `base64`; `binary` or `latin1`; `hex`; `utf-8` or

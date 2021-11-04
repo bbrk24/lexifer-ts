@@ -1,5 +1,5 @@
 /*!
-Lexifer TS v1.2.0-alpha.11
+Lexifer TS v1.2.0-alpha.12
 
 Copyright (c) 2021 William Baker
 
@@ -29,7 +29,7 @@ declare class ArbSorter {
     private wordAsValues;
     private valuesAsWord;
     split(word: string): string[];
-    sort(list: string[]): string[];
+    sort(list: readonly string[]): string[];
 }
 declare const main: (file: string, num?: number | undefined, verbose?: boolean, unsorted?: boolean | undefined, onePerLine?: boolean, stderr?: (inp: Error | string) => void) => string;
 declare const genWords: () => void;
@@ -39,8 +39,8 @@ declare const last: {
     <T>(arr: ArrayLike<T> | null | undefined): T | null | undefined;
 };
 declare class PhonologyDefinition {
-    private stderr;
-    private macros;
+    private readonly stderr;
+    private readonly macros;
     private letters;
     private phClasses;
     private categories;
@@ -110,7 +110,7 @@ declare class Segment {
     readonly voiced: boolean;
     readonly place: Place;
     readonly manner: Manner;
-    constructor(arr: [string, string, boolean, Place, Manner]);
+    constructor(arr: readonly [string, string, boolean, Place, Manner]);
     get isStop(): boolean;
     get isPeripheral(): boolean;
     get isApprox(): boolean;
@@ -119,26 +119,26 @@ declare class Segment {
 declare class ClusterEngine {
     private static readonly segments;
     constructor(isIpa: boolean);
-    applyAssimilations(word: string[]): string[];
-    applyCoronalMetathesis(word: string[]): string[];
-    applyRejections(word: string[]): string[];
+    applyAssimilations(word: readonly string[]): string[];
+    applyCoronalMetathesis(word: readonly string[]): string[];
+    applyRejections(word: readonly string[]): readonly string[];
 }
 declare class WeightedSelector<T> {
     private readonly keys;
     private readonly weights;
     private readonly sum;
-    constructor(dic: Map<T, number | undefined>);
+    constructor(dic: Readonly<Map<T, number | undefined>>);
     select(): T;
 }
 declare class Word {
     static verbose: boolean;
     static sorter: ArbSorter | null;
     static clusterEngine: ClusterEngine | null;
-    private forms;
-    private filters;
+    private readonly forms;
+    private readonly filters;
     constructor(form: string, rule: string);
     private applyFilter;
-    applyFilters(filters: [string, string][]): void;
+    applyFilters(filters: ReadonlyArray<readonly [string, string]>): void;
     applyAssimilations(): void;
     applyCoronalMetathesis(): void;
     applyRejections(): void;
@@ -150,15 +150,13 @@ declare class Category extends Map<Rule, number> {
     constructor(weight: number);
 }
 declare class SoundSystem {
+    private readonly filters;
     private phonemeset;
-    private filters;
+    private ruleset;
     randpercent: number;
     useAssim: boolean;
     useCoronalMetathesis: boolean;
     useRejections: boolean;
-    ruleset: {
-        [key: string]: Category;
-    };
     sorter: ArbSorter | null;
     constructor();
     private applyFilters;
@@ -172,6 +170,6 @@ declare class SoundSystem {
     generate(numWords: number, verbose: boolean, unsorted: boolean, category: string, force?: boolean): string[];
     randomCategory(): string;
 }
-declare const textify: (phsys: SoundSystem, sentences?: number) => string;
+declare const textify: (phsys: Readonly<SoundSystem>, sentences?: number) => string;
 declare const wrap: (str: string) => string;
 export = main;

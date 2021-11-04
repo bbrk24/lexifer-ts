@@ -29,8 +29,8 @@ class Word {
     static sorter: ArbSorter | null = null;
     static clusterEngine: ClusterEngine | null = null;
 
-    private forms: string[];
-    private filters: string[];
+    private readonly forms: string[];
+    private readonly filters: string[];
 
     constructor(form: string, rule: string) {
         this.forms = [form];
@@ -50,7 +50,7 @@ class Word {
         }
     }
 
-    applyFilters(filters: [string, string][]) {
+    applyFilters(filters: ReadonlyArray<readonly [string, string]>) {
         for (const filt of filters) {
             this.applyFilter(...filt);
             if (last(this.forms) === 'REJECT') {
