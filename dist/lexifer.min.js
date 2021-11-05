@@ -1,6 +1,5 @@
 "use strict";
-/*!
-Lexifer TS v1.2.0-alpha.12
+/*! Lexifer TS v1.2.0-alpha.12+2
 
 Copyright (c) 2021 William Baker
 

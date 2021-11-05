@@ -22,8 +22,7 @@
 
 # run a linter pass
 echo 'Linting...'
-node_modules/.bin/eslint src/*.ts --fix || exit $?
-node_modules/.bin/eslint bin/index.ts --fix || exit $?
+node_modules/.bin/eslint src/*.ts bin/index.ts --fix || exit $?
 
 echo 'Combining files...'
 # put the version number and license comment here, so it ends up in all dist/
@@ -31,7 +30,7 @@ echo 'Combining files...'
 version=$(grep version package.json | cut -d '"' -f 4)
 {
     # the use of `/*!` ensures compilation preserves it
-    printf '/*!\nLexifer TS v%s\n\n' "$version"
+    printf '/*! Lexifer TS v%s\n\n' "$version"
     cat LICENSE
     echo '*/'
     sed '/export/d;/import/d' src/*.ts
@@ -46,9 +45,19 @@ echo 'module.exports = main;' >> dist/index.js
 echo 'export = main;' >> dist/index.d.ts
 
 (
-    cd bin 
-    ../node_modules/.bin/tsc
-) || exit $?
+    # In the bin/ directory...
+    cd bin &&
+    # ...run `tsc`...
+    ../node_modules/.bin/tsc || exit $?
+    # ...and then add the hashbang, version number and license text to the js file.
+    {
+        printf '#! /usr/bin/env node\n/*! Lexifer TS v%s\n\n' "$version"
+        cat ../LICENSE
+        echo '*/'
+        cat index.js
+    } > tempfile
+    mv tempfile index.js
+)
 
 # change CRLF to LF (thanks Microsoft)
 sed -e 's/^M//' dist/index.js > tempfile
@@ -65,16 +74,9 @@ echo 'Minifying code...'
 # The mixture of semicolons=true/false was chosen to minimize file size after
 # gzip.
 node_modules/.bin/terser dist/index.js -mo dist/lexifer.min.js -c unsafe \
-    -f wrap_func_args=false --ecma 2017
-node_modules/.bin/terser bin/index.js -mc unsafe --ecma 2019 \
-    -f wrap_func_args=false,semicolons=false > bin/lexifer
-
-# We never put the version number in the CLI file!
-# Somewhat fortunately, due to a bug in terser, `-f semicolons=false` leaves a
-# blank line near the top of the file. Replace that with the version number
-# comment.
-sed "s|^$|/*! Lexifer TS v${version} */|" bin/lexifer > tempfile
-mv tempfile bin/lexifer
+    -f wrap_func_args=false --ecma 2017 &&
+node_modules/.bin/terser bin/index.js -mo bin/lexifer -c unsafe --ecma 2019 \
+    -f wrap_func_args=false,semicolons=false || exit $?
 
 # If only the version number changed, the new version didn't actually change
 # anything.

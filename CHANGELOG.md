@@ -9,6 +9,8 @@ All notable changes to this project will be documented in this file.
 `std-rejections` -- rejects word-initial nonsibilant-approximant and
 nasal-trill clusters if both consonants have the same place of articulation.
 
+The CLI, based on the original Python version, has been re-introduced.
+
 ### Changed
 
 The program does not re-parse the input if it is not changed, improving
@@ -17,7 +19,7 @@ performance substantially on repeated runs.
 The program now correctly enforces that exactly one featureset is used in a
 `with:` directive.
 
-The compilation target is now ES8 rather than ES6.
+The compilation target is now ES8 (2017) rather than ES6 (2015).
 
 ## v1.1.2
 

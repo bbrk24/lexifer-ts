@@ -1,6 +1,4 @@
-#! /usr/bin/env node
-
-/*!
+/*
  * Copyright (c) 2021 William Baker
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
