@@ -36,28 +36,8 @@ version=$(grep version package.json | cut -d '"' -f 4)
     sed '/export/d;/import/d' src/*.ts
 } > combined.ts
 
-echo 'Compiling to JS...'
+echo 'Compiling main program...'
 node_modules/.bin/tsc || exit $?
-
-# prepare for use as a package by declaring exports
-# ES6 and CommonJS modules can't be used with only one outfile for some reason
-echo 'module.exports = main;' >> dist/index.js
-echo 'export = main;' >> dist/index.d.ts
-
-(
-    # In the bin/ directory...
-    cd bin &&
-    # ...run `tsc`...
-    ../node_modules/.bin/tsc || exit $?
-    # ...and then add the hashbang, version number and license text to the js file.
-    {
-        printf '#! /usr/bin/env node\n/*! Lexifer TS v%s\n\n' "$version"
-        cat ../LICENSE
-        echo '*/'
-        cat index.js
-    } > tempfile
-    mv tempfile index.js
-)
 
 # change CRLF to LF (thanks Microsoft)
 sed -e 's/^M//' dist/index.js > tempfile
@@ -65,16 +45,36 @@ mv tempfile dist/index.js
 sed -e 's/^M//' dist/index.d.ts > tempfile
 mv tempfile dist/index.d.ts
 
-echo 'Minifying code...'
+echo 'Minifying web version...'
 
 # use terser
 # Even though --mangle-props shaves off 2kB, it ends up being more trouble
 # than it's worth.
 # -c unsafe replaces `new Error()` with `Error()`.
-# The mixture of semicolons=true/false was chosen to minimize file size after
-# gzip.
 node_modules/.bin/terser dist/index.js -mo dist/lexifer.min.js -c unsafe \
-    -f wrap_func_args=false --ecma 2017 &&
+    -f wrap_func_args=false --ecma 2017 || exit $?
+
+# prepare for use as a package by declaring exports
+# ES6 and CommonJS modules can't be used with only one outfile for some reason
+echo 'module.exports = main;' >> dist/index.js
+echo 'export = main;' >> dist/index.d.ts
+
+echo 'Compiling CLI...'
+
+# In the bin directory, run `tsc`...
+cd bin/ && ../node_modules/.bin/tsc || exit $?
+# ...and then add the hashbang, version number and license text to the js file.
+{
+    printf '#! /usr/bin/env node\n/*! Lexifer TS v%s\n\n' "$version"
+    cat ../LICENSE
+    echo '*/'
+    cat index.js
+} > tempfile
+mv tempfile index.js
+cd ../
+
+echo 'Minifying CLI...'
+
 node_modules/.bin/terser bin/index.js -mo bin/lexifer -c unsafe --ecma 2019 \
     -f wrap_func_args=false,semicolons=false || exit $?
 

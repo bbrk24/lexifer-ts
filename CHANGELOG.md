@@ -9,7 +9,7 @@ All notable changes to this project will be documented in this file.
 `std-rejections` -- rejects word-initial nonsibilant-approximant and
 nasal-trill clusters if both consonants have the same place of articulation.
 
-The CLI, based on the original Python version, has been re-introduced.
+A CLI, based on the original Python version, has been introduced.
 
 ### Changed
 

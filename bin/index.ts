@@ -20,15 +20,13 @@
  * IN THE SOFTWARE.
  */
 
-import { readFileSync } from 'fs';
-import yargs from 'yargs/yargs';
-import main from '../dist';
+import fs = require('fs');
+import yargs = require('yargs/yargs');
+import main = require('../dist');
 
 const encodings: readonly BufferEncoding[] = [
     'ascii',
-    'base64',
     'binary',
-    'hex',
     'latin1',
     'ucs-2',
     'ucs2',
@@ -120,7 +118,7 @@ const argv: {
 const fileDescriptor = argv._[0] ?? 0;
 
 try {
-    const fileText = readFileSync(fileDescriptor, argv.encoding);
+    const fileText = fs.readFileSync(fileDescriptor, argv.encoding);
 
     console.log(
         main(
@@ -130,6 +128,8 @@ try {
             argv.unsorted,
             argv['one-per-line'],
             e => {
+                // Don't throw it; the `catch` block is designed to catch the
+                // fs error on Windows.
                 if (e instanceof Error) {
                     process.exitCode = 1;
                 }

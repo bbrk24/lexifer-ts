@@ -3,8 +3,7 @@
 [![version][1]][2] [![license][3]][4] [![issue count][5]][6]
 [![git activity][7]][8]
 
-This is a TypeScript implementation of William Annis's
-[Lexifer][9].
+This is a TypeScript implementation of William Annis's [Lexifer][9].
 
 **For full documentation, see [the docs here][10].**
 
@@ -26,11 +25,14 @@ yarn add lexifer
 
 And then, in your script:
 
-```js
-// with CommonJS
+```ts
+// in CommonJS
 const lexifer = require('lexifer');
 
-// with ES6 modules
+// TypeScript with --module commonjs, node12, or nodenext
+import lexifer = require('lexifer');
+
+// in ES modules
 import lexifer from 'lexifer';
 ```
 
@@ -99,8 +101,7 @@ from other commands.
 
 Note: on Windows, file names and pipes are supported, but Lexifer cannot read
 directly from stdin as it can on Unix-like systems. This is largely beyond my
-control: `fs.readFileSync()` attempts to stat the file, and you cannot stat
-stdin on Windows.
+control, as `fs` throws an error in this case.
 
 Flags are as follows:
 
@@ -112,10 +113,8 @@ Flags are as follows:
 `lexifer example.def -n 15`
 - `-V` or `--verbose`: Equivalent to the `verbose` argument above.
 - `-e` or `--encoding`: The input encoding. If not given, defaults to utf-8.
-Valid values: `ascii`; `base64`; `binary` or `latin1`; `hex`; `utf-8` or
-`utf8`; `utf16le`, `ucs-2`, or `ucs-2`. For details, see [Node's documentation
-for encodings][11]. `base64url` is not supported, for backwards compatibility
-with Node 12.
+Valid values: `ascii`; `binary` or `latin1`; `utf-8` or `utf8`; `utf16le`,
+`ucs-2`, or `ucs-2`. For details, see [Node's documentation for encodings][11].
 
 The input file name should go before any flags. If you want to put it at the
 end, it must be delimited with `--`, such as `lexifer -n 15 -- example.def`.
