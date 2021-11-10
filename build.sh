@@ -77,7 +77,7 @@ node_modules/.bin/terser bin/index.js -mo bin/lexifer -c unsafe --ecma 2019 \
 
 # If only the version number changed, the new version didn't actually change
 # anything.
-for filename in dist/* bin/lexifer
+for filename in dist/*
 do
     # POSIX sh doesn't have arrays, so I can't just `| read -ra`
     diffstr=$(git diff --numstat "$filename")
