@@ -80,10 +80,11 @@ class Fragment {
         private readonly minReps: number,
         private readonly maxReps: number,
         private readonly allowRepeats?: boolean
-    ) { }
+    ) {
+    }
 
     private getPhoneme(word?: string) {
-        if (!word || !word.length) {
+        if (!word?.length) {
             return Fragment.getRandomPhoneme!(this.value);
         }
 

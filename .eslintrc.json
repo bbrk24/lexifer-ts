@@ -3,10 +3,12 @@
     "noInlineConfig": true,
     "extends": [
         "eslint:recommended",
-        "plugin:@typescript-eslint/recommended"
+        "plugin:@typescript-eslint/recommended",
+        "plugin:eslint-plugin-unicorn/recommended"
     ],
     "plugins": [
-        "@typescript-eslint"
+        "@typescript-eslint",
+        "eslint-plugin-unicorn"
     ],
     "parser": "@typescript-eslint/parser",
     "parserOptions": {
@@ -367,6 +369,12 @@
         ],
         "switch-colon-spacing": "warn",
         "template-curly-spacing": "warn",
+        "unicorn/catch-error-name": [
+            "warn",
+            {
+                "name": "e"
+            }
+        ],
         "yoda": "warn",
         /*
          * CODE WARNINGS
@@ -384,6 +392,28 @@
          * These are things that are enabled by default that cause more harm
          * than good in this project.
          */
-        "no-magic-numbers": "off"
+        // this catches things like `arr[i + 1]`
+        "no-magic-numbers": "off",
+        // I'm hiding these on purpose, thank you very much
+        "unicorn/consistent-function-scoping": "off",
+        // I wish this were configurable, e.g. enforce newline
+        "unicorn/empty-brace-spaces": "off",
+        "unicorn/filename-case": "off",
+        "unicorn/no-array-callback-reference": "off",
+        // this rule doesn't even make sense to me
+        "unicorn/no-array-method-this-argument": "off",
+        // this case is handled better by @typescript-eslint/prefer-for-of
+        "unicorn/no-for-loop": "off",
+        // conflicts with other things; `null` is `object`
+        "unicorn/no-null": "off",
+        // unicorn disagrees with TypeScript on what's "useless"
+        "unicorn/no-useless-undefined": "off",
+        // it's a shame only Infinity is configurable and not the rest
+        "unicorn/prefer-number-properties": "off",
+        // Since when is .substring() "lesser known"?
+        "unicorn/prefer-string-slice": "off",
+        // I'm not convinced by this one.
+        "unicorn/prefer-query-selector": "off",
+        "unicorn/prevent-abbreviations": "off"
     }
 }

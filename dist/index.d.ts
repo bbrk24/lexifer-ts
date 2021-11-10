@@ -1,4 +1,4 @@
-/*! Lexifer TS v1.2.0-alpha.14
+/*! Lexifer TS v1.2.0-alpha.15
 
 Copyright (c) 2021 William Baker
 
@@ -20,23 +20,6 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-interface LexiferOptions {
-    number: number;
-    unsorted?: boolean;
-}
-declare class WordGenerator {
-    private readonly phonDef;
-    constructor(file: string, stderr: (error: Error | string) => void);
-    generate(options: Readonly<LexiferOptions>): string;
-}
-declare const main: {
-    (file: string, num?: number | undefined, verbose?: boolean, unsorted?: boolean | undefined, onePerLine?: boolean, stderr?: (inp: Error | string) => void): string;
-    WordGenerator: typeof WordGenerator;
-    ClusterEngine: typeof ClusterEngine;
-    Segment: typeof Segment;
-    Place: typeof Place;
-    Manner: typeof Manner;
-};
 declare enum Place {
     Bilabial = 0,
     Labiodental = 1,
@@ -83,4 +66,21 @@ declare class ClusterEngine {
     applyCoronalMetathesis(word: readonly string[]): string[];
     applyRejections(word: readonly string[]): readonly string[];
 }
+interface LexiferOptions {
+    number: number;
+    unsorted?: boolean;
+}
+declare class WordGenerator {
+    private readonly phonDef;
+    constructor(file: string, stderr: (error: Error | string) => void);
+    generate(options: Readonly<LexiferOptions>): string;
+}
+declare const main: {
+    (file: string, num?: number | undefined, verbose?: boolean, unsorted?: boolean | undefined, onePerLine?: boolean, stderr?: (inp: Error | string) => void): string;
+    WordGenerator: typeof WordGenerator;
+    ClusterEngine: typeof ClusterEngine;
+    Segment: typeof Segment;
+    Place: typeof Place;
+    Manner: typeof Manner;
+};
 export = main;

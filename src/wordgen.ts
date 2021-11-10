@@ -35,7 +35,7 @@ const invalidItemAndWeight = (item: string) => {
 
     const weight = +parts[1]!;
 
-    return isNaN(weight) || weight < 0 || weight === Infinity;
+    return Number.isNaN(weight) || weight < 0 || weight === Infinity;
 };
 
 class Category extends Map<Rule, number> {
@@ -213,7 +213,7 @@ class SoundSystem {
             }
         }
 
-        let wordList = Array.from(words);
+        let wordList = [...words];
         if (!(unsorted || verbose)) {
             if (this.sorter) {
                 wordList = this.sorter.sort(wordList);
@@ -270,11 +270,7 @@ const textify = (phsys: Readonly<SoundSystem>, sentences = 25) => {
             }
         }
 
-        if (Math.random() <= 0.85) {
-            text += '. ';
-        } else {
-            text += '? ';
-        }
+        text += Math.random() <= 0.85 ? '. ' : '? ';
     }
 
     return wrap(text.trim());

@@ -115,7 +115,7 @@ class PhonologyDefinition {
     }
 
     private sanityCheck() {
-        if (this.letters.length) {
+        if (this.letters.length > 0) {
             const letters = new Set(this.letters);
             const phonemes = new Set(this.phClasses);
             if (phonemes.size > letters.size) {
@@ -205,8 +205,7 @@ class PhonologyDefinition {
         const rules = line.split(/\s+/gu);
         const weighted = line.includes(':');
 
-        if (line[0] === '?' || /\s\?[^?!]/u.exec(line)) {
-            // This doesn't need /g since I'm using it as a boolean test.
+        if (line[0] === '?' || /\s\?[^?!]/u.test(line)) {
             throw new Error("Rule cannot start with '?'.");
         }
 
@@ -230,17 +229,17 @@ class PhonologyDefinition {
                 weight = +weightStr;
             } else {
                 rule = rules[i]!;
-                weight = 10.0 / (i + 1) ** 0.9;
+                weight = 10 / (i + 1) ** 0.9;
             }
 
             // Inform the user of empty words. Error if it will only produce
             // empty words, but if it only sometimes produces empty words, only
             // warn them.
-            if (!/[^?!]/u.exec(rule)) {
+            if (!/[^?!]/u.test(rule)) {
                 throw new Error(`'${rules[i]}'`
                     + `${cat ? ` (in category ${cat})` : ''} will only `
                     + 'produce empty words.');
-            } else if (/^\?*[^?!]!?\?+!?$/u.exec(rule)) {
+            } else if (/^\?*[^?!]!?\?+!?$/u.test(rule)) {
                 // Here, we don't know what random-rate or category weight is,
                 // so this may not even be an issue.
                 this.stderr(`'${rules[i]}'`
@@ -313,7 +312,7 @@ class PhonologyDefinition {
                 values
             ]);
         } else if (sclass.length === 1) {
-            this.phClasses = this.phClasses.concat(values.split(/\s+/gu));
+            this.phClasses = [...this.phClasses, ...values.split(/\s+/gu)];
             this.soundsys.addPhUnit(sclass, values);
         } else if (this.categories.includes(sclass)) {
             this.addRules(values, sclass);

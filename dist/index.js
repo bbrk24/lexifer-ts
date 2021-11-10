@@ -1,5 +1,5 @@
 "use strict";
-/*! Lexifer TS v1.2.0-alpha.14
+/*! Lexifer TS v1.2.0-alpha.15
 
 Copyright (c) 2021 William Baker
 
@@ -56,93 +56,6 @@ class ArbSorter {
         return l2.map(this.valuesAsWord, this);
     }
 }
-class WordGenerator {
-    constructor(file, stderr) {
-        this.phonDef = new PhonologyDefinition(file, stderr);
-    }
-    generate(options) {
-        return this.phonDef.generate(options.number, false, options.unsorted);
-    }
-}
-const main = (() => {
-    let hash = 0;
-    let phonDef = null;
-    const hashString = (str) => {
-        let hash = 0;
-        if (str.length === 0) {
-            return hash;
-        }
-        for (let i = 0; i < str.length; ++i) {
-            hash = (hash << 5) - hash + str.charCodeAt(i);
-            hash |= 0;
-        }
-        return hash;
-    };
-    const lexifer = (file, num, verbose = false, unsorted, onePerLine = false, stderr = console.error) => {
-        let ans = '';
-        try {
-            const newHash = hashString(file);
-            if (hash !== newHash || !phonDef) {
-                phonDef = new PhonologyDefinition(file, stderr);
-                hash = newHash;
-            }
-            if (num) {
-                if (num < 0 || num === Infinity) {
-                    stderr(`Cannot generate ${num} words.`);
-                    ans = phonDef.paragraph();
-                }
-                else {
-                    if (num !== Math.round(num)) {
-                        stderr(`Requested number of words (${num}) is not an `
-                            + `integer. Rounding to ${Math.round(num)}.`);
-                        num = Math.round(num);
-                    }
-                    if (verbose) {
-                        if (unsorted === false) {
-                            stderr("** 'Unsorted' option always enabled in "
-                                + 'verbose mode.');
-                            unsorted = true;
-                        }
-                        if (onePerLine) {
-                            stderr("** 'One per line' option ignored in "
-                                + 'verbose mode.');
-                        }
-                    }
-                    ans = wrap(phonDef.generate(num, verbose, unsorted, onePerLine));
-                }
-            }
-            else {
-                if (verbose) {
-                    stderr("** 'Verbose' option ignored in paragraph mode.");
-                }
-                if (unsorted) {
-                    stderr("** 'Unsorted' option ignored in paragraph mode.");
-                }
-                if (onePerLine) {
-                    stderr("** 'One per line' option ignored in paragraph "
-                        + 'mode.');
-                }
-                ans = phonDef.paragraph();
-            }
-        }
-        catch (e) {
-            stderr(e);
-        }
-        return ans;
-    };
-    lexifer.WordGenerator = WordGenerator;
-    lexifer.ClusterEngine = ClusterEngine;
-    lexifer.Segment = Segment;
-    lexifer.Place = Place;
-    lexifer.Manner = Manner;
-    return lexifer;
-})();
-const genWords = () => {
-    document.getElementById('errors').innerHTML = '';
-    document.getElementById('result').innerHTML = main(document.getElementById('def').value, parseInt(document.getElementById('number').value), document.getElementById('verbose').checked, document.getElementById('unsorted').checked, document.getElementById('one-per-line').checked, message => {
-        document.getElementById('errors').innerHTML += `${message}<br />`;
-    }).replace(/\n/gu, '<br />');
-};
 const last = (arr) => arr && arr[arr.length - 1];
 class PhonologyDefinition {
     constructor(defFile, stderr) {
@@ -218,7 +131,7 @@ class PhonologyDefinition {
         }
     }
     sanityCheck() {
-        if (this.letters.length) {
+        if (this.letters.length > 0) {
             const letters = new Set(this.letters);
             const phonemes = new Set(this.phClasses);
             if (phonemes.size > letters.size) {
@@ -296,7 +209,7 @@ class PhonologyDefinition {
     addRules(line, cat) {
         const rules = line.split(/\s+/gu);
         const weighted = line.includes(':');
-        if (line[0] === '?' || /\s\?[^?!]/u.exec(line)) {
+        if (line[0] === '?' || /\s\?[^?!]/u.test(line)) {
             throw new Error("Rule cannot start with '?'.");
         }
         if (line.includes('??')) {
@@ -316,14 +229,14 @@ class PhonologyDefinition {
             }
             else {
                 rule = rules[i];
-                weight = 10.0 / (i + 1) ** 0.9;
+                weight = 10 / (i + 1) ** 0.9;
             }
-            if (!/[^?!]/u.exec(rule)) {
+            if (!/[^?!]/u.test(rule)) {
                 throw new Error(`'${rules[i]}'`
                     + `${cat ? ` (in category ${cat})` : ''} will only `
                     + 'produce empty words.');
             }
-            else if (/^\?*[^?!]!?\?+!?$/u.exec(rule)) {
+            else if (/^\?*[^?!]!?\?+!?$/u.test(rule)) {
                 this.stderr(`'${rules[i]}'`
                     + `${cat ? ` (in category ${cat})` : ''} may produce `
                     + 'empty words.');
@@ -388,7 +301,7 @@ class PhonologyDefinition {
             ]);
         }
         else if (sclass.length === 1) {
-            this.phClasses = this.phClasses.concat(values.split(/\s+/gu));
+            this.phClasses = [...this.phClasses, ...values.split(/\s+/gu)];
             this.soundsys.addPhUnit(sclass, values);
         }
         else if (this.categories.includes(sclass)) {
@@ -500,7 +413,7 @@ class Fragment {
         this.allowRepeats = allowRepeats;
     }
     getPhoneme(word) {
-        if (!word || !word.length) {
+        if (!(word === null || word === void 0 ? void 0 : word.length)) {
             return Fragment.getRandomPhoneme(this.value);
         }
         let val = '';
@@ -825,7 +738,7 @@ const invalidItemAndWeight = (item) => {
         return true;
     }
     const weight = +parts[1];
-    return isNaN(weight) || weight < 0 || weight === Infinity;
+    return Number.isNaN(weight) || weight < 0 || weight === Infinity;
 };
 class Category extends Map {
     constructor(weight) {
@@ -952,7 +865,7 @@ class SoundSystem {
                 }
             }
         }
-        let wordList = Array.from(words);
+        let wordList = [...words];
         if (!(unsorted || verbose)) {
             if (this.sorter) {
                 wordList = this.sorter.sort(wordList);
@@ -988,14 +901,96 @@ const textify = (phsys, sentences = 25) => {
                 text += ',';
             }
         }
-        if (Math.random() <= 0.85) {
-            text += '. ';
-        }
-        else {
-            text += '? ';
-        }
+        text += Math.random() <= 0.85 ? '. ' : '? ';
     }
     return wrap(text.trim());
 };
 const wrap = (str) => str.replace(/(?![^\n]{1,70}$)([^\n]{1,70})\s/gu, '$1\n');
+class WordGenerator {
+    constructor(file, stderr) {
+        this.phonDef = new PhonologyDefinition(file, stderr);
+    }
+    generate(options) {
+        return this.phonDef.generate(options.number, false, options.unsorted);
+    }
+}
+const main = (() => {
+    let hash = 0;
+    let phonDef = null;
+    const hashString = (str) => {
+        let hash = 0;
+        if (str.length === 0) {
+            return hash;
+        }
+        for (let i = 0; i < str.length; ++i) {
+            hash = (hash << 5) - hash + str.charCodeAt(i);
+            hash = Math.trunc(hash);
+        }
+        return hash;
+    };
+    const lexifer = (file, num, verbose = false, unsorted, onePerLine = false, stderr = console.error) => {
+        let ans = '';
+        try {
+            const newHash = hashString(file);
+            if (hash !== newHash || !phonDef) {
+                phonDef = new PhonologyDefinition(file, stderr);
+                hash = newHash;
+            }
+            if (num) {
+                if (num < 0 || num === Infinity) {
+                    stderr(`Cannot generate ${num} words.`);
+                    ans = phonDef.paragraph();
+                }
+                else {
+                    if (num !== Math.round(num)) {
+                        stderr(`Requested number of words (${num}) is not an `
+                            + `integer. Rounding to ${Math.round(num)}.`);
+                        num = Math.round(num);
+                    }
+                    if (verbose) {
+                        if (unsorted === false) {
+                            stderr("** 'Unsorted' option always enabled in "
+                                + 'verbose mode.');
+                            unsorted = true;
+                        }
+                        if (onePerLine) {
+                            stderr("** 'One per line' option ignored in "
+                                + 'verbose mode.');
+                        }
+                    }
+                    ans = wrap(phonDef.generate(num, verbose, unsorted, onePerLine));
+                }
+            }
+            else {
+                if (verbose) {
+                    stderr("** 'Verbose' option ignored in paragraph mode.");
+                }
+                if (unsorted) {
+                    stderr("** 'Unsorted' option ignored in paragraph mode.");
+                }
+                if (onePerLine) {
+                    stderr("** 'One per line' option ignored in paragraph "
+                        + 'mode.');
+                }
+                ans = phonDef.paragraph();
+            }
+        }
+        catch (e) {
+            stderr(e);
+        }
+        return ans;
+    };
+    lexifer.WordGenerator = WordGenerator;
+    lexifer.ClusterEngine = ClusterEngine;
+    lexifer.Segment = Segment;
+    lexifer.Place = Place;
+    lexifer.Manner = Manner;
+    return lexifer;
+})();
+const genWords = () => {
+    document.getElementById('errors').innerHTML = '';
+    document.getElementById('result').innerHTML = main(document.getElementById('def').value, parseInt(document.getElementById('number').value), document.getElementById('verbose').checked, document.getElementById('unsorted').checked, document.getElementById('one-per-line').checked, message => {
+        document.getElementById('errors').innerHTML += `${message}<br />`;
+    }).replace(/\n/gu, '<br />');
+};
 module.exports = main;

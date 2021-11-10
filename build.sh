@@ -33,7 +33,13 @@ version=$(grep version package.json | cut -d '"' -f 4)
     printf '/*! Lexifer TS v%s\n\n' "$version"
     cat LICENSE
     echo '*/'
-    sed '/export/d;/import/d' src/*.ts
+    # index.ts needs to go last; the others, order doesn't matter
+    for filename in src/*.ts
+    do
+        [ "$filename" != 'src/index.ts' ] &&
+            sed '/import/d;/export/d' "$filename"
+    done
+    sed '/import/d;/export/d' src/index.ts
     echo 'export = main;'
 } > combined.ts
 
