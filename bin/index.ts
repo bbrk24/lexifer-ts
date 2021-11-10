@@ -22,7 +22,7 @@
 
 import fs = require('fs');
 import yargs = require('yargs/yargs');
-import main = require('../dist');
+import lexifer = require('../dist');
 
 const encodings: readonly BufferEncoding[] = [
     'ascii',
@@ -121,7 +121,7 @@ try {
     const fileText = fs.readFileSync(fileDescriptor, argv.encoding);
 
     console.log(
-        main(
+        lexifer(
             fileText,
             argv.number,
             argv.verbose,

@@ -1,6 +1,8 @@
 {
     "include": ["*.ts"],
     "compilerOptions": {
+        "allowUnusedLabels": false,
+        "exactOptionalPropertyTypes": true,
         "noImplicitReturns": true,
         "noUncheckedIndexedAccess": true,
         "strict": true,

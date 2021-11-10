@@ -34,30 +34,21 @@ version=$(grep version package.json | cut -d '"' -f 4)
     cat LICENSE
     echo '*/'
     sed '/export/d;/import/d' src/*.ts
+    echo 'export = main;'
 } > combined.ts
 
 echo 'Compiling main program...'
 node_modules/.bin/tsc || exit $?
 
-# change CRLF to LF (thanks Microsoft)
-sed -e 's/^M//' dist/index.js > tempfile
-mv tempfile dist/index.js
-sed -e 's/^M//' dist/index.d.ts > tempfile
-mv tempfile dist/index.d.ts
+# change CRLF to LF, and change the file names from 'combined' to 'index'
+sed -e 's/^M//' dist/combined.js > dist/index.js
+sed -e 's/^M//' dist/combined.d.ts > dist/index.d.ts
+rm dist/combined.*
 
 echo 'Minifying web version...'
 
-# use terser
-# Even though --mangle-props shaves off 2kB, it ends up being more trouble
-# than it's worth.
-# -c unsafe replaces `new Error()` with `Error()`.
-node_modules/.bin/terser dist/index.js -mo dist/lexifer.min.js -c unsafe \
-    -f wrap_func_args=false --ecma 2017 || exit $?
-
-# prepare for use as a package by declaring exports
-# ES6 and CommonJS modules can't be used with only one outfile for some reason
-echo 'module.exports = main;' >> dist/index.js
-echo 'export = main;' >> dist/index.d.ts
+head -n -1 dist/index.js | node_modules/.bin/terser -mo dist/lexifer.min.js \
+    -c unsafe -f wrap_func_args=false --ecma 2017 || exit $?
 
 echo 'Compiling CLI...'
 

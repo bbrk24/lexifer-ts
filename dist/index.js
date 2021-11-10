@@ -1,5 +1,5 @@
 "use strict";
-/*! Lexifer TS v1.2.0-alpha.12+2
+/*! Lexifer TS v1.2.0-alpha.14
 
 Copyright (c) 2021 William Baker
 
@@ -54,6 +54,14 @@ class ArbSorter {
         const l2 = list.filter(el => el !== '').map(this.wordAsValues, this);
         l2.sort((a, b) => a[0] - b[0]);
         return l2.map(this.valuesAsWord, this);
+    }
+}
+class WordGenerator {
+    constructor(file, stderr) {
+        this.phonDef = new PhonologyDefinition(file, stderr);
+    }
+    generate(options) {
+        return this.phonDef.generate(options.number, false, options.unsorted);
     }
 }
 const main = (() => {
@@ -122,12 +130,17 @@ const main = (() => {
         }
         return ans;
     };
+    lexifer.WordGenerator = WordGenerator;
+    lexifer.ClusterEngine = ClusterEngine;
+    lexifer.Segment = Segment;
+    lexifer.Place = Place;
+    lexifer.Manner = Manner;
     return lexifer;
 })();
 const genWords = () => {
     document.getElementById('errors').innerHTML = '';
     document.getElementById('result').innerHTML = main(document.getElementById('def').value, parseInt(document.getElementById('number').value), document.getElementById('verbose').checked, document.getElementById('unsorted').checked, document.getElementById('one-per-line').checked, message => {
-        document.getElementById('errors').innerHTML += message + '<br />';
+        document.getElementById('errors').innerHTML += `${message}<br />`;
     }).replace(/\n/gu, '<br />');
 };
 const last = (arr) => arr && arr[arr.length - 1];
@@ -516,54 +529,149 @@ class Fragment {
         return retVal;
     }
 }
+var Place;
+(function (Place) {
+    Place[Place["Bilabial"] = 0] = "Bilabial";
+    Place[Place["Labiodental"] = 1] = "Labiodental";
+    Place[Place["Alveolar"] = 2] = "Alveolar";
+    Place[Place["Postalveolar"] = 3] = "Postalveolar";
+    Place[Place["Retroflex"] = 4] = "Retroflex";
+    Place[Place["Palatal"] = 5] = "Palatal";
+    Place[Place["Velar"] = 6] = "Velar";
+    Place[Place["Uvular"] = 7] = "Uvular";
+})(Place || (Place = {}));
+var Manner;
+(function (Manner) {
+    Manner[Manner["Plosive"] = 0] = "Plosive";
+    Manner[Manner["Fricative"] = 1] = "Fricative";
+    Manner[Manner["Nasal"] = 2] = "Nasal";
+    Manner[Manner["Sibilant"] = 3] = "Sibilant";
+    Manner[Manner["LateralFricative"] = 4] = "LateralFricative";
+    Manner[Manner["LateralAffricate"] = 5] = "LateralAffricate";
+    Manner[Manner["Affricate"] = 6] = "Affricate";
+    Manner[Manner["Approx"] = 7] = "Approx";
+    Manner[Manner["LateralApproximant"] = 8] = "LateralApproximant";
+    Manner[Manner["Trill"] = 9] = "Trill";
+})(Manner || (Manner = {}));
 class Segment {
-    constructor(arr) {
-        [this.ipa, this.digraph, this.voiced, this.place, this.manner] = arr;
+    constructor(representation, voiced, place, manner) {
+        this.representation = representation;
+        this.voiced = voiced;
+        this.place = place;
+        this.manner = manner;
     }
     get isStop() {
-        return this.manner === 2 || this.manner === 0;
+        return this.manner === Manner.Nasal || this.manner === Manner.Plosive;
     }
     get isPeripheral() {
-        return this.place === 0 || this.place === 6;
+        return this.place === Place.Bilabial || this.place === Place.Velar;
     }
     get isApprox() {
-        return this.manner === 7
-            || this.manner === 8
-            || this.manner === 9;
+        return this.manner === Manner.Approx
+            || this.manner === Manner.LateralApproximant
+            || this.manner === Manner.Trill;
     }
     toString() {
-        return this[Segment.index];
+        return this.representation;
     }
 }
 class ClusterEngine {
     constructor(isIpa) {
-        Segment.index = isIpa ? 'ipa' : 'digraph';
+        this.segments = [
+            new Segment('p', false, Place.Bilabial, Manner.Plosive),
+            new Segment('b', true, Place.Bilabial, Manner.Plosive),
+            new Segment(isIpa ? 'ɸ' : 'ph', false, Place.Bilabial, Manner.Fricative),
+            new Segment(isIpa ? 'β' : 'bh', true, Place.Bilabial, Manner.Fricative),
+            new Segment('f', false, Place.Labiodental, Manner.Fricative),
+            new Segment('v', true, Place.Labiodental, Manner.Fricative),
+            new Segment('m', true, Place.Bilabial, Manner.Nasal),
+            new Segment('m', true, Place.Labiodental, Manner.Nasal),
+            new Segment(isIpa ? 'ʋ' : 'vw', true, Place.Bilabial, Manner.Approx),
+            new Segment('w', true, Place.Bilabial, Manner.Approx),
+            new Segment('w', true, Place.Labiodental, Manner.Approx),
+            new Segment('t', false, Place.Alveolar, Manner.Plosive),
+            new Segment('d', true, Place.Alveolar, Manner.Plosive),
+            new Segment('s', false, Place.Alveolar, Manner.Sibilant),
+            new Segment('z', true, Place.Alveolar, Manner.Sibilant),
+            new Segment(isIpa ? 'θ' : 'th', false, Place.Alveolar, Manner.Fricative),
+            new Segment(isIpa ? 'ð' : 'dh', true, Place.Alveolar, Manner.Fricative),
+            new Segment(isIpa ? 'ɬ' : 'lh', false, Place.Alveolar, Manner.LateralFricative),
+            new Segment(isIpa ? 'ɮ' : 'ldh', true, Place.Alveolar, Manner.LateralFricative),
+            new Segment(isIpa ? 'tɬ' : 'tl', false, Place.Alveolar, Manner.LateralAffricate),
+            new Segment(isIpa ? 'dɮ' : 'dl', true, Place.Alveolar, Manner.LateralAffricate),
+            new Segment('ts', false, Place.Alveolar, Manner.Affricate),
+            new Segment('dz', true, Place.Alveolar, Manner.Affricate),
+            new Segment(isIpa ? 'ʃ' : 'sh', false, Place.Postalveolar, Manner.Sibilant),
+            new Segment(isIpa ? 'ʒ' : 'zh', true, Place.Postalveolar, Manner.Sibilant),
+            new Segment(isIpa ? 'tʃ' : 'ch', false, Place.Postalveolar, Manner.Affricate),
+            new Segment(isIpa ? 'dʒ' : 'j', true, Place.Postalveolar, Manner.Affricate),
+            new Segment('n', true, Place.Alveolar, Manner.Nasal),
+            new Segment(isIpa ? 'ɹ' : 'rh', true, Place.Alveolar, Manner.Approx),
+            new Segment('l', true, Place.Alveolar, Manner.LateralApproximant),
+            new Segment('r', true, Place.Alveolar, Manner.Trill),
+            new Segment(isIpa ? 'ʈ' : 'rt', false, Place.Retroflex, Manner.Plosive),
+            new Segment(isIpa ? 'ɖ' : 'rd', true, Place.Retroflex, Manner.Plosive),
+            new Segment(isIpa ? 'ʂ' : 'sr', false, Place.Retroflex, Manner.Sibilant),
+            new Segment(isIpa ? 'ʐ' : 'zr', true, Place.Retroflex, Manner.Sibilant),
+            new Segment(isIpa ? 'ʈʂ' : 'rts', false, Place.Retroflex, Manner.Affricate),
+            new Segment(isIpa ? 'ɖʐ' : 'rdz', true, Place.Retroflex, Manner.Affricate),
+            new Segment(isIpa ? 'ɳ' : 'rn', true, Place.Retroflex, Manner.Nasal),
+            new Segment(isIpa ? 'ɻ' : 'rr', true, Place.Retroflex, Manner.Approx),
+            new Segment(isIpa ? 'ɭ' : 'rl', true, Place.Retroflex, Manner.LateralApproximant),
+            new Segment(isIpa ? 'c' : 'ky', false, Place.Palatal, Manner.Plosive),
+            new Segment(isIpa ? 'ɟ' : 'gy', true, Place.Palatal, Manner.Plosive),
+            new Segment(isIpa ? 'ɕ' : 'sy', false, Place.Palatal, Manner.Sibilant),
+            new Segment(isIpa ? 'ʑ' : 'zy', true, Place.Palatal, Manner.Sibilant),
+            new Segment(isIpa ? 'ç' : 'hy', false, Place.Palatal, Manner.Fricative),
+            new Segment(isIpa ? 'ʝ' : 'yy', true, Place.Palatal, Manner.Fricative),
+            new Segment(isIpa ? 'tɕ' : 'cy', false, Place.Palatal, Manner.Affricate),
+            new Segment(isIpa ? 'dʑ' : 'jy', true, Place.Palatal, Manner.Affricate),
+            new Segment(isIpa ? 'ɲ' : 'ny', true, Place.Palatal, Manner.Nasal),
+            new Segment(isIpa ? 'j' : 'y', true, Place.Palatal, Manner.Approx),
+            new Segment('k', false, Place.Velar, Manner.Plosive),
+            new Segment('g', true, Place.Velar, Manner.Plosive),
+            new Segment(isIpa ? 'x' : 'kh', false, Place.Velar, Manner.Fricative),
+            new Segment(isIpa ? 'ɣ' : 'gh', true, Place.Velar, Manner.Fricative),
+            new Segment(isIpa ? 'ŋ' : 'ng', true, Place.Velar, Manner.Nasal),
+            new Segment(isIpa ? 'ɰ' : 'wy', true, Place.Velar, Manner.Approx),
+            new Segment('q', false, Place.Uvular, Manner.Plosive),
+            new Segment(isIpa ? 'ɢ' : 'gq', true, Place.Uvular, Manner.Plosive),
+            new Segment(isIpa ? 'χ' : 'qh', false, Place.Uvular, Manner.Fricative),
+            new Segment(isIpa ? 'ʁ' : 'gqh', true, Place.Uvular, Manner.Fricative),
+            new Segment(isIpa ? 'ɴ' : 'nq', true, Place.Uvular, Manner.Nasal)
+        ];
+    }
+    getSegment(features) {
+        return this.segments.find(el => (features.voiced === undefined || el.voiced === features.voiced)
+            && (features.place === undefined || el.place === features.place)
+            && (features.manner === undefined
+                || el.manner === features.manner));
     }
     applyAssimilations(word) {
         const nasalAssimilate = (ph1, ph2) => {
-            const data1 = ClusterEngine.segments.find(el => el.toString() === ph1);
-            if (data1 && data1.manner === 2) {
-                const data2 = ClusterEngine.segments.find(el => el.toString() === ph2);
+            const data1 = this.segments.find(el => el.representation === ph1);
+            if (data1 && data1.manner === Manner.Nasal) {
+                const data2 = this.segments.find(el => el.representation === ph2);
                 if (data2 && !data2.isApprox) {
-                    const result = ClusterEngine.segments.find(el => el.place === data2.place
-                        && el.manner === 2);
+                    const result = this.segments.find(el => el.place === data2.place
+                        && el.manner === Manner.Nasal);
                     if (result) {
-                        return result.toString();
+                        return result.representation;
                     }
                 }
             }
             return ph1;
         };
         const voiceAssimilate = (ph1, ph2) => {
-            const data2 = ClusterEngine.segments.find(el => el.toString() === ph2);
+            const data2 = this.segments.find(el => el.representation === ph2);
             if (data2 && !data2.isApprox) {
-                const data1 = ClusterEngine.segments.find(el => el.toString() === ph1);
+                const data1 = this.segments.find(el => el.representation === ph1);
                 if (data1) {
-                    const result = ClusterEngine.segments.find(el => el.voiced === data2.voiced
+                    const result = this.segments.find(el => el.voiced === data2.voiced
                         && el.place === data1.place
                         && el.manner === data1.manner);
                     if (result) {
-                        return result.toString();
+                        return result.representation;
                     }
                 }
             }
@@ -578,9 +686,9 @@ class ClusterEngine {
     }
     applyCoronalMetathesis(word) {
         const coronalMetathesis = (ph1, ph2) => {
-            const data1 = ClusterEngine.segments.find(el => el.toString() === ph1);
-            if (data1 && data1.place === 2) {
-                const data2 = ClusterEngine.segments.find(el => el.toString() === ph2);
+            const data1 = this.segments.find(el => el.representation === ph1);
+            if (data1 && data1.place === Place.Alveolar) {
+                const data2 = this.segments.find(el => el.representation === ph2);
                 if ((data2 === null || data2 === void 0 ? void 0 : data2.isPeripheral)
                     && data2.isStop
                     && data2.manner === data1.manner) {
@@ -597,15 +705,15 @@ class ClusterEngine {
     }
     applyRejections(word) {
         const rejectCluster = (ph1, ph2) => {
-            const data1 = ClusterEngine.segments.find(el => el.toString() === ph1);
-            if (data1 && data1.manner !== 3) {
-                const data2 = ClusterEngine.segments.find(el => el.toString() === ph2);
+            const data1 = this.segments.find(el => el.representation === ph1);
+            if (data1 && data1.manner !== Manner.Sibilant) {
+                const data2 = this.segments.find(el => el.representation === ph2);
                 if ((data2 === null || data2 === void 0 ? void 0 : data2.isApprox)
-                    && data1.manner !== 9
+                    && data1.manner !== Manner.Trill
                     && data2.place === data1.place) {
-                    if (data2.manner === 9) {
+                    if (data2.manner === Manner.Trill) {
                         return data1.isApprox
-                            || data1.manner === 2;
+                            || data1.manner === Manner.Nasal;
                     }
                     return data1 !== data2;
                 }
@@ -618,69 +726,6 @@ class ClusterEngine {
         return word;
     }
 }
-ClusterEngine.segments = [
-    new Segment(['p', 'p', false, 0, 0]),
-    new Segment(['b', 'b', true, 0, 0]),
-    new Segment(['ɸ', 'ph', false, 0, 1]),
-    new Segment(['β', 'bh', true, 0, 1]),
-    new Segment(['f', 'f', false, 1, 1]),
-    new Segment(['v', 'v', true, 1, 1]),
-    new Segment(['m', 'm', true, 0, 2]),
-    new Segment(['m', 'm', true, 1, 2]),
-    new Segment(['ʋ', 'vw', true, 0, 7]),
-    new Segment(['w', 'w', true, 0, 7]),
-    new Segment(['w', 'w', true, 1, 7]),
-    new Segment(['t', 't', false, 2, 0]),
-    new Segment(['d', 'd', true, 2, 0]),
-    new Segment(['s', 's', false, 2, 3]),
-    new Segment(['z', 'z', true, 2, 3]),
-    new Segment(['θ', 'th', false, 2, 1]),
-    new Segment(['ð', 'dh', true, 2, 1]),
-    new Segment(['ɬ', 'lh', false, 2, 4]),
-    new Segment(['ɮ', 'ldh', true, 2, 4]),
-    new Segment(['tɬ', 'tl', false, 2, 5]),
-    new Segment(['dɮ', 'dl', true, 2, 5]),
-    new Segment(['ts', 'ts', false, 2, 6]),
-    new Segment(['dz', 'dz', true, 2, 6]),
-    new Segment(['ʃ', 'sh', false, 3, 3]),
-    new Segment(['ʒ', 'zh', true, 3, 3]),
-    new Segment(['tʃ', 'ch', false, 3, 6]),
-    new Segment(['dʒ', 'j', true, 3, 6]),
-    new Segment(['n', 'n', true, 2, 2]),
-    new Segment(['ɹ', 'rh', true, 2, 7]),
-    new Segment(['l', 'l', true, 2, 8]),
-    new Segment(['r', 'r', true, 2, 9]),
-    new Segment(['ʈ', 'rt', false, 4, 0]),
-    new Segment(['ɖ', 'rd', true, 4, 0]),
-    new Segment(['ʂ', 'sr', false, 4, 3]),
-    new Segment(['ʐ', 'zr', true, 4, 3]),
-    new Segment(['ʈʂ', 'rts', false, 4, 6]),
-    new Segment(['ɖʐ', 'rdz', true, 4, 6]),
-    new Segment(['ɳ', 'rn', true, 4, 2]),
-    new Segment(['ɻ', 'rr', true, 4, 7]),
-    new Segment(['ɭ', 'rl', true, 4, 8]),
-    new Segment(['c', 'ky', false, 5, 0]),
-    new Segment(['ɟ', 'gy', true, 5, 0]),
-    new Segment(['ɕ', 'sy', false, 5, 3]),
-    new Segment(['ʑ', 'zy', true, 5, 3]),
-    new Segment(['ç', 'hy', false, 5, 1]),
-    new Segment(['ʝ', 'yy', true, 5, 1]),
-    new Segment(['tɕ', 'cy', false, 5, 6]),
-    new Segment(['dʑ', 'jy', true, 5, 6]),
-    new Segment(['ɲ', 'ny', true, 5, 2]),
-    new Segment(['j', 'y', true, 5, 7]),
-    new Segment(['k', 'k', false, 6, 0]),
-    new Segment(['g', 'g', true, 6, 0]),
-    new Segment(['x', 'kh', false, 6, 1]),
-    new Segment(['ɣ', 'gh', true, 6, 1]),
-    new Segment(['ŋ', 'ng', true, 6, 2]),
-    new Segment(['ɰ', 'wy', true, 6, 7]),
-    new Segment(['q', 'q', false, 7, 0]),
-    new Segment(['ɢ', 'gq', true, 7, 0]),
-    new Segment(['χ', 'qh', false, 7, 1]),
-    new Segment(['ʁ', 'gqh', true, 7, 1]),
-    new Segment(['ɴ', 'nq', true, 7, 2])
-];
 class WeightedSelector {
     constructor(dic) {
         this.keys = [];

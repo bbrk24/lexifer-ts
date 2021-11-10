@@ -22,6 +22,28 @@
 
 import wrap from './wrap';
 import PhonologyDefinition from './PhDefParser';
+import { ClusterEngine, Segment, Place, Manner } from './SmartClusters';
+
+interface LexiferOptions {
+    number: number;
+    unsorted?: boolean;
+}
+
+/**
+ * Everything about this class is heavily WIP and subject to change without
+ * notice.
+ */
+class WordGenerator {
+    private readonly phonDef: PhonologyDefinition;
+
+    constructor(file: string, stderr: (error: Error | string) => void) {
+        this.phonDef = new PhonologyDefinition(file, stderr);
+    }
+
+    generate(options: Readonly<LexiferOptions>) {
+        return this.phonDef.generate(options.number, false, options.unsorted);
+    }
+}
 
 // Original "main" -- returns a string
 const main = (() => {
@@ -106,6 +128,13 @@ const main = (() => {
         return ans;
     };
 
+    lexifer.WordGenerator = WordGenerator;
+
+    lexifer.ClusterEngine = ClusterEngine;
+    lexifer.Segment = Segment;
+    lexifer.Place = Place;
+    lexifer.Manner = Manner;
+
     return lexifer;
 })();
 
@@ -120,7 +149,7 @@ const genWords = () => {
         (<HTMLInputElement>document.getElementById('unsorted')).checked,
         (<HTMLInputElement>document.getElementById('one-per-line')).checked,
         message => {
-            document.getElementById('errors')!.innerHTML += message + '<br />';
+            document.getElementById('errors')!.innerHTML += `${message}<br />`;
         }
     ).replace(/\n/gu, '<br />');
 };
