@@ -22,7 +22,7 @@
 
 # run a linter pass
 echo 'Linting...'
-node_modules/.bin/eslint src/*.ts bin/index.ts --fix || exit $?
+npx eslint ./ --fix || exit $?
 
 echo 'Combining files...'
 # put the version number and license comment here, so it ends up in all dist/
@@ -43,23 +43,16 @@ version=$(grep version package.json | cut -d '"' -f 4)
     echo 'export = main;'
 } > combined.ts
 
-echo 'Compiling main program...'
-node_modules/.bin/tsc || exit $?
+echo 'Compiling to JS...'
+npx tsc || exit $?
 
 # change CRLF to LF, and change the file names from 'combined' to 'index'
 sed -e 's/^M//' dist/combined.js > dist/index.js
 sed -e 's/^M//' dist/combined.d.ts > dist/index.d.ts
 rm dist/combined.*
 
-echo 'Minifying web version...'
-
-head -n -1 dist/index.js | node_modules/.bin/terser -mo dist/lexifer.min.js \
-    -c unsafe -f wrap_func_args=false --ecma 2017 || exit $?
-
-echo 'Compiling CLI...'
-
 # In the bin directory, run `tsc`...
-cd bin/ && ../node_modules/.bin/tsc || exit $?
+cd bin/ && npx tsc || exit $?
 # ...and then add the hashbang, version number and license text to the js file.
 {
     printf '#! /usr/bin/env node\n/*! Lexifer TS v%s\n\n' "$version"
@@ -70,25 +63,12 @@ cd bin/ && ../node_modules/.bin/tsc || exit $?
 mv tempfile index.js
 cd ../
 
-echo 'Minifying CLI...'
+echo 'Minifying...'
 
-node_modules/.bin/terser bin/index.js -mo bin/lexifer -c unsafe --ecma 2019 \
-    -f wrap_func_args=false,semicolons=false || exit $?
-
-# If only the version number changed, the new version didn't actually change
-# anything.
-for filename in dist/*
-do
-    # POSIX sh doesn't have arrays, so I can't just `| read -ra`
-    diffstr=$(git diff --numstat "$filename")
-    diffins=$(echo "$diffstr" | awk '{print $1}')
-    diffdel=$(echo "$diffstr" | awk '{print $2}')
-
-    if [ "$diffins" = '1' ] && [ "$diffdel" = '1' ]
-    then
-        git restore "$filename"
-    fi
-done
+head -n -1 dist/index.js | npx terser -mo dist/lexifer.min.js --ecma 2017 \
+    -c unsafe -f wrap_func_args=false &&
+    npx terser bin/index.js -mc unsafe --ecma 2019 \
+    -f wrap_func_args=false,semicolons=false > bin/lexifer || exit $?
 
 # and now it's done
 echo 'Done.'

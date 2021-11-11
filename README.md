@@ -29,7 +29,7 @@ And then, in your script:
 // in CommonJS
 const lexifer = require('lexifer');
 
-// TypeScript with --module commonjs, node12, or nodenext
+// in TypeScript with --module commonjs, node12, or nodenext
 import lexifer = require('lexifer');
 
 // in ES modules
@@ -40,84 +40,6 @@ Lexifer comes bundled with its own type declarations. However, these
 declarations are not parsed properly by TypeScript v3.5 and earlier. If you're
 using Lexifer in a TypeScript project, you must be using TypeScript v3.6 or
 later.
-
-The export is currently a single function, with the following signature:
-
-```ts
-declare const lexifer: (
-    file: string,
-    num?: number | undefined,
-    verbose?: boolean,
-    unsorted?: boolean | undefined,
-    onePerLine?: boolean,
-    stderr?: (inp: Error | string) => void
-) => string;
-```
-
-The arguments are as follows:
-
-- `file`: The full text of the .def file used for word generation. This is the
-full text of the file rather than the file name so that it can be used in cases
-where it is infeasible to use a file; the web version uses the text from an
-HTML textarea as the input.
-- `num`: A nonnegative number, or `undefined`. If falsy (`0`, `undefined`, or
-`NaN`), a paragraph will be generated. If not an integer, it will round it with
-a warning.
-- `verbose`: A boolean value indicating whether to display all generation
-steps. Useful for debugging, but `false` by default. If set to `true` without
-specifying a number of words, it is ignored with a warning.
-- `unsorted`: A boolean value indicating whether to leave the words in the
-generated order rather than alphabetizing them. If set to `true` without
-specifying a number of words, or set to `false` when `verbose` is set to
-`true`, it is ignored with a warning. Defaults to `false` unless `verbose` is
-`true`.
-- `onePerLine`: A boolean value indicating whether to only display one word per
-output line. If set to `true` without specifying a number of words, it is
-ignored with a warning. Defaults to `false`.
-- `stderr`: What to do when encountering a warning or error. Non-fatal errors
-and warnings are reported as strings; fatal errors are reported as error
-objects. The body of the main function is wrapped in a try-catch statement, so
-any errors are guaranteed to hit here without being thrown. If not given,
-defaults to `console.error`.
-
-It always returns a string value. This value is the value that would be output
-to `stdout` from the CLI, or displayed as the generation output in the online
-version. If a fatal error is hit, this may be empty string.
-
-## CLI
-
-As of v1.2, this package now provides a CLI for lexifer. The general syntax is
-
-```
-lexifer [input file] [flags...]
-```
-
-To ensure that `lexifer` is in your path, you should install it globally, using
-`npm i -g lexifer`. If you install it locally, you may have to run
-`node_modules/.bin/lexifer` instead.
-
-If no input file is specified, it will read from stdin, so it supports piping
-from other commands.
-
-Note: on Windows, file names and pipes are supported, but Lexifer cannot read
-directly from stdin as it can on Unix-like systems. This is largely beyond my
-control, as `fs` throws an error in this case.
-
-Flags are as follows:
-
-- `-?` or `--help`: Show the list of flags.
-- `-v` or `--version`: Print the version number then exit.
-- `-o` or `--one-per-line`: Equivalent to `onePerLine` argument above.
-- `-u` or `--unsorted`: Equivalent to the `unsorted` argument above.
-- `-n` or `--number`: Specify the number of words. Example usage:
-`lexifer example.def -n 15`
-- `-V` or `--verbose`: Equivalent to the `verbose` argument above.
-- `-e` or `--encoding`: The input encoding. If not given, defaults to utf-8.
-Valid values: `ascii`; `binary` or `latin1`; `utf-8` or `utf8`; `utf16le`,
-`ucs-2`, or `ucs-2`. For details, see [Node's documentation for encodings][11].
-
-The input file name should go before any flags. If you want to put it at the
-end, it must be delimited with `--`, such as `lexifer -n 15 -- example.def`.
 
 ## About tsconfig
 
@@ -136,5 +58,4 @@ run.
 [7]: https://img.shields.io/github/commit-activity/m/bbrk24/lexifer-ts
 [8]: https://github.com/bbrk24/lexifer-ts/commits "commit log"
 [9]: https://github.com/wmannis/lexifer
-[10]: ./docs.md
-[11]: https://nodejs.org/api/buffer.html#buffers-and-character-encodings
+[10]: ./docs/index.md

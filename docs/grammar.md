@@ -1,131 +1,43 @@
-# Documentation
+# The Phonology Definition
 
-This file explains the usage of Lexifer.
+## Table of Contents
 
-## Table of contents
-
-> - [Inputs](#inputs)
->     - [Online](#online)
->     - [API](#api)
->     - [CLI](#cli)
-> - [The Phonology Definition](#the-phonology-definition)
->     - [Comments](#comments)
->     - [Options – the `with:` directive](#options--the-with-directive)
->         - [Featuresets](#featuresets)
->         - [Engines](#engines)
->             - [`std-assimilations`](#std-assimilations)
->             - [`coronal-metathesis`](#coronal-metathesis)
->             - [`std-rejections`](#std-rejections)
->     - [Alphabetization – the `letters:`
+> - [Overview](#overview)
+> - [Comments](#comments)
+> - [Options – the `with:` directive](#options--the-with-directive)
+>     - [Featuresets](#featuresets)
+>     - [Engines](#engines)
+>         - [`std-assimilations`](#std-assimilations)
+>         - [`coronal-metathesis`](#coronal-metathesis)
+>         - [`std-rejections`](#std-rejections)
+> - [Alphabetization – the `letters:`
 > directive](#alphabetization--the-letters-directive)
->     - [Describing words](#describing-words)
->         - [Phoneme classes](#phoneme-classes)
->         - [Building word shapes](#building-word-shapes)
->         - [Macros](#macros)
->         - [Categories](#categories)
->     - [Filters and Rejections](#filters-and-rejections)
->     - [Cluster Fields](#cluster-fields)
+> - [Describing words](#describing-words)
+>     - [Phoneme classes](#phoneme-classes)
+>     - [Building word shapes](#building-word-shapes)
+>     - [Macros](#macros)
+>     - [Categories](#categories)
+> - [Filters and Rejections](#filters-and-rejections)
+> - [Cluster Fields](#cluster-fields)
 
-## Inputs
-
-### Online
-
-The web app has five inputs.
-
-The first is a large text area. This is where your phonology definition goes;
-most of this document will be spent explaining what that means.
-
-The second is a textbox to enter a number. If you leave it blank or put `0`,
-Lexifer will generate a fake paragraph. If you enter a positive number, it will
-attempt to generate that many words. If you put too large of a number, or if
-the phonology definition leaves a small number of legal words, it may not be
-able to generate the requested amount. Note that it will still try to, and so
-entering too large of a number will result in slowdowns. This shouldn't be an
-issue for reasonable cases, however.
-
-Below that are three checkboxes. They only matter if you enter a positive
-number for the number of words.
-
-The first one is labelled "leave output unsorted". By default, Lexifer will
-alphabetize the wordlist. Check this box to disable that, instead outputting
-the words in a random order.
-
-The second one is labelled "display only one word per line". By default,
-Lexifer will display multiple words on each line, similarly to in paragraph
-mode. What this option does is pretty self-explanatory.
-
-The third one is labelled "display all generation steps". This option exists
-primarily for debugging. It shows you how exactly Lexifer got to the words it
-generated. In this mode, the output is always unsorted, and the one word per
-line option is ignored. I recommend using a smaller number of words for this,
-or else the output gets quite long. With the default phonology definition, an
-example output might look like:
-
-> V?CVD?CVD?CVD? – chánanbi  
-> std-assimilations – chánambi
-> 
-> V?CVD?CVD?CVD? – nininu  
-> (..+)\1+ > REJECT – REJECT
-
-The more filters and rejections you have, the longer the output tends to be.
-
-### API
-
-The inputs to the API are generally the same as for the web app. The first
-input represents the definition, the second input is an optional number for
-the number of words, and the next three inputs are optional booleans
-corresponding to the checkboxes, although not in the same order. There is a
-final parameter, however, which is used to capture errors.
-
-If the main function simply threw its errors, they would be logged to the
-console without the end user ever seeing them. The last argument to the API
-function call is the error handler. In the web app, this puts the error message
-on the page so the user can see it. In the API, it defaults to `console.error`
-if not provided. I expect a common callback to look something like this:
-
-```js
-lexifer(
-    // other arguments
-    err => {
-        if (err instanceof Error) {
-            // Lexifer encountered a problem and stopped.
-            throw err;
-        } else {
-            // Lexifer has a concern but may proceed.
-            console.warn(err);
-        }
-    }
-)
-```
-
-### CLI
-
-The CLI for this version of Lexifer was designed to be compatible with the
-original Python version. The `-o`, `-u`, and `-n` flags work practically the
-same as for that version. If, for some reason, you wanted to specify `-o` or
-`-u` as false (rather than implying that by leaving it out), you may say
-`-o false` and `-u false` respectively. Verbose mode is enabled with `-V`,
-and you may specify the encoding with `-e`. If not given, the default
-encoding is UTF-8. Note that `-u false -V` is not valid.
-
-## The Phonology Definition
+## Overview
 
 The phonology definition is the main input to the wordgen. In the command-line
-version, these were saved as `.def` files; I may still refer to them as def
-files, even though they technically aren't.
+version, these are saved as `.def` files; I may still refer to them as def
+files, even though in most cases they aren't.
 
-### Comments
+## Comments
 
 If a line contains a `#` sign, everything after the `#` on that line is
 ignored. You can use this to leave notes about what the def file does or why
 you made certain decisions.
 
-### Options – the `with:` directive
+## Options – the `with:` directive
 
 The first line of the default definition starts with `with:`. If you have such
 a directive, it should be at the start of the file.
 
-#### Featuresets
+### Featuresets
 
 If you have a `with:` statement, you must use exactly one featureset.
 Currently, there are two options: `std-ipa-features` and
@@ -211,13 +123,13 @@ Choosing a specific featureset does not mean you have to use it for everything.
 Rather, you only need to use it for the consonants that will be considered by
 the engines you use (see below). Any unrecognized segments will be ignored.
 
-#### Engines
+### Engines
 
 Without an engine, there is no real purpose in having a `with:` directive.
 There are three engines present in Lexifer: `std-assimilations`,
 `coronal-metathesis`, and `std-rejections`.
 
-##### `std-assimilations`
+#### `std-assimilations`
 
 This engine has two behaviors.
 
@@ -230,14 +142,14 @@ approximants, lateral approximants, and trills. It applies leftward
 assimilation of place of articulation. For example, it would turn `amta` into
 *anta* and `anka` into *aŋka*.
 
-##### `coronal-metathesis`
+#### `coronal-metathesis`
 
 This engine only affects bilabial, alveolar, and velar plosives and nasals. It
 ensures that clusters of these segments have the alveolar element last. For
 example, it would turn `atka` into *akta* and `anma` into *amna*. It does not
 metathesize a nasal with a plosive; `anpa` would not become *apna*.
 
-##### `std-rejections`
+#### `std-rejections`
 
 **Note: This is WIP and subject to change at any time.**
 
@@ -252,7 +164,7 @@ same place of articulation.
 Thus, clusters like `mw` and `ɟj` are rejected outright. `tl` and `tsl` are
 rejected, but `sl` and `ll` are not.
 
-### Alphabetization – the `letters:` directive
+## Alphabetization – the `letters:` directive
 
 If you have a `with:` directive, there must also be `letters:`. If not,
 `letters:` is optional.
@@ -280,11 +192,11 @@ In this case, `tʃ` is treated as an affricate. Additionally, words starting
 with *tʃ* will be sorted above words starting with *tt*, even though *t* by
 itself comes before *ʃ*.
 
-### Describing Words
+## Describing Words
 
 This is the main purpose of the def file. There are many parts to this.
 
-#### Phoneme classes
+### Phoneme classes
 
 These are groupings of phonemes that have one-letter names. For example, here
 are the classes from the default definition:
@@ -331,7 +243,7 @@ If you specify a weight for any phoneme in a class, you must specify the weight
 for all of them. If you specify a weight of `0`, the phoneme will never be
 selected.
 
-#### Building word shapes
+### Building word shapes
 
 The most common way to make a word is to use the `words:` directive. Words are
 weighted similarly to how phonemes are weighted in classes.
@@ -361,7 +273,7 @@ If you choose from the same class twice in a row, you may put an `!` after the
 second one, to indicate they must not be the same phoneme. For example, `CC`
 may generate *tt*, but `CC!` never will.
 
-#### Macros
+### Macros
 
 Macros are a system designed to provide an abbreviation for syllable shapes.
 They are defined similarly to phoneme classes, but with several important
@@ -390,7 +302,7 @@ words: V?CVD?CVD? V?CVD? V?CVD?CVD?CVD?
 
 However, since most syllables are `CVD?`, it is quicker to use a macro.
 
-#### Categories
+### Categories
 
 The `categories:` directive is an alternative to `words:`. You may not include
 both directives in the same definition.
@@ -417,7 +329,7 @@ categories: root:0 prefix:0 suffix:0 full-word:1
 The order that the categories are declared is the order they are presented when
 generating a specific number of words.
 
-### Filters and Rejections
+## Filters and Rejections
 
 Filters are a way to change a word after it has been generated and run though
 the cluster engines. If your spelling doesn't match up with a featureset
@@ -486,7 +398,7 @@ instead `filter: (..+)\1+ > $1`. This would simplify *kiki* into simply *ki*.
 This may not be desirable as it can make words that are significantly shorter
 than expected.
 
-### Cluster Fields
+## Cluster Fields
 
 Cluster fields are a way to put a lot of related filters or rejections in a
 smaller space. They are laid out like tables, and must start with `%`. For

@@ -1,4 +1,4 @@
-/*! Lexifer TS v1.2.0-alpha.15
+/*! Lexifer TS v1.2.0-alpha.15+3
 
 Copyright (c) 2021 William Baker
 
