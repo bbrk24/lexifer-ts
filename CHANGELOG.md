@@ -21,6 +21,13 @@ The program now correctly enforces that exactly one featureset is used in a
 
 The compilation target is now ES8 (2017) rather than ES6 (2015).
 
+## v1.1.3
+
+### Changed
+
+The coronal metathesis engine now applies metathesis properly, rather than just
+copying the letter.
+
 ## v1.1.2
 
 This version contains very little in the way of functional changes, but
