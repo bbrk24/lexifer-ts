@@ -1,5 +1,6 @@
 {
-    // This file contains only common linting rules between bin/ and src/.
+    // This file contains only common linting rules between bin/, src/, and
+    // tests/.
     "noInlineConfig": true,
     "extends": [
         "eslint:recommended",
@@ -11,9 +12,6 @@
         "eslint-plugin-unicorn"
     ],
     "parser": "@typescript-eslint/parser",
-    "parserOptions": {
-        "project": "./**/tsconfig.json"
-    },
     "rules": {
         /*
          * CODE ERRORS
@@ -24,7 +22,6 @@
             "method"
         ],
         "@typescript-eslint/prefer-for-of": "error",
-        "@typescript-eslint/switch-exhaustiveness-check": "error",
         "default-case": "error",
         "default-case-last": "error",
         "no-eq-null": "error",
@@ -143,14 +140,10 @@
         ],
         "@typescript-eslint/func-call-spacing": "error",
         "@typescript-eslint/no-confusing-non-null-assertion": "error",
-        "@typescript-eslint/no-confusing-void-expression": "error",
         "@typescript-eslint/no-duplicate-imports": "error",
         "@typescript-eslint/no-extra-parens": "error",
         "@typescript-eslint/no-invalid-void-type": "error",
-        "@typescript-eslint/no-meaningless-void-operator": "error",
         "@typescript-eslint/no-non-null-asserted-nullish-coalescing": "error",
-        "@typescript-eslint/no-unnecessary-boolean-literal-compare": "error",
-        "@typescript-eslint/no-unnecessary-condition": "error",
         "@typescript-eslint/no-useless-constructor": "error",
         "@typescript-eslint/semi": "error",
         "@typescript-eslint/space-before-function-paren": [
@@ -264,16 +257,7 @@
             "always"
         ],
         "@typescript-eslint/prefer-function-type": "warn",
-        "@typescript-eslint/prefer-includes": "warn",
         "@typescript-eslint/prefer-optional-chain": "warn",
-        "@typescript-eslint/prefer-readonly": "warn",
-        "@typescript-eslint/prefer-readonly-parameter-types": [
-            "warn",
-            {
-                "ignoreInferredTypes": true
-            }
-        ],
-        "@typescript-eslint/prefer-regexp-exec": "warn",
         "@typescript-eslint/sort-type-union-intersection-members": "warn",
         "@typescript-eslint/type-annotation-spacing": "warn",
         "@typescript-eslint/quotes": [

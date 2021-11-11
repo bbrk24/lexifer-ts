@@ -1,5 +1,5 @@
 "use strict";
-/*! Lexifer TS v1.2.0-alpha.15+3
+/*! Lexifer TS v1.2.0-alpha.16
 
 Copyright (c) 2021 William Baker
 
@@ -612,7 +612,7 @@ class ClusterEngine {
         };
         const newArr = [...word];
         for (let i = 0; i < word.length - 1; ++i) {
-            [newArr[i], newArr[i + 1]] = coronalMetathesis(word[i], word[i + 1]);
+            [newArr[i], newArr[i + 1]] = coronalMetathesis(newArr[i], word[i + 1]);
         }
         return newArr;
     }

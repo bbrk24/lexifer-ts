@@ -1,13 +1,30 @@
 {
-    // This file contains environment information that does not apply to bin/.
+    // This file contains environment information and rules that only apply to
+    // src/.
     "env": {
         "browser": true
     },
     "parserOptions": {
         "ecmaVersion": 8,
-        "sourceType": "module"
+        "sourceType": "module",
+        "project": "src/tsconfig.json"
     },
     "rules": {
+        /*
+         * CODE ERRORS
+         * These are things that will affect the runtime and must be avoided.
+         */
+        "@typescript-eslint/switch-exhaustiveness-check": "error",
+        /*
+         * SYNTAX ERRORS
+         * These are generally undesirable patterns that are to be avoided,
+         * even though most of them are technically not wrong. They could
+         * indicate mistaken intent.
+         */
+        "@typescript-eslint/no-confusing-void-expression": "error",
+        "@typescript-eslint/no-meaningless-void-operator": "error",
+        "@typescript-eslint/no-unnecessary-boolean-literal-compare": "error",
+        "@typescript-eslint/no-unnecessary-condition": "error",
         /*
          * STYLE WARNINGS
          * These are dispreffered styles that do not relate to git issues and
@@ -45,6 +62,15 @@
                 ]
             }
         ],
+        "@typescript-eslint/prefer-includes": "warn",
+        "@typescript-eslint/prefer-readonly": "warn",
+        "@typescript-eslint/prefer-readonly-parameter-types": [
+            "warn",
+            {
+                "ignoreInferredTypes": true
+            }
+        ],
+        "@typescript-eslint/prefer-regexp-exec": "warn",
         /*
          * NON-PROBLEMS
          * These are things that are enabled by default that cause more harm

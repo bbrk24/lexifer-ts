@@ -593,7 +593,7 @@ class ClusterEngine {
 
         for (let i = 0; i < word.length - 1; ++i) {
             [newArr[i], newArr[i + 1]] = coronalMetathesis(
-                word[i]!,
+                newArr[i]!,
                 word[i + 1]!
             );
         }

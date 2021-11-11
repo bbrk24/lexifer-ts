@@ -1,11 +1,12 @@
 {
-    // This file contains environment information and rules that conflict with
-    // the web app.
+    // This file contains environment information and rules that only apply to
+    // bin/.
     "env": {
         "node": true
     },
     "parserOptions": {
-        "ecmaVersion": 10 // compatible with Node 12
+        "ecmaVersion": 10, // compatible with Node 12
+        "project": "bin/tsconfig.json"
     },
     "rules": {
         /*
@@ -13,9 +14,33 @@
          * These are things that will affect the runtime and must be avoided.
          */
         "@typescript-eslint/no-base-to-string": "error",
+        "@typescript-eslint/switch-exhaustiveness-check": "error",
         "eqeqeq": [
             "error",
             "smart"
+        ],
+        /*
+         * SYNTAX ERRORS
+         * These are generally undesirable patterns that are to be avoided,
+         * even though most of them are technically not wrong. They could
+         * indicate mistaken intent.
+         */
+        "@typescript-eslint/no-confusing-void-expression": "error",
+        "@typescript-eslint/no-meaningless-void-operator": "error",
+        "@typescript-eslint/no-unnecessary-boolean-literal-compare": "error",
+        "@typescript-eslint/no-unnecessary-condition": "error",
+        /*
+         * STYLE WARNINGS
+         * These are dispreffered styles that do not relate to git issues and
+         * are not severe enough to be errors.
+         */
+        "@typescript-eslint/prefer-includes": "warn",
+        "@typescript-eslint/prefer-readonly": "warn",
+        "@typescript-eslint/prefer-readonly-parameter-types": [
+            "warn",
+            {
+                "ignoreInferredTypes": true
+            }
         ],
         /*
          * NON-PROBLEMS

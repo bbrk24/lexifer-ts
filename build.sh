@@ -73,4 +73,4 @@ head -n -1 dist/index.js | npx terser -mo dist/lexifer.min.js --ecma 2017 \
 # and now it's done
 echo 'Done.'
 echo 'Minified file sizes:'
-wc -c dist/lexifer.min.js bin/lexifer
+wc -c dist/lexifer.min.js bin/lexifer | sed '$d'
