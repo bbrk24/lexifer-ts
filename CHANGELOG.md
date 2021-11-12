@@ -11,6 +11,9 @@ nasal-trill clusters if both consonants have the same place of articulation.
 
 A CLI, based on the original Python version, has been introduced.
 
+Documentation and testing have been added, in the `docs/` and `tests/` folders
+respectively.
+
 ### Changed
 
 The program does not re-parse the input if it is not changed, improving

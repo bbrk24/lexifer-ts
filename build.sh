@@ -70,7 +70,11 @@ head -n -1 dist/index.js | npx terser -mo dist/lexifer.min.js --ecma 2017 \
     npx terser bin/index.js -mc unsafe --ecma 2019 \
     -f wrap_func_args=false,semicolons=false > bin/lexifer || exit $?
 
-# and now it's done
-echo 'Done.'
-echo 'Minified file sizes:'
-wc -c dist/lexifer.min.js bin/lexifer | sed '$d'
+echo 'Testing...'
+# Only redirects on success, not error
+if yarn test > /dev/null
+then
+    echo 'Done.'
+else
+    exit 1
+fi

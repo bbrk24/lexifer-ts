@@ -9,7 +9,8 @@ This is a TypeScript implementation of William Annis's [Lexifer][9].
 
 To compile this, run the build shell script. This can be run directly, or with
 `yarn prepack`. Windows users may NOT use powershell, and will have to install
-a proper shell terminal.
+a proper shell terminal.  
+To run only the tests, use `yarn test`.
 
 ## Using Lexifer in your project
 
@@ -40,14 +41,6 @@ Lexifer comes bundled with its own type declarations. However, these
 declarations are not parsed properly by TypeScript v3.5 and earlier. If you're
 using Lexifer in a TypeScript project, you must be using TypeScript v3.6 or
 later.
-
-## About tsconfig
-
-The main-level `tsconfig.json` is the one used during compilation of the main
-project. `bin/tsconfig.json` is necessary because the CLI is compiled
-separately from the rest of the project. `src/tsconfig.json` is only used to
-aid the IDE, as otherwise unexpected errors may occur when the build script is
-run.
 
 [1]: https://img.shields.io/npm/v/lexifer
 [2]: https://www.npmjs.com/package/lexifer "npm package"
