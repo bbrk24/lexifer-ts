@@ -1,5 +1,5 @@
 "use strict";
-/*! Lexifer TS v1.2.0-alpha.16+2
+/*! Lexifer TS v1.2.0-alpha.17
 
 Copyright (c) 2021 William Baker
 
@@ -853,7 +853,7 @@ class SoundSystem {
             dict.set(category, 0);
         }
         const ruleSelector = new WeightedSelector(dict);
-        for (let i = 0; force || i < 3 * numWords; ++i) {
+        for (let i = 0; i < Number.MAX_SAFE_INTEGER && (force || i < 4 * numWords); ++i) {
             const rule = ruleSelector.select();
             const form = rule.generate();
             const word = new Word(form, rule.toString());

@@ -42,6 +42,21 @@ declarations are not parsed properly by TypeScript v3.5 and earlier. If you're
 using Lexifer in a TypeScript project, you must be using TypeScript v3.6 or
 later.
 
+To use your project as a lexifer frontend, use the default export:
+
+```js
+import lexifer from 'lexifer';
+
+console.log(
+    lexifer(
+        // ...inputs
+    )
+);
+```
+
+Other utilities, such as `lexifer.ClusterEngine`, are also exposed. See [the
+API documentation][11] for full details.
+
 [1]: https://img.shields.io/npm/v/lexifer
 [2]: https://www.npmjs.com/package/lexifer "npm package"
 [3]: https://img.shields.io/npm/l/lexifer
@@ -52,3 +67,4 @@ later.
 [8]: https://github.com/bbrk24/lexifer-ts/commits "commit log"
 [9]: https://github.com/wmannis/lexifer
 [10]: ./docs/index.md
+[11]: ./docs/api.md

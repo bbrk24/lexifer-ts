@@ -182,8 +182,12 @@ class SoundSystem {
         }
 
         const dict = new Map<Rule | string, number | undefined>(
-            this.ruleset[category]!
+            // @ts-expect-error `Category` and `undefined` are both
+            // individually valid, but no single overload matches both.
+            this.ruleset[category]
         );
+        // If the map is empty, add `category` to it with weight 0 to produce a
+        // more legible error message.
         if (dict.size === 0) {
             dict.set(category, 0);
         }
@@ -192,7 +196,7 @@ class SoundSystem {
 
         /*
          * If they request more words than are possible, we don't want to lock
-         * up. Instead, try up to three times as many (note: is this enough?),
+         * up. Instead, try up to four times as many (note: is this good?),
          * and then cut off after that. However, this doesn't guarantee that
          * it's impossible to generate more. Setting `force` to true requires
          * it to generate that many words, or freeze if it can't. It's
@@ -200,9 +204,13 @@ class SoundSystem {
          * time. I think it's safe to assume it's always possible to generate
          * at least one valid word.
          */
-        for (let i = 0; force || i < 3 * numWords; ++i) {
-            const rule = ruleSelector.select();
-            const form = (<Rule>rule).generate();
+        for (
+            let i = 0;
+            i < Number.MAX_SAFE_INTEGER && (force || i < 4 * numWords);
+            ++i
+        ) {
+            const rule = <Rule>ruleSelector.select();
+            const form = rule.generate();
             const word = new Word(form, rule.toString());
             this.applyFilters(word);
             if (word.toString() !== 'REJECT') {

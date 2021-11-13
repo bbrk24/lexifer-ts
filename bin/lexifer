@@ -1,5 +1,5 @@
 #! /usr/bin/env node
-/*! Lexifer TS v1.2.0-alpha.16+2
+/*! Lexifer TS v1.2.0-alpha.17
 
 Copyright (c) 2021 William Baker
 
@@ -22,14 +22,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 "use strict"
-var _a
+var e
 Object.defineProperty(exports,"__esModule",{value:!0})
-const fs=require("fs"),yargs=require("yargs/yargs"),main=require("../dist"),encodings=["ascii","binary","latin1","ucs-2","ucs2","utf-8","utf16le","utf8"],argv=yargs(process.argv.slice(2)).alias({help:"?",version:"v"}).option("one-per-line",{alias:"o",describe:"Display one word per line",type:"boolean"}).option("unsorted",{alias:"u",describe:"Leave output unsorted",type:"boolean"}).option("number",{alias:"n",describe:"How many words to generate",type:"number"}).option("verbose",{alias:"V",describe:"Display all generation steps",type:"boolean"}).option("encoding",{alias:"e",describe:"What file encoding to use",default:"utf-8",choices:encodings,coerce:e=>{let r=e.toLowerCase()
-if("utf-16le"===r)r="utf16le"
-else if(!encodings.includes(r)){let r=`Invalid values:\n  Argument: encoding, Given: "${e}", Choices: `
-for(let e=0;e<encodings.length;++e)0!==e&&(r+=", "),r+=`"${encodings[e]}"`
-throw Error(r)}return r}}).check(e=>{const r=e._.length
-if(r>1)throw Error(`Expected 1 file (saw ${r}).`)
-return 0===e.number&&console.error("Cannot generate 0 words."),!0}).argv,fileDescriptor=null!==(_a=argv._[0])&&void 0!==_a?_a:0
-try{const e=fs.readFileSync(fileDescriptor,argv.encoding)
-console.log(main(e,argv.number,argv.verbose,argv.unsorted,argv["one-per-line"],e=>{e instanceof Error&&(process.exitCode=1),console.error(e)}))}catch{process.exitCode=1,console.error(0===fileDescriptor?"Error: No input or pipe provided; cannot read from stdin on Windows.":`Error: Could not find file '${fileDescriptor}'.`)}
+const o=require("fs"),r=require("yargs/yargs"),n=require("../dist"),i=["ascii","binary","latin1","ucs-2","ucs2","utf-8","utf16le","utf8"],t=r(process.argv.slice(2)).alias({help:"?",version:"v"}).option("one-per-line",{alias:"o",describe:"Display one word per line",type:"boolean"}).option("unsorted",{alias:"u",describe:"Leave output unsorted",type:"boolean"}).option("number",{alias:"n",describe:"How many words to generate",type:"number"}).option("verbose",{alias:"V",describe:"Display all generation steps",type:"boolean"}).option("encoding",{alias:"e",describe:"What file encoding to use",default:"utf-8",choices:i,coerce:e=>{let o=e.toLowerCase()
+if("utf-16le"===o)o="utf16le"
+else if(!i.includes(o)){let o=`Invalid values:\n  Argument: encoding, Given: "${e}", Choices: `
+for(let e=0;e<i.length;++e)0!==e&&(o+=", "),o+=`"${i[e]}"`
+throw Error(o)}return o}}).check(e=>{const o=e._.length
+if(o>1)throw Error(`Expected 1 file (saw ${o}).`)
+return 0===e.number&&console.error("Cannot generate 0 words."),!0}).argv,s=null!==(e=t._[0])&&void 0!==e?e:0
+try{const e=o.readFileSync(s,t.encoding)
+console.log(n(e,t.number,t.verbose,t.unsorted,t["one-per-line"],e=>{e instanceof Error&&(process.exitCode=1),console.error(e)}))}catch{process.exitCode=1,console.error(0===s?"Error: No input or pipe provided; cannot read from stdin on Windows.":`Error: Could not find file '${s}'.`)}
