@@ -26,8 +26,8 @@ import { SoundSystem, textify, invalidItemAndWeight } from './wordgen';
 
 class PhonologyDefinition {
     private readonly macros: [RegExp, string][] = [];
+    private readonly phClasses: string[] = [];
     private letters: string[] = [];
-    private phClasses: string[] = [];
     private categories: string[] = [];
 
     /*
@@ -312,7 +312,7 @@ class PhonologyDefinition {
                 values
             ]);
         } else if (sclass.length === 1) {
-            this.phClasses = [...this.phClasses, ...values.split(/\s+/gu)];
+            this.phClasses.push(...values.split(/\s+/gu));
             this.soundsys.addPhUnit(sclass, values);
         } else if (this.categories.includes(sclass)) {
             this.addRules(values, sclass);
@@ -352,14 +352,18 @@ class PhonologyDefinition {
     generate(
         numWords = 1,
         verbose = false,
-        unsorted = verbose,
-        onePerLine = false
+        unsorted = verbose
     ) {
-        let words = '';
-        let wordList: string[] = [];
+        const retval: { [key: string]: string[] } = Object.create(null);
 
         for (const cat of this.categories) {
-            wordList = this.soundsys.generate(numWords, verbose, unsorted, cat);
+            const wordList = this.soundsys.generate(
+                numWords,
+                verbose,
+                unsorted,
+                cat
+            );
+
             if (wordList.length < numWords) {
                 this.stderr(`Could only generate ${wordList.length} word`
                     + `${wordList.length === 1 ? '' : 's'} `
@@ -367,14 +371,10 @@ class PhonologyDefinition {
                     + `(${numWords} requested).`);
             }
 
-            if (cat !== 'words:') {
-                words += `\n\n${cat}:\n`;
-            }
-
-            words += wordList.join(onePerLine || verbose ? '\n' : ' ');
+            retval[cat] = wordList;
         }
 
-        return words.trim();
+        return retval;
     }
 
     paragraph(sentences?: number) {

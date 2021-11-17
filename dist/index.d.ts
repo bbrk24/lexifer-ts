@@ -1,4 +1,4 @@
-/*! Lexifer TS v1.2.0-alpha.17
+/*! Lexifer TS v1.2.0-alpha.18
 
 Copyright (c) 2021 William Baker
 
@@ -70,14 +70,28 @@ interface LexiferOptions {
     number: number;
     unsorted?: boolean;
 }
+declare class GeneratedWords implements Iterable<[string, string]> {
+    readonly categories: {
+        readonly [key: string]: readonly string[];
+    };
+    readonly warnings: readonly string[];
+    constructor(categories: {
+        readonly [key: string]: readonly string[];
+    }, warnings: readonly string[]);
+    get allWords(): string[];
+    [Symbol.iterator](): IterableIterator<[string, string]>;
+}
 declare class WordGenerator {
     private readonly phonDef;
-    constructor(file: string, stderr: (error: Error | string) => void);
-    generate(options: Readonly<LexiferOptions>): string;
+    private readonly initWarnings;
+    private runWarnings;
+    constructor(file: string);
+    generate(options: Readonly<LexiferOptions>): GeneratedWords;
 }
 declare const main: {
     (file: string, num?: number | undefined, verbose?: boolean, unsorted?: boolean | undefined, onePerLine?: boolean, stderr?: (inp: Error | string) => void): string;
     WordGenerator: typeof WordGenerator;
+    GeneratedWords: typeof GeneratedWords;
     ClusterEngine: typeof ClusterEngine;
     Segment: typeof Segment;
     Place: typeof Place;

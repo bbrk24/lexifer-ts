@@ -1,5 +1,5 @@
 "use strict";
-/*! Lexifer TS v1.2.0-alpha.17
+/*! Lexifer TS v1.2.0-alpha.18
 
 Copyright (c) 2021 William Baker
 
@@ -61,8 +61,8 @@ class PhonologyDefinition {
     constructor(defFile, stderr) {
         this.stderr = stderr;
         this.macros = [];
-        this.letters = [];
         this.phClasses = [];
+        this.letters = [];
         this.categories = [];
         this.defFileLineNum = 0;
         this.soundsys = new SoundSystem();
@@ -301,7 +301,7 @@ class PhonologyDefinition {
             ]);
         }
         else if (sclass.length === 1) {
-            this.phClasses = [...this.phClasses, ...values.split(/\s+/gu)];
+            this.phClasses.push(...values.split(/\s+/gu));
             this.soundsys.addPhUnit(sclass, values);
         }
         else if (this.categories.includes(sclass)) {
@@ -335,23 +335,19 @@ class PhonologyDefinition {
             }
         }
     }
-    generate(numWords = 1, verbose = false, unsorted = verbose, onePerLine = false) {
-        let words = '';
-        let wordList = [];
+    generate(numWords = 1, verbose = false, unsorted = verbose) {
+        const retval = Object.create(null);
         for (const cat of this.categories) {
-            wordList = this.soundsys.generate(numWords, verbose, unsorted, cat);
+            const wordList = this.soundsys.generate(numWords, verbose, unsorted, cat);
             if (wordList.length < numWords) {
                 this.stderr(`Could only generate ${wordList.length} word`
                     + `${wordList.length === 1 ? '' : 's'} `
                     + (cat === 'words:' ? '' : `of category '${cat}' `)
                     + `(${numWords} requested).`);
             }
-            if (cat !== 'words:') {
-                words += `\n\n${cat}:\n`;
-            }
-            words += wordList.join(onePerLine || verbose ? '\n' : ' ');
+            retval[cat] = wordList;
         }
-        return words.trim();
+        return retval;
     }
     paragraph(sentences) {
         return textify(this.soundsys, sentences);
@@ -906,12 +902,47 @@ const textify = (phsys, sentences = 25) => {
     return wrap(text.trim());
 };
 const wrap = (str) => str.replace(/(?![^\n]{1,70}$)([^\n]{1,70})\s/gu, '$1\n');
+class GeneratedWords {
+    constructor(categories, warnings) {
+        this.categories = categories;
+        this.warnings = warnings;
+    }
+    get allWords() {
+        const retval = [];
+        for (const words of Object.values(this.categories)) {
+            retval.push(...words);
+        }
+        return retval;
+    }
+    *[Symbol.iterator]() {
+        for (const [cat, words] of Object.entries(this.categories)) {
+            for (const word of words) {
+                yield [cat, word];
+            }
+        }
+    }
+}
 class WordGenerator {
-    constructor(file, stderr) {
-        this.phonDef = new PhonologyDefinition(file, stderr);
+    constructor(file) {
+        this.initWarnings = [];
+        this.runWarnings = [];
+        let initDone = false;
+        this.phonDef = new PhonologyDefinition(file, e => {
+            if (e instanceof Error) {
+                throw e;
+            }
+            else if (initDone) {
+                this.runWarnings.push(e);
+            }
+            else {
+                this.initWarnings.push(e);
+            }
+        });
+        initDone = true;
     }
     generate(options) {
-        return this.phonDef.generate(options.number, false, options.unsorted);
+        this.runWarnings = [];
+        return new GeneratedWords(this.phonDef.generate(options.number, false, options.unsorted), [...this.initWarnings, ...this.runWarnings]);
     }
 }
 const main = (() => {
@@ -958,7 +989,16 @@ const main = (() => {
                                 + 'verbose mode.');
                         }
                     }
-                    ans = wrap(phonDef.generate(num, verbose, unsorted, onePerLine));
+                    const words = phonDef.generate(num, verbose, unsorted);
+                    for (const cat in words) {
+                        if (cat !== 'words:') {
+                            ans += `\n\n${cat}:\n`;
+                        }
+                        ans += words[cat].join(onePerLine || verbose
+                            ? '\n'
+                            : ' ');
+                    }
+                    ans = wrap(ans);
                 }
             }
             else {
@@ -981,6 +1021,7 @@ const main = (() => {
         return ans;
     };
     lexifer.WordGenerator = WordGenerator;
+    lexifer.GeneratedWords = GeneratedWords;
     lexifer.ClusterEngine = ClusterEngine;
     lexifer.Segment = Segment;
     lexifer.Place = Place;

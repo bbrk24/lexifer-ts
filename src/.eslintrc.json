@@ -39,6 +39,19 @@
                 ],
                 "selector": "default"
             },
+            // allow methods to have consecutive caps (e.g. toJSON)
+            {
+                "format": [
+                    "camelCase"
+                ],
+                "selector": [
+                    "classMethod",
+                    "typeMethod"
+                ],
+                "modifiers": [
+                    "public"
+                ]
+            },
             // require type names to be PascalCase
             {
                 "format": [

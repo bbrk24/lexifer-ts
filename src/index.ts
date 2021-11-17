@@ -30,18 +30,91 @@ interface LexiferOptions {
 }
 
 /**
+ * The return type of `WordGenerator#generate()`.
+ */
+class GeneratedWords implements Iterable<[string, string]> {
+    /**
+     * @internal Create a new `GeneratedWords` object given a Record.
+     * @param categories An associative array of category names to arrays of
+     * words. Constructed using `Object.create(null)`, so there is guaranteed
+     * to be no key pollution.
+     * @param warnings Any warnings produced during word generation.
+     */
+    constructor(
+        readonly categories: { readonly [key: string]: readonly string[] },
+        readonly warnings: readonly string[]
+    ) {
+    }
+
+    /**
+     * All words that have been generated, regardless of category.
+     */
+    get allWords() {
+        const retval: string[] = [];
+
+        for (const words of Object.values(this.categories)) {
+            retval.push(...words);
+        }
+
+        return retval;
+    }
+
+    *[Symbol.iterator](): IterableIterator<[string, string]> {
+        for (const [cat, words] of Object.entries(this.categories)) {
+            for (const word of words) {
+                yield [cat, word];
+            }
+        }
+    }
+}
+
+/**
  * Everything about this class is heavily WIP and subject to change without
  * notice.
  */
 class WordGenerator {
     private readonly phonDef: PhonologyDefinition;
+    private readonly initWarnings: string[] = [];
+    private runWarnings?: string[];
 
-    constructor(file: string, stderr: (error: Error | string) => void) {
-        this.phonDef = new PhonologyDefinition(file, stderr);
+    constructor(file: string) {
+        let initDone = false;
+
+        this.phonDef = new PhonologyDefinition(file, e => {
+            if (e instanceof Error) {
+                throw e;
+            } else if (initDone) {
+                this.runWarnings!.push(e);
+            } else {
+                this.initWarnings.push(e);
+            }
+        });
+
+        initDone = true;
     }
 
     generate(options: Readonly<LexiferOptions>) {
-        return this.phonDef.generate(options.number, false, options.unsorted);
+        if (
+            options.number > Number.MAX_SAFE_INTEGER
+            || options.number <= 0
+            || Number.isNaN(options.number)
+        ) {
+            throw new Error(`Cannot generate ${options.number} words.`);
+        }
+
+        this.runWarnings = [];
+
+        let number = options.number;
+        if (number !== Math.round(number)) {
+            this.runWarnings.push(`Requested number of words (${number}) is `
+                + `not an integer. Rounding to ${Math.round(number)}.`);
+            number = Math.round(number);
+        }
+
+        return new GeneratedWords(
+            this.phonDef.generate(number, false, options.unsorted),
+            [...this.initWarnings, ...this.runWarnings]
+        );
     }
 }
 
@@ -57,8 +130,7 @@ const main = (() => {
         }
 
         for (let i = 0; i < str.length; ++i) {
-            hash = (hash << 5) - hash + str.charCodeAt(i);
-            hash = Math.trunc(hash);
+            hash = Math.trunc((hash << 5) - hash + str.charCodeAt(i));
         }
 
         return hash;
@@ -73,6 +145,7 @@ const main = (() => {
         stderr: (inp: Error | string) => void = console.error
     ) => {
         let ans = '';
+
         try {
             // There's no need to re-parse if nothing changed.
             const newHash = hashString(file);
@@ -103,9 +176,21 @@ const main = (() => {
                         }
                     }
 
-                    ans = wrap(
-                        phonDef.generate(num, verbose, unsorted, onePerLine)
-                    );
+                    const words = phonDef.generate(num, verbose, unsorted);
+
+                    for (const cat in words) {
+                        if (cat !== 'words:') {
+                            ans += `\n\n${cat}:\n`;
+                        }
+
+                        ans += words[cat]!.join(
+                            onePerLine || verbose
+                                ? '\n'
+                                : ' '
+                        );
+                    }
+
+                    ans = wrap(ans);
                 }
             } else {
                 if (verbose) {
@@ -129,6 +214,7 @@ const main = (() => {
     };
 
     lexifer.WordGenerator = WordGenerator;
+    lexifer.GeneratedWords = GeneratedWords;
 
     lexifer.ClusterEngine = ClusterEngine;
     lexifer.Segment = Segment;
