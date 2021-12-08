@@ -24,6 +24,13 @@ The program now correctly enforces that exactly one featureset is used in a
 
 The compilation target is now ES8 (2017) rather than ES6 (2015).
 
+## v1.1.4
+
+### Changed
+
+A bug in the alphabetization was fixed, involving words that start the same but
+end differently.
+
 ## v1.1.3
 
 ### Changed
