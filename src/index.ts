@@ -23,6 +23,7 @@
 import wrap from './wrap';
 import PhonologyDefinition from './PhDefParser';
 import { ClusterEngine, Segment, Place, Manner } from './SmartClusters';
+import ArbSorter from './ArbSorter';
 
 interface LexiferOptions {
     number: number;
@@ -220,6 +221,8 @@ const main = (() => {
     lexifer.Segment = Segment;
     lexifer.Place = Place;
     lexifer.Manner = Manner;
+
+    lexifer.__ArbSorter = ArbSorter;
 
     return lexifer;
 })();

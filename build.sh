@@ -65,7 +65,7 @@ cd ../
 
 echo 'Minifying...'
 
-head -n -1 dist/index.js | npx terser -mo dist/lexifer.min.js --ecma 2017 \
+sed '$d' dist/index.js | npx terser -mo dist/lexifer.min.js --ecma 2017 \
     -c unsafe,unsafe_symbols -f wrap_func_args=false &&
     npx terser bin/index.js -mc unsafe --ecma 2019 --toplevel \
     -f wrap_func_args=false,semicolons=false > bin/lexifer || exit $?

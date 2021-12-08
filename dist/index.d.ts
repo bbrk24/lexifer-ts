@@ -1,4 +1,4 @@
-/*! Lexifer TS v1.2.0-alpha.18
+/*! Lexifer TS v1.2.0-alpha.19
 
 Copyright (c) 2021 William Baker
 
@@ -20,6 +20,16 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+declare class ArbSorter {
+    private readonly splitter;
+    private readonly ords;
+    private readonly vals;
+    constructor(order: string);
+    private wordAsValues;
+    private valuesAsWord;
+    split(word: string): string[];
+    sort(list: readonly string[]): string[];
+}
 declare enum Place {
     Bilabial = 0,
     Labiodental = 1,
@@ -84,7 +94,7 @@ declare class GeneratedWords implements Iterable<[string, string]> {
 declare class WordGenerator {
     private readonly phonDef;
     private readonly initWarnings;
-    private runWarnings;
+    private runWarnings?;
     constructor(file: string);
     generate(options: Readonly<LexiferOptions>): GeneratedWords;
 }
@@ -96,5 +106,6 @@ declare const main: {
     Segment: typeof Segment;
     Place: typeof Place;
     Manner: typeof Manner;
+    __ArbSorter: typeof ArbSorter;
 };
 export = main;

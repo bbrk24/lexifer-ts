@@ -1,5 +1,5 @@
 "use strict";
-/*! Lexifer TS v1.2.0-alpha.18
+/*! Lexifer TS v1.2.0-alpha.19
 
 Copyright (c) 2021 William Baker
 
@@ -52,7 +52,14 @@ class ArbSorter {
     }
     sort(list) {
         const l2 = list.filter(el => el !== '').map(this.wordAsValues, this);
-        l2.sort((a, b) => a[0] - b[0]);
+        l2.sort((a, b) => {
+            for (let i = 0; i < Math.min(a.length, b.length); ++i) {
+                if (a[i] !== b[i]) {
+                    return a[i] - b[i];
+                }
+            }
+            return a.length - b.length;
+        });
         return l2.map(this.valuesAsWord, this);
     }
 }
@@ -925,7 +932,6 @@ class GeneratedWords {
 class WordGenerator {
     constructor(file) {
         this.initWarnings = [];
-        this.runWarnings = [];
         let initDone = false;
         this.phonDef = new PhonologyDefinition(file, e => {
             if (e instanceof Error) {
@@ -941,8 +947,19 @@ class WordGenerator {
         initDone = true;
     }
     generate(options) {
+        if (options.number > Number.MAX_SAFE_INTEGER
+            || options.number <= 0
+            || Number.isNaN(options.number)) {
+            throw new Error(`Cannot generate ${options.number} words.`);
+        }
         this.runWarnings = [];
-        return new GeneratedWords(this.phonDef.generate(options.number, false, options.unsorted), [...this.initWarnings, ...this.runWarnings]);
+        let number = options.number;
+        if (number !== Math.round(number)) {
+            this.runWarnings.push(`Requested number of words (${number}) is `
+                + `not an integer. Rounding to ${Math.round(number)}.`);
+            number = Math.round(number);
+        }
+        return new GeneratedWords(this.phonDef.generate(number, false, options.unsorted), [...this.initWarnings, ...this.runWarnings]);
     }
 }
 const main = (() => {
@@ -954,8 +971,7 @@ const main = (() => {
             return hash;
         }
         for (let i = 0; i < str.length; ++i) {
-            hash = (hash << 5) - hash + str.charCodeAt(i);
-            hash = Math.trunc(hash);
+            hash = Math.trunc((hash << 5) - hash + str.charCodeAt(i));
         }
         return hash;
     };
@@ -1026,6 +1042,7 @@ const main = (() => {
     lexifer.Segment = Segment;
     lexifer.Place = Place;
     lexifer.Manner = Manner;
+    lexifer.__ArbSorter = ArbSorter;
     return lexifer;
 })();
 const genWords = () => {
