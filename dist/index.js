@@ -1,5 +1,5 @@
 "use strict";
-/*! Lexifer TS v1.2.0-alpha.19
+/*! Lexifer TS v1.2.0-alpha.20
 
 Copyright (c) 2021 William Baker
 
@@ -971,7 +971,7 @@ const main = (() => {
             return hash;
         }
         for (let i = 0; i < str.length; ++i) {
-            hash = Math.trunc((hash << 5) - hash + str.charCodeAt(i));
+            hash = Math.trunc((hash << 5) - hash + str.codePointAt(i));
         }
         return hash;
     };

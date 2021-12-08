@@ -131,7 +131,7 @@ const main = (() => {
         }
 
         for (let i = 0; i < str.length; ++i) {
-            hash = Math.trunc((hash << 5) - hash + str.charCodeAt(i));
+            hash = Math.trunc((hash << 5) - hash + str.codePointAt(i)!);
         }
 
         return hash;
