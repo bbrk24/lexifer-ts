@@ -81,7 +81,15 @@ class ArbSorter {
         const l2 = list.filter(el => el !== '')
             .map(el => this.wordAsValues(el));
 
-        l2.sort((a, b) => a[0]! - b[0]!);
+        l2.sort((a, b) => {
+            for (let i = 0; i < Math.min(a.length, b.length); ++i) {
+                if (a[i] !== b[i]) {
+                    return a[i]! - b[i]!;
+                }
+            }
+
+            return a.length - b.length;
+        });
 
         return l2.map(el => this.valuesAsWord(el));
     }

@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## v1.1.4
+
+### Changed
+
+A bug in the alphabetization was fixed, involving words that start the same but
+end differently.
+
 ## v1.1.3
 
 ### Changed
