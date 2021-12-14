@@ -52,7 +52,6 @@ class SoundSystem {
     randpercent = 10;
     useAssim = false;
     useCoronalMetathesis = false;
-    useRejections = false;
     sorter: ArbSorter | null = null;
 
     constructor() {
@@ -71,9 +70,6 @@ class SoundSystem {
         }
         if (this.useCoronalMetathesis) {
             word.applyCoronalMetathesis();
-        }
-        if (this.useRejections) {
-            word.applyRejections();
         }
 
         word.applyFilters(this.filters);

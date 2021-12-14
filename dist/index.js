@@ -1,5 +1,5 @@
 "use strict";
-/*! Lexifer TS v1.2.0-alpha.21
+/*! Lexifer TS v1.2.0-alpha.22
 
 Copyright (c) 2021 William Baker
 
@@ -125,15 +125,13 @@ class PhonologyDefinition {
                 throw new Error(`parsing error at '${line}'.`);
             }
         }
-        if (this.soundsys.useAssim
-            || this.soundsys.useCoronalMetathesis
-            || this.soundsys.useRejections) {
+        if (this.soundsys.useAssim || this.soundsys.useCoronalMetathesis) {
             if (!Word.clusterEngine) {
                 throw new Error('Must select a featureset.');
             }
             else if (!this.soundsys.sorter) {
-                this.stderr("Without 'letters:' cannot apply assimilations, "
-                    + 'rejections, or coronal metathesis.');
+                this.stderr("Without 'letters:' cannot apply assimilations or "
+                    + 'coronal metathesis.');
             }
         }
     }
@@ -465,9 +463,6 @@ var Manner;
     Manner[Manner["LateralFricative"] = 4] = "LateralFricative";
     Manner[Manner["LateralAffricate"] = 5] = "LateralAffricate";
     Manner[Manner["Affricate"] = 6] = "Affricate";
-    Manner[Manner["Approx"] = 7] = "Approx";
-    Manner[Manner["LateralApproximant"] = 8] = "LateralApproximant";
-    Manner[Manner["Trill"] = 9] = "Trill";
 })(Manner || (Manner = {}));
 class Segment {
     constructor(representation, voiced, place, manner) {
@@ -481,11 +476,6 @@ class Segment {
     }
     get isPeripheral() {
         return this.place === Place.Bilabial || this.place === Place.Velar;
-    }
-    get isApprox() {
-        return this.manner === Manner.Approx
-            || this.manner === Manner.LateralApproximant
-            || this.manner === Manner.Trill;
     }
     toString() {
         return this.representation;
@@ -502,9 +492,6 @@ class ClusterEngine {
             new Segment('v', true, Place.Labiodental, Manner.Fricative),
             new Segment('m', true, Place.Bilabial, Manner.Nasal),
             new Segment('m', true, Place.Labiodental, Manner.Nasal),
-            new Segment(isIpa ? 'ʋ' : 'vw', true, Place.Bilabial, Manner.Approx),
-            new Segment('w', true, Place.Bilabial, Manner.Approx),
-            new Segment('w', true, Place.Labiodental, Manner.Approx),
             new Segment('t', false, Place.Alveolar, Manner.Plosive),
             new Segment('d', true, Place.Alveolar, Manner.Plosive),
             new Segment('s', false, Place.Alveolar, Manner.Sibilant),
@@ -522,9 +509,6 @@ class ClusterEngine {
             new Segment(isIpa ? 'tʃ' : 'ch', false, Place.Postalveolar, Manner.Affricate),
             new Segment(isIpa ? 'dʒ' : 'j', true, Place.Postalveolar, Manner.Affricate),
             new Segment('n', true, Place.Alveolar, Manner.Nasal),
-            new Segment(isIpa ? 'ɹ' : 'rh', true, Place.Alveolar, Manner.Approx),
-            new Segment('l', true, Place.Alveolar, Manner.LateralApproximant),
-            new Segment('r', true, Place.Alveolar, Manner.Trill),
             new Segment(isIpa ? 'ʈ' : 'rt', false, Place.Retroflex, Manner.Plosive),
             new Segment(isIpa ? 'ɖ' : 'rd', true, Place.Retroflex, Manner.Plosive),
             new Segment(isIpa ? 'ʂ' : 'sr', false, Place.Retroflex, Manner.Sibilant),
@@ -532,8 +516,6 @@ class ClusterEngine {
             new Segment(isIpa ? 'ʈʂ' : 'rts', false, Place.Retroflex, Manner.Affricate),
             new Segment(isIpa ? 'ɖʐ' : 'rdz', true, Place.Retroflex, Manner.Affricate),
             new Segment(isIpa ? 'ɳ' : 'rn', true, Place.Retroflex, Manner.Nasal),
-            new Segment(isIpa ? 'ɻ' : 'rr', true, Place.Retroflex, Manner.Approx),
-            new Segment(isIpa ? 'ɭ' : 'rl', true, Place.Retroflex, Manner.LateralApproximant),
             new Segment(isIpa ? 'c' : 'ky', false, Place.Palatal, Manner.Plosive),
             new Segment(isIpa ? 'ɟ' : 'gy', true, Place.Palatal, Manner.Plosive),
             new Segment(isIpa ? 'ɕ' : 'sy', false, Place.Palatal, Manner.Sibilant),
@@ -543,13 +525,11 @@ class ClusterEngine {
             new Segment(isIpa ? 'tɕ' : 'cy', false, Place.Palatal, Manner.Affricate),
             new Segment(isIpa ? 'dʑ' : 'jy', true, Place.Palatal, Manner.Affricate),
             new Segment(isIpa ? 'ɲ' : 'ny', true, Place.Palatal, Manner.Nasal),
-            new Segment(isIpa ? 'j' : 'y', true, Place.Palatal, Manner.Approx),
             new Segment('k', false, Place.Velar, Manner.Plosive),
             new Segment('g', true, Place.Velar, Manner.Plosive),
             new Segment(isIpa ? 'x' : 'kh', false, Place.Velar, Manner.Fricative),
             new Segment(isIpa ? 'ɣ' : 'gh', true, Place.Velar, Manner.Fricative),
             new Segment(isIpa ? 'ŋ' : 'ng', true, Place.Velar, Manner.Nasal),
-            new Segment(isIpa ? 'ɰ' : 'wy', true, Place.Velar, Manner.Approx),
             new Segment('q', false, Place.Uvular, Manner.Plosive),
             new Segment(isIpa ? 'ɢ' : 'gq', true, Place.Uvular, Manner.Plosive),
             new Segment(isIpa ? 'χ' : 'qh', false, Place.Uvular, Manner.Fricative),
@@ -568,7 +548,7 @@ class ClusterEngine {
             const data1 = this.segments.find(el => el.representation === ph1);
             if (data1 && data1.manner === Manner.Nasal) {
                 const data2 = this.segments.find(el => el.representation === ph2);
-                if (data2 && !data2.isApprox) {
+                if (data2) {
                     const result = this.segments.find(el => el.place === data2.place
                         && el.manner === Manner.Nasal);
                     if (result) {
@@ -580,7 +560,7 @@ class ClusterEngine {
         };
         const voiceAssimilate = (ph1, ph2) => {
             const data2 = this.segments.find(el => el.representation === ph2);
-            if (data2 && !data2.isApprox) {
+            if (data2) {
                 const data1 = this.segments.find(el => el.representation === ph1);
                 if (data1) {
                     const result = this.segments.find(el => el.voiced === data2.voiced
@@ -618,28 +598,6 @@ class ClusterEngine {
             [newArr[i], newArr[i + 1]] = coronalMetathesis(newArr[i], word[i + 1]);
         }
         return newArr;
-    }
-    applyRejections(word) {
-        const rejectCluster = (ph1, ph2) => {
-            const data1 = this.segments.find(el => el.representation === ph1);
-            if (data1 && data1.manner !== Manner.Sibilant) {
-                const data2 = this.segments.find(el => el.representation === ph2);
-                if ((data2 === null || data2 === void 0 ? void 0 : data2.isApprox)
-                    && data1.manner !== Manner.Trill
-                    && data2.place === data1.place) {
-                    if (data2.manner === Manner.Trill) {
-                        return data1.isApprox
-                            || data1.manner === Manner.Nasal;
-                    }
-                    return data1 !== data2;
-                }
-            }
-            return false;
-        };
-        if (rejectCluster(word[0], word[1])) {
-            return ['REJECT'];
-        }
-        return word;
     }
 }
 class WeightedSelector {
@@ -711,16 +669,6 @@ class Word {
             }
         }
     }
-    applyRejections() {
-        if (Word.sorter && Word.clusterEngine) {
-            const newWord = Word.clusterEngine.applyRejections(Word.sorter.split(last(this.forms)))
-                .join('');
-            if (newWord !== last(this.forms)) {
-                this.forms.push(newWord);
-                this.filters.push('std-rejections');
-            }
-        }
-    }
     toString() {
         if (Word.verbose) {
             let ans = '';
@@ -757,7 +705,6 @@ class SoundSystem {
         this.randpercent = 10;
         this.useAssim = false;
         this.useCoronalMetathesis = false;
-        this.useRejections = false;
         this.sorter = null;
         Fragment.getRandomPhoneme = phoneme => {
             if (phoneme in this.phonemeset) {
@@ -772,9 +719,6 @@ class SoundSystem {
         }
         if (this.useCoronalMetathesis) {
             word.applyCoronalMetathesis();
-        }
-        if (this.useRejections) {
-            word.applyRejections();
         }
         word.applyFilters(this.filters);
         return word;

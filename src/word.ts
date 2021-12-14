@@ -91,22 +91,6 @@ class Word {
         }
     }
 
-    applyRejections() {
-        if (Word.sorter && Word.clusterEngine) {
-            const newWord = Word.clusterEngine.applyRejections(
-                Word.sorter.split(
-                    last(this.forms)!
-                )
-            )
-                .join('');
-
-            if (newWord !== last(this.forms)) {
-                this.forms.push(newWord);
-                this.filters.push('std-rejections');
-            }
-        }
-    }
-
     toString() {
         if (Word.verbose) {
             let ans = '';

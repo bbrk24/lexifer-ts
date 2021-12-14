@@ -1,4 +1,4 @@
-/*! Lexifer TS v1.2.0-alpha.21
+/*! Lexifer TS v1.2.0-alpha.22
 
 Copyright (c) 2021 William Baker
 
@@ -47,10 +47,7 @@ declare enum Manner {
     Sibilant = 3,
     LateralFricative = 4,
     LateralAffricate = 5,
-    Affricate = 6,
-    Approx = 7,
-    LateralApproximant = 8,
-    Trill = 9
+    Affricate = 6
 }
 declare class Segment {
     readonly representation: string;
@@ -60,7 +57,6 @@ declare class Segment {
     constructor(representation: string, voiced: boolean, place: Place, manner: Manner);
     get isStop(): boolean;
     get isPeripheral(): boolean;
-    get isApprox(): boolean;
     toString(): string;
 }
 interface SegmentFeatures {
@@ -74,7 +70,6 @@ declare class ClusterEngine {
     getSegment(features: Readonly<SegmentFeatures>): Segment | undefined;
     applyAssimilations(word: readonly string[]): string[];
     applyCoronalMetathesis(word: readonly string[]): string[];
-    applyRejections(word: readonly string[]): readonly string[];
 }
 interface LexiferOptions {
     number: number;

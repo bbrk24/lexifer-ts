@@ -9,7 +9,6 @@
 >     - [Engines](#engines)
 >         - [`std-assimilations`](#std-assimilations)
 >         - [`coronal-metathesis`](#coronal-metathesis)
->         - [`std-rejections`](#std-rejections)
 > - [Alphabetization – the `letters:`
 > directive](#alphabetization--the-letters-directive)
 > - [Describing words](#describing-words)
@@ -53,8 +52,6 @@ The recognized consonants are as follows:
 |  f  |    f    | voiceless labiodental fricative      |
 |  v  |    v    | voiced labiodental fricative         |
 |  m  |    m    | voiced labial¹ nasal                 |
-|  ʋ  |   vw    | voiced labiodental approximant       |
-|  w  |    w    | voiced labial¹ approximant           |
 |  t  |    t    | voiceless alveolar plosive           |
 |  d  |    d    | voiced alveolar plosive              |
 |  s  |    s    | voiceless alveolar sibilant          |
@@ -72,9 +69,6 @@ The recognized consonants are as follows:
 | tʃ  |   ch    | voiceless postalveolar affricate     |
 | dʒ  |    j    | voiced postalveolar affricate        |
 |  n  |    n    | voiced alveolar nasal                |
-|  ɹ  |   rh    | voiced alveolar approximant          |
-|  l  |    l    | voiced alveolar lateral approximant  |
-|  r  |    r    | voiced alveolar trill                |
 |  ʈ  |   rt    | voiceless retroflex plosive          |
 |  ɖ  |   rd    | voiced retroflex plosive             |
 |  ʂ  |   sr    | voiceless retroflex sibilant         |
@@ -82,8 +76,6 @@ The recognized consonants are as follows:
 | ʈʂ  |   rts   | voiceless retroflex affricate        |
 | ɖʐ  |   rdz   | voiced retroflex affricate           |
 |  ɳ  |   rn    | voiced retroflex nasal               |
-|  ɻ  |   rr    | voiced retroflex approximant         |
-|  ɭ  |   rl    | voiced retroflex lateral approximant |
 |  c  |   ky    | voiceless palatal plosive            |
 |  ɟ  |   gy    | voiced palatal plosive               |
 |  ɕ  |   sy    | voiceless palatal sibilant           |
@@ -93,13 +85,11 @@ The recognized consonants are as follows:
 | tɕ  |   cy    | voiceless palatal affricate          |
 | dʑ  |   jy    | voiced palatal affricate             |
 |  ɲ  |   ny    | voiced palatal nasal                 |
-|  j  |    y    | voiced palatal approximant           |
 |  k  |    k    | voiceless velar plosive              |
 |  g  |    g    | voiced velar plosive                 |
 |  x  |   kh    | voiceless velar fricative            |
 |  ɣ  |   gh    | voiced velar fricative               |
 |  ŋ  |   ng    | voiced velar nasal                   |
-|  ɰ  |   wy    | voiced velar approximant             |
 |  q  |    q    | voiceless uvular plosive             |
 |  ɢ  |   gq    | voiced uvular plosive                |
 |  χ  |   qh    | voiceless uvular fricative           |
@@ -126,8 +116,8 @@ the engines you use (see below). Any unrecognized segments will be ignored.
 ### Engines
 
 Without an engine, there is no real purpose in having a `with:` directive.
-There are three engines present in Lexifer: `std-assimilations`,
-`coronal-metathesis`, and `std-rejections`.
+There are two engines present in Lexifer: `std-assimilations` and
+`coronal-metathesis`.
 
 #### `std-assimilations`
 
@@ -148,21 +138,6 @@ This engine only affects bilabial, alveolar, and velar plosives and nasals. It
 ensures that clusters of these segments have the alveolar element last. For
 example, it would turn `atka` into *akta* and `anma` into *amna*. It does not
 metathesize a nasal with a plosive; `anpa` would not become *apna*.
-
-#### `std-rejections`
-
-**Note: This is WIP and subject to change at any time.**
-
-This engine considers all consonants except sibilants. It prevents word-initial
-clusters that consist of:
-
-- Any consonant followed by an approximant or lateral approximant of the same
-place of articulation;
-- Any approximant, nasal, or lateral approximant followed by a trill of the
-same place of articulation.
-
-Thus, clusters like `mw` and `ɟj` are rejected outright. `tl` and `tsl` are
-rejected, but `sl` and `ll` are not.
 
 ## Alphabetization – the `letters:` directive
 

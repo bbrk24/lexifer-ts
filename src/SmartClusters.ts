@@ -38,10 +38,7 @@ enum Manner {
     Sibilant,
     LateralFricative,
     LateralAffricate,
-    Affricate,
-    Approx,
-    LateralApproximant,
-    Trill
+    Affricate
 }
 
 /**
@@ -72,15 +69,6 @@ class Segment {
     /** `true` iff the phoneme is bilabial or velar. */
     get isPeripheral() {
         return this.place === Place.Bilabial || this.place === Place.Velar;
-    }
-
-    /**
-     * `true` iff the phoneme is an approximant, lateral approximant, or trill.
-     */
-    get isApprox() {
-        return this.manner === Manner.Approx
-            || this.manner === Manner.LateralApproximant
-            || this.manner === Manner.Trill;
     }
 
     toString() {
@@ -156,24 +144,6 @@ class ClusterEngine {
                 true,
                 Place.Labiodental,
                 Manner.Nasal
-            ),
-            new Segment(
-                isIpa ? 'ʋ' : 'vw',
-                true,
-                Place.Bilabial,
-                Manner.Approx
-            ),
-            new Segment(
-                'w',
-                true,
-                Place.Bilabial,
-                Manner.Approx
-            ),
-            new Segment(
-                'w',
-                true,
-                Place.Labiodental,
-                Manner.Approx
             ),
             // Alveolar
             new Segment(
@@ -278,24 +248,6 @@ class ClusterEngine {
                 Place.Alveolar,
                 Manner.Nasal
             ),
-            new Segment(
-                isIpa ? 'ɹ' : 'rh',
-                true,
-                Place.Alveolar,
-                Manner.Approx
-            ),
-            new Segment(
-                'l',
-                true,
-                Place.Alveolar,
-                Manner.LateralApproximant
-            ),
-            new Segment(
-                'r',
-                true,
-                Place.Alveolar,
-                Manner.Trill
-            ),
             // Retroflex
             new Segment(
                 isIpa ? 'ʈ' : 'rt',
@@ -338,18 +290,6 @@ class ClusterEngine {
                 true,
                 Place.Retroflex,
                 Manner.Nasal
-            ),
-            new Segment(
-                isIpa ? 'ɻ' : 'rr',
-                true,
-                Place.Retroflex,
-                Manner.Approx
-            ),
-            new Segment(
-                isIpa ? 'ɭ' : 'rl',
-                true,
-                Place.Retroflex,
-                Manner.LateralApproximant
             ),
             // Palatal
             new Segment(
@@ -406,12 +346,6 @@ class ClusterEngine {
                 Place.Palatal,
                 Manner.Nasal
             ),
-            new Segment(
-                isIpa ? 'j' : 'y',
-                true,
-                Place.Palatal,
-                Manner.Approx
-            ),
             // Velar
             new Segment(
                 'k',
@@ -442,12 +376,6 @@ class ClusterEngine {
                 true,
                 Place.Velar,
                 Manner.Nasal
-            ),
-            new Segment(
-                isIpa ? 'ɰ' : 'wy',
-                true,
-                Place.Velar,
-                Manner.Approx
             ),
             // Uvular
             new Segment(
@@ -509,7 +437,7 @@ class ClusterEngine {
                 const data2 = this.segments.find(el =>
                     el.representation === ph2);
 
-                if (data2 && !data2.isApprox) {
+                if (data2) {
                     const result = this.segments.find(el =>
                         el.place === data2!.place
                         && el.manner === Manner.Nasal);
@@ -527,7 +455,7 @@ class ClusterEngine {
             const data2 = this.segments.find(el =>
                 el.representation === ph2);
 
-            if (data2 && !data2.isApprox) {
+            if (data2) {
                 const data1 = this.segments.find(el =>
                     el.representation === ph1);
 
@@ -599,49 +527,6 @@ class ClusterEngine {
         }
 
         return newArr;
-    }
-
-    /**
-     * Apply `std-rejections` to a word.
-     * @param word The word, as an array of graphs.
-     * @returns Either the original word, or `['REJECT']`.
-     */
-    applyRejections(word: readonly string[]) {
-        const rejectCluster = (ph1: string, ph2: string) => {
-            const data1 = this.segments.find(
-                el => el.representation === ph1
-            );
-
-            if (data1 && data1.manner !== Manner.Sibilant) {
-                const data2 = this.segments.find(
-                    el => el.representation === ph2
-                );
-
-                if (
-                    data2?.isApprox
-                    && data1.manner !== Manner.Trill
-                    && data2.place === data1.place
-                ) {
-                    // Trills are allowed a bit more generously
-                    if (data2.manner === Manner.Trill) {
-                        return data1.isApprox
-                            || data1.manner === Manner.Nasal;
-                    }
-
-                    // Allow /ll/ etc
-                    return data1 !== data2;
-                }
-            }
-
-            return false;
-        };
-
-        // Only apply rejections word-initially.
-        if (rejectCluster(word[0]!, word[1]!)) {
-            return ['REJECT'];
-        }
-
-        return word;
     }
 }
 

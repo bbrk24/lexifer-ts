@@ -82,9 +82,9 @@ directive](./grammar.md#options--the-with-directive).
 The constructor takes a single argument: a boolean value. `true` indicates to
 use the IPA featureset, and `false` indicates to use digraphs.
 
-The methods `applyAssimilation()`, `applyCoronalMetathesis()`, and
-`applyRejections()` act on arrays of phones. This makes processing the words
-simpler, as the cluster engine itself does not have to parse the words.
+The methods `applyAssimilation()` and `applyCoronalMetathesis()` act on arrays
+of phones. This makes processing the words simpler, as the cluster engine itself
+does not have to parse the words.
 
 If you just want to search the engine's database to see what phoneme matches a
 given set of features, you can use the `getSegment()` method to do so.

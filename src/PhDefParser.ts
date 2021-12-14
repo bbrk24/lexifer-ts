@@ -100,16 +100,12 @@ class PhonologyDefinition {
                 throw new Error(`parsing error at '${line}'.`);
             }
         }
-        if (
-            this.soundsys.useAssim
-                || this.soundsys.useCoronalMetathesis
-                || this.soundsys.useRejections
-        ) {
+        if (this.soundsys.useAssim || this.soundsys.useCoronalMetathesis) {
             if (!Word.clusterEngine) {
                 throw new Error('Must select a featureset.');
             } else if (!this.soundsys.sorter) {
-                this.stderr("Without 'letters:' cannot apply assimilations, "
-                    + 'rejections, or coronal metathesis.');
+                this.stderr("Without 'letters:' cannot apply assimilations or "
+                    + 'coronal metathesis.');
             }
         }
     }
