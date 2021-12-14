@@ -4,6 +4,7 @@
 
 > - [The Default Export](#the-default-export)
 > - [`lexifer.ClusterEngine`](#lexiferclusterengine)
+> - [`lexifer.WordGenerator`](#lexiferwordgenerator)
 
 ## The Default Export
 

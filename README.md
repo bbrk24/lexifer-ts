@@ -66,5 +66,5 @@ API documentation][11] for full details.
 [7]: https://img.shields.io/github/commit-activity/m/bbrk24/lexifer-ts
 [8]: https://github.com/bbrk24/lexifer-ts/commits "commit log"
 [9]: https://github.com/wmannis/lexifer
-[10]: ./docs/index.md
+[10]: ./docs/README.md
 [11]: ./docs/api.md

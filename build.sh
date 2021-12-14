@@ -22,7 +22,7 @@
 
 # run a linter pass
 echo 'Linting...'
-npx eslint ./ --fix || exit $?
+yarn -s lint --fix || exit $?
 
 echo 'Combining files...'
 # put the version number and license comment here, so it ends up in all dist/
@@ -71,10 +71,5 @@ sed '$d' dist/index.js | npx terser -mo dist/lexifer.min.js --ecma 2017 \
     -f wrap_func_args=false,semicolons=false > bin/lexifer || exit $?
 
 echo 'Testing...'
-# Only redirects on success, not error
-if yarn test > /dev/null
-then
-    echo 'Done.'
-else
-    exit 1
-fi
+yarn -s test && echo 'Done.'
+exit $?

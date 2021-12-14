@@ -7,8 +7,8 @@ lexifer [def file] [flags...]
 ```
 
 To ensure that `lexifer` is in your path, you should install it globally, using
-`npm i -g lexifer`. If you install it locally, you may have to run
-`node_modules/.bin/lexifer` instead.
+`npm i -g lexifer`. If you install it locally, you may have to run `npx lexifer`
+instead.
 
 If no input file is specified, it will read from stdin, so it supports piping
 from other commands.

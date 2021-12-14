@@ -1,4 +1,4 @@
-/*! Lexifer TS v1.2.0-alpha.20
+/*! Lexifer TS v1.2.0-alpha.21
 
 Copyright (c) 2021 William Baker
 
@@ -94,7 +94,7 @@ declare class GeneratedWords implements Iterable<[string, string]> {
 declare class WordGenerator {
     private readonly phonDef;
     private readonly initWarnings;
-    private runWarnings?;
+    private runWarnings;
     constructor(file: string);
     generate(options: Readonly<LexiferOptions>): GeneratedWords;
 }

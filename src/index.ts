@@ -76,7 +76,7 @@ class GeneratedWords implements Iterable<[string, string]> {
 class WordGenerator {
     private readonly phonDef: PhonologyDefinition;
     private readonly initWarnings: string[] = [];
-    private runWarnings?: string[];
+    private runWarnings!: string[];
 
     constructor(file: string) {
         let initDone = false;
@@ -85,7 +85,7 @@ class WordGenerator {
             if (e instanceof Error) {
                 throw e;
             } else if (initDone) {
-                this.runWarnings!.push(e);
+                this.runWarnings.push(e);
             } else {
                 this.initWarnings.push(e);
             }
