@@ -1,5 +1,5 @@
 "use strict";
-/*! Lexifer TS v1.2.0-alpha.22
+/*! Lexifer TS v1.2.0-beta.1
 
 Copyright (c) 2021 William Baker
 
@@ -868,7 +868,7 @@ class GeneratedWords {
     *[Symbol.iterator]() {
         for (const [cat, words] of Object.entries(this.categories)) {
             for (const word of words) {
-                yield [cat, word];
+                yield [word, cat];
             }
         }
     }

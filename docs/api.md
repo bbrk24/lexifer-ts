@@ -91,5 +91,44 @@ given set of features, you can use the `getSegment()` method to do so.
 
 ## `lexifer.WordGenerator`
 
-Everything about this class is heavily WIP and subject to change without
-notice. At this time, its use is discouraged.
+This is meant to provide a cleaner API than the default export. Its constructor
+takes a single argument, the phonology definition. If it cannot be parsed, the
+constructor will throw an error.
+
+It currently has one public method, `generate()`. This method takes an object as
+its argument which must include at least the number of words (per category) to
+generate. It returns a custom object -- an instance of `lexifer.GeneratedWords`.
+
+This class has a few properties meant to make it versatile.
+
+- To grab words by category, use the `categories` property. For example, you
+might access `categories["noun"]` to get only the nouns generated, and ignore
+the rest.
+- To get all words ignoring category, use the `allWords` property. Note that
+this is a computed property, so repeated accesses at runtime, especially on
+larger objects, may result in slowdowns.
+- To see any warnings from word generation, you may access the `warnings`
+property. I don't anticipate this getting high usage, but it's there for
+completeness.
+- Finally, you may iterate over the words and categories in a for-of loop. This
+might look like:
+
+```ts
+for (const [wordform, category] of generatedWords) {
+   console.log(category, wordform);
+   // prints e.g:
+   // noun foo
+   // noun bar
+   // verb baz
+   // verb qux
+}
+```
+
+Or, if you don't use the categories (i.e. you use `words:` instead), you may
+simply omit `category`:
+
+```ts
+for (const [wordform] of generatedWords) {
+    console.log(wordform);
+}
+```

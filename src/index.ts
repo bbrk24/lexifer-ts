@@ -63,7 +63,7 @@ class GeneratedWords implements Iterable<[string, string]> {
     *[Symbol.iterator](): IterableIterator<[string, string]> {
         for (const [cat, words] of Object.entries(this.categories)) {
             for (const word of words) {
-                yield [cat, word];
+                yield [word, cat];
             }
         }
     }
