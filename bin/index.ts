@@ -42,7 +42,7 @@ const argv: {
     number?: number,
     verbose?: boolean,
     encoding: BufferEncoding,
-    _: [] | [number | string],
+    _: (number | string)[],
     $0: string
 } = <any>yargs(process.argv.slice(2))
     // aliases for default flags
@@ -75,10 +75,10 @@ const argv: {
         choices:  encodings,
         coerce:   (enc: string) => {
             // ignore case, and allow 'utf-16le' as a synonym for 'utf16le'
-            let littleEnc = enc.toLowerCase();
+            const littleEnc = enc.toLowerCase();
 
             if (littleEnc === 'utf-16le') {
-                littleEnc = 'utf16le';
+                return 'utf16le';
             } else if (!(<string[]>encodings).includes(littleEnc)) {
                 // throw an error indicating an invalid encoding
                 let errorString = 'Invalid values:\n  Argument: encoding, '

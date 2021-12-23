@@ -71,9 +71,9 @@ class Rule {
 }
 
 class Fragment {
-    static addOptional?: () => boolean; // Filled in in PhDefParser
+    static addOptional: () => boolean; // Filled in in PhDefParser
 
-    static getRandomPhoneme?: (group: string) => string; // Filled in in wordgen
+    static getRandomPhoneme: (group: string) => string; // Filled in in wordgen
 
     constructor(
         private readonly value: string,
@@ -85,13 +85,13 @@ class Fragment {
 
     private getPhoneme(word?: string) {
         if (!word?.length) {
-            return Fragment.getRandomPhoneme!(this.value);
+            return Fragment.getRandomPhoneme(this.value);
         }
 
-        let val = '';
+        let val: string;
 
         do {
-            val = Fragment.getRandomPhoneme!(this.value);
+            val = Fragment.getRandomPhoneme(this.value);
         } while (this.allowRepeats === false && val === last(word));
 
         return val;
@@ -99,7 +99,7 @@ class Fragment {
 
     generate() {
         if (this.maxReps === 1) {
-            if (this.minReps === 0 && !Fragment.addOptional!()) {
+            if (this.minReps === 0 && !Fragment.addOptional()) {
                 return '';
             }
 
@@ -114,7 +114,7 @@ class Fragment {
         }
 
         for (; i < this.maxReps; ++i) {
-            if (Fragment.addOptional!()) {
+            if (Fragment.addOptional()) {
                 retVal += this.getPhoneme(retVal);
             }
         }

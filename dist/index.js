@@ -1,5 +1,5 @@
 "use strict";
-/*! Lexifer TS v1.2.0-beta.1
+/*! Lexifer TS v1.2.0-beta.2
 
 Copyright (c) 2021 William Baker
 
@@ -417,7 +417,7 @@ class Fragment {
         if (!(word === null || word === void 0 ? void 0 : word.length)) {
             return Fragment.getRandomPhoneme(this.value);
         }
-        let val = '';
+        let val;
         do {
             val = Fragment.getRandomPhoneme(this.value);
         } while (this.allowRepeats === false && val === last(word));
