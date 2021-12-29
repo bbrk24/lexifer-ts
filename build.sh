@@ -64,10 +64,11 @@ mv tempfile index.js
 cd ../
 
 echo 'Minifying...'
-sed '$d' dist/index.js | npx terser -mo dist/lexifer.min.js --ecma 2017 \
-    -c unsafe,unsafe_symbols -f wrap_func_args=false &&
-    npx terser bin/index.js -mc unsafe --ecma 2019 --toplevel \
-    -f wrap_func_args=false,semicolons=false > bin/lexifer || exit $?
+sed '$d' dist/index.js | npx terser -m reserved='[genWords]' --ecma 2017 \
+    --toplevel -c unsafe,unsafe_symbols,top_retain='genWords' \
+    -f wrap_func_args=false -o dist/lexifer.min.js && npx terser bin/index.js \
+    -mc unsafe --ecma 2019 --toplevel -f wrap_func_args=false,semicolons=false \
+    > bin/lexifer || exit $?
 
 echo 'Testing...'
 yarn -s test && echo 'Done.'

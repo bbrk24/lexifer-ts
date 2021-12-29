@@ -70,8 +70,7 @@ class GeneratedWords implements Iterable<[string, string]> {
 }
 
 /**
- * Everything about this class is heavily WIP and subject to change without
- * notice.
+ * The primary word generator for the API. Not used by the CLI or web app.
  */
 class WordGenerator {
     private readonly phonDef: PhonologyDefinition;
