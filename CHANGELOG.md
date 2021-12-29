@@ -6,7 +6,8 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
-A CLI, based on the original Python version, has been introduced.
+A CLI, based on the original Python version, has been introduced. The API has
+also been vastly expanded.
 
 Documentation and testing have been added, in the `docs/` and `tests/` folders
 respectively.
@@ -15,6 +16,8 @@ respectively.
 
 The program does not re-parse the input if it is not changed, improving
 performance substantially on repeated runs.
+
+`CC!C!` etc are now allowed.
 
 The program now correctly enforces that exactly one featureset is used in a
 `with:` directive.

@@ -1,4 +1,4 @@
-/*! Lexifer TS v1.2.0-beta.2
+/*! Lexifer TS v1.2.0-rc.1
 
 Copyright (c) 2021 William Baker
 
