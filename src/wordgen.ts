@@ -79,11 +79,8 @@ class SoundSystem {
 
     addPhUnit(name: string, selection: string) {
         const naturalWeights = (phonemes: string) => {
-            const jitter = (val: number, percent = 10) => {
-                const move = val * percent / 100;
-
-                return val + move * (Math.random() - 0.5);
-            };
+            const jitter = (val: number, percent = 10) =>
+                val * (1 + percent * (Math.random() - 0.5) / 100);
 
             const phons = phonemes.split(/\s+/gu);
             const weighted: { [key: string]: number } = {};
@@ -91,7 +88,7 @@ class SoundSystem {
 
             for (let i = 0; i < numPhons; ++i) {
                 weighted[phons[i]!] = jitter(
-                    (Math.log(numPhons + 1) - Math.log(i + 1)) / numPhons
+                    Math.log(numPhons + 1) - Math.log(i + 1)
                 );
             }
 
