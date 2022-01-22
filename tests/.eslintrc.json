@@ -1,0 +1,22 @@
+{
+    // This file contains environment information and rules that only apply to
+    // tests/.
+    "env": {
+        "node": true
+    },
+    
+    "rules": {
+        /*
+         * CODE ERRORS
+         * These are things that will affect the runtime and must be avoided.
+         */
+        
+        /*
+         * STYLE WARNINGS
+         * These are dispreffered styles that do not relate to git issues and
+         * are not severe enough to be errors.
+         */
+        // This conflicts with TypeScript, but the tests are plain JavaScript.
+        
+    }
+}
