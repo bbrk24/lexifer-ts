@@ -1,4 +1,12 @@
+# dependencies
 node_modules/
+
+# intermediate compilation files
 combined.ts
-*.tgz
 bin/*.js
+
+# npm packed files
+*.tgz
+
+# OS generated files
+.DS_Store

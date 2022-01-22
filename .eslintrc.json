@@ -399,5 +399,25 @@
         // I'm not convinced by this one.
         "unicorn/prefer-query-selector": "off",
         "unicorn/prevent-abbreviations": "off"
-    }
+    },
+    "overrides": [
+        {
+            "files": "*.js",
+            "env": {
+                "node": true
+            },
+            "parserOptions": {
+                "ecmaVersion": 10
+            },
+            "rules": {
+                "eqeqeq": [
+                    "error",
+                    "smart"
+                ],
+                "@typescript-eslint/no-var-requires": "off",
+                "unicorn/no-useless-undefined": "warn",
+                "unicorn/prefer-module": "off"
+            }
+        }
+    ]
 }
