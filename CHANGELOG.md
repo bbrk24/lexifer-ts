@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## v1.2.1
+
+### Changed
+
+Spaces in macro definitions are now reported as warnings, rather than silently
+being allowed and causing quite strange-looking words.
+
 ## v1.2.0
 
 ### Added

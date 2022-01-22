@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 William Baker
+ * Copyright (c) 2021-2022 William Baker
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
@@ -81,9 +81,7 @@ class WordGenerator {
         let initDone = false;
 
         this.phonDef = new PhonologyDefinition(file, e => {
-            if (e instanceof Error) {
-                throw e;
-            } else if (initDone) {
+            if (initDone) {
                 this.runWarnings.push(e);
             } else {
                 this.initWarnings.push(e);

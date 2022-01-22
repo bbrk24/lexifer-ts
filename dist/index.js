@@ -1,5 +1,5 @@
 "use strict";
-/*! Lexifer TS v1.2.0+1
+/*! Lexifer TS v1.2.1-beta
 
 Copyright (c) 2021-2022 William Baker
 
@@ -300,6 +300,11 @@ class PhonologyDefinition {
         sclass = sclass.trim();
         values = values.trim();
         if (sclass[0] === '$') {
+            if (/\s/u.test(values)) {
+                this.stderr(`Unexpected whitespace in macro '${sclass}'. `
+                    + 'Macros cannot make choices, so this may give very '
+                    + 'unexpected output.');
+            }
             this.macros.push([
                 new RegExp(`\\${sclass}`, 'gu'),
                 values
@@ -875,10 +880,7 @@ class WordGenerator {
         this.initWarnings = [];
         let initDone = false;
         this.phonDef = new PhonologyDefinition(file, e => {
-            if (e instanceof Error) {
-                throw e;
-            }
-            else if (initDone) {
+            if (initDone) {
                 this.runWarnings.push(e);
             }
             else {

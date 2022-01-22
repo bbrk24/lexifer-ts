@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 William Baker
+ * Copyright (c) 2021-2022 William Baker
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
@@ -43,7 +43,7 @@ class PhonologyDefinition {
 
     constructor(
         defFile: string,
-        private readonly stderr: (inp: Error | string) => void
+        private readonly stderr: (inp: string) => void
     ) {
         if (defFile.trim() === '') {
             throw new Error('Please include a definition.');
@@ -303,6 +303,13 @@ class PhonologyDefinition {
         sclass = sclass.trim();
         values = values.trim();
         if (sclass[0] === '$') {
+            // It's a macro. Macros can't make choices, so disallow whitespace.
+            if (/\s/u.test(values)) {
+                this.stderr(`Unexpected whitespace in macro '${sclass}'. `
+                    + 'Macros cannot make choices, so this may give very '
+                    + 'unexpected output.');
+            }
+
             this.macros.push([
                 new RegExp(`\\${sclass}`, 'gu'),
                 values
