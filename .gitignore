@@ -1,9 +1,11 @@
 # dependencies
 node_modules/
 
-# intermediate compilation files
+# compiled files
 combined.ts
 bin/*.js
+bin/lexifer
+dist/
 
 # npm packed files
 *.tgz
