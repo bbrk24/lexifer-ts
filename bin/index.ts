@@ -51,11 +51,13 @@ const argv: {
     .option('one-per-line', {
         alias:    'o',
         describe: 'Display one word per line',
+        implies:  'number',
         type:     'boolean'
     })
     .option('unsorted', {
         alias:    'u',
         describe: 'Leave output unsorted',
+        implies:  'number',
         type:     'boolean'
     })
     .option('number', {
@@ -64,9 +66,11 @@ const argv: {
         type:     'number'
     })
     .option('verbose', {
-        alias:    'V',
-        describe: 'Display all generation steps',
-        type:     'boolean'
+        alias:     'V',
+        conflicts: 'one-per-line',
+        describe:  'Display all generation steps',
+        implies:   'number',
+        type:      'boolean'
     })
     .option('encoding', {
         alias:    'e',
@@ -98,14 +102,27 @@ const argv: {
             return littleEnc;
         }
     })
-    // ensure that they don't pass in multiple files
-    .check(argv => {
-        const length = argv._.length;
-
-        if (length > 1) {
-            throw new Error(`Expected 1 file (saw ${length}).`);
+    // perform some sanity checks
+    .check((argv, aliases) => {
+        // ensure that no more than one file name is passed in
+        if (argv._.length > 1) {
+            throw new Error(`Expected 1 file (saw ${argv._.length}).`);
         }
 
+        // Error on unknown arguments
+        for (const flagname in argv) {
+            // '_' and '$0' are provided by yargs. For some reason 'e' is not
+            // in the alias object.
+            if (['_', '$0', 'e'].includes(flagname)) {
+                continue;
+            }
+            // @ts-expect-error the type of `aliases` is not what yargs says
+            if (!aliases.key[flagname]) {
+                throw new Error(`Unknown argument: ${flagname}`);
+            }
+        }
+
+        // warn about something otherwise undetected
         if (argv.number === 0) {
             console.error('Cannot generate 0 words.');
         }

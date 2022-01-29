@@ -1,6 +1,6 @@
 {
   "name": "lexifer",
-  "version": "1.2.1-beta",
+  "version": "1.2.1-beta.2",
   "description": "A highly customizable wordgen for conlangers",
   "keywords": [
     "wordgen",
@@ -21,7 +21,7 @@
   },
   "devDependencies": {
     "@types/node": "~12.20.7",
-    "@types/yargs": "^17.0.4",
+    "@types/yargs": "^17.0.8",
     "@typescript-eslint/eslint-plugin": "~5.9.0",
     "@typescript-eslint/parser": "~5.9.0",
     "eslint": "^8.7.0",
