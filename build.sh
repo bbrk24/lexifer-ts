@@ -30,9 +30,7 @@ echo 'Combining files...'
 version=$(grep version package.json | cut -d '"' -f 4)
 {
     # the use of `/*!` ensures compilation preserves it
-    printf '/*! Lexifer TS v%s\n\n' "$version"
-    cat LICENSE
-    echo '*/'
+    printf '/*! Lexifer TS v%s\n\n%s\n*/' "$version" "$(cat LICENSE)"
     # index.ts needs to go last; the others, order doesn't matter
     for filename in src/*.ts
     do
@@ -46,20 +44,15 @@ version=$(grep version package.json | cut -d '"' -f 4)
 echo 'Compiling to JS...'
 npx tsc || exit $?
 
-# change CRLF to LF, and change the file names from 'combined' to 'index'
-sed -e 's/^M//' dist/combined.js > dist/index.js
-sed -e 's/^M//' dist/combined.d.ts > dist/index.d.ts
-rm dist/combined.*
+# change the file names from 'combined' to 'index'
+mv dist/combined.js dist/index.js
+mv dist/combined.d.ts dist/index.d.ts
 
 # In the bin directory, run `tsc`...
 cd bin/ && npx tsc || exit $?
 # ...and then add the hashbang, version number and license text to the js file.
-{
-    printf '#! /usr/bin/env node\n/*! Lexifer TS v%s\n\n' "$version"
-    cat ../LICENSE
-    echo '*/'
-    cat index.js
-} > tempfile
+printf '#! /usr/bin/env node\n/*! Lexifer TS v%s\n\n%s\n*/%s' "$version" \
+    "$(cat ../LICENSE)" "$(cat index.js)" > tempfile
 mv tempfile index.js
 cd ../
 

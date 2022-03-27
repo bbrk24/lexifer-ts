@@ -31,7 +31,7 @@ them. Requires `--number`; implied by `--verbose`.
 how exactly Lexifer got to the words it generated, but can produce long outputs.
 - `-e` or `--encoding`: The input encoding. If not given, defaults to utf-8.
 Valid values: `ascii`; `binary` or `latin1`; `utf-8` or `utf8`; `utf16le`,
-`ucs-2`, or `ucs-2`. For details, see [Node's documentation for encodings][1].
+`ucs-2`, or `ucs2`. For details, see [Node's documentation for encodings][1].
 
 The input file name should go before any flags. If you want to put it at the
 end, it must be delimited with `--`, such as `lexifer -n 15 -- example.def`.

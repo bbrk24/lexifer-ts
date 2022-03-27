@@ -13,6 +13,7 @@
         "exactOptionalPropertyTypes": true,
         "removeComments": true,
         "target": "ES2017",
-        "lib": ["ES2017", "DOM"]
+        "lib": ["ES2017", "DOM"],
+        "newLine": "lf"
     }
 }
