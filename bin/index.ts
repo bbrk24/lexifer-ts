@@ -75,7 +75,7 @@ const argv: {
     .option('encoding', {
         alias:    'e',
         describe: 'What file encoding to use',
-        default:  'utf-8',
+        default:  'utf8',
         choices:  encodings,
         coerce:   (enc: string) => {
             // ignore case, and allow 'utf-16le' as a synonym for 'utf16le'
