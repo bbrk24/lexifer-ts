@@ -1,4 +1,4 @@
 dist/*
 bin/*
 !bin/*.ts
-combined.ts
+/index.ts

@@ -2,7 +2,7 @@
 node_modules/
 
 # compiled files
-combined.ts
+/index.ts
 bin/*.js
 bin/lexifer
 dist/

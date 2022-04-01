@@ -1,5 +1,5 @@
 {
-    "files": ["combined.ts"],
+    "files": ["index.ts"],
     "compilerOptions": {
         "allowUnreachableCode": false,
         "allowUnusedLabels": false,
