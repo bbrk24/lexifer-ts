@@ -6,7 +6,7 @@
 /**
  * Strategically replace spaces with line breaks, allowing no more than 70
  * chars per line.
- * @param s The paragraph to add line breaks to.
+ * @param str The paragraph to add line breaks to.
  * @returns The paragraph, with line breaks inserted.
  */
 const wrap = (str: string) => str.replace(

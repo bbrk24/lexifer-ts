@@ -20,17 +20,20 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+set -e
+
 # run a linter pass
 echo 'Linting...'
-yarn -s lint --fix || exit $?
+yarn -s lint --fix
 
 echo 'Combining files...'
 # put the version number and license comment here, so it ends up in all dist/
 # files
 version=$(grep version package.json | cut -d '"' -f 4)
+# the use of `/*!` ensures compilation preserves it
+license_comment=$(printf '/*! Lexifer TS v%s\n\n%s\n*/' "$version" "$(cat LICENSE)")
 {
-    # the use of `/*!` ensures compilation preserves it
-    printf '/*! Lexifer TS v%s\n\n%s\n*/' "$version" "$(cat LICENSE)"
+    echo "$license_comment"
     # index.ts needs to go last; the others, order doesn't matter
     for filename in src/*.ts
     do
@@ -42,17 +45,16 @@ version=$(grep version package.json | cut -d '"' -f 4)
 } > combined.ts
 
 echo 'Compiling to JS...'
-npx tsc || exit $?
+npx tsc
 
 # change the file names from 'combined' to 'index'
 mv dist/combined.js dist/index.js
 mv dist/combined.d.ts dist/index.d.ts
 
 # In the bin directory, run `tsc`...
-cd bin/ && npx tsc || exit $?
+cd bin/ && npx tsc
 # ...and then add the hashbang, version number and license text to the js file.
-printf '#! /usr/bin/env node\n/*! Lexifer TS v%s\n\n%s\n*/%s' "$version" \
-    "$(cat ../LICENSE)" "$(cat index.js)" > tempfile
+printf '#! /usr/bin/env node\n%s' "$version" "$license_comment" > tempfile
 mv tempfile index.js
 cd ../
 
@@ -61,8 +63,7 @@ sed '$d' dist/index.js | npx terser -m reserved='[genWords]' --ecma 2017 \
     --toplevel -c unsafe,unsafe_symbols,top_retain='genWords' \
     -f wrap_func_args=false -o dist/lexifer.min.js && npx terser bin/index.js \
     -mc unsafe --ecma 2019 --toplevel -f wrap_func_args=false,semicolons=false \
-    > bin/lexifer || exit $?
+    > bin/lexifer
 
 echo 'Testing...'
 yarn -s test && echo 'Done.'
-exit $?
