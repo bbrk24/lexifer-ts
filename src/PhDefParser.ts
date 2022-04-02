@@ -299,9 +299,9 @@ class PhonologyDefinition {
     }
 
     private parseClass(line: string) {
-        let [sclass, values] = <[string, string]>line.split('=');
-        sclass = sclass.trim();
-        values = values.trim();
+        const [sclass, values] = <[string, string]>line.split('=')
+            .map(el => el.trim());
+
         if (sclass[0] === '$') {
             // It's a macro. Macros can't make choices, so disallow whitespace.
             if (/\s/u.test(values)) {

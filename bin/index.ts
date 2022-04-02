@@ -61,9 +61,10 @@ const argv: {
         type:     'boolean'
     })
     .option('number', {
-        alias:    'n',
-        describe: 'How many words to generate',
-        type:     'number'
+        alias:       'n',
+        describe:    'How many words to generate',
+        requiresArg: true,
+        type:        'number'
     })
     .option('verbose', {
         alias:     'V',
@@ -73,11 +74,12 @@ const argv: {
         type:      'boolean'
     })
     .option('encoding', {
-        alias:    'e',
-        describe: 'What file encoding to use',
-        default:  'utf8',
-        choices:  encodings,
-        coerce:   (enc: string) => {
+        alias:       'e',
+        choices:     encodings,
+        describe:    'What file encoding to use',
+        default:     'utf8',
+        requiresArg: true,
+        coerce:      (enc: string) => {
             // ignore case, and allow 'utf-16le' as a synonym for 'utf16le'
             const littleEnc = enc.toLowerCase();
 

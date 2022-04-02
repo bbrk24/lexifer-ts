@@ -9,7 +9,8 @@ All notable changes to this project will be documented in this file.
 Spaces in macro definitions are now reported as warnings, rather than silently
 being allowed and causing quite strange-looking words.
 
-The CLI now warns about unrecognized flags.
+The CLI does better validation of flags, including an error for unrecognized
+flags.
 
 ## v1.2.0
 

@@ -83,7 +83,7 @@ class ArbSorter {
      */
     split(word: string) {
         return word.split(this.splitter)
-            .filter(el => el);
+            .filter(Boolean);
     }
 
     /**
