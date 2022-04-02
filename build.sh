@@ -47,23 +47,18 @@ license_comment=$(printf '/*! Lexifer TS v%s\n\n%s\n*/' "$version" "$(cat LICENS
 echo 'Compiling to JS...'
 npx tsc
 
-# In the bin directory, run `tsc`...
+# Run `tsc` in the bin/ directory
 cd bin/
 npx tsc
-# ...and then add the hashbang, version number and license text to the js file.
-{
-    printf '#! /usr/bin/env node\n%s' "$license_comment"
-    cat index.js
-} > tempfile
-mv tempfile index.js
 cd ../
 
 echo 'Minifying...'
 sed '$d' dist/index.js | npx terser -m reserved='[genWords]' --ecma 2017 \
     --toplevel -c unsafe,unsafe_symbols,top_retain='genWords' \
-    -f wrap_func_args=false -o dist/lexifer.min.js
-npx terser bin/index.js -mc unsafe --ecma 2019 --toplevel \
-    -f wrap_func_args=false,semicolons=false > bin/lexifer
+    -o dist/lexifer.min.js -f wrap_func_args=false
+npx terser bin/index.js -mc unsafe --ecma 2019 --toplevel -o bin/lexifer \
+    -f wrap_func_args=false,semicolons=false,preamble="'$(printf \
+    '#! /usr/bin/env node\n%s' "$license_comment")'"
 
 echo 'Testing...'
 yarn -s test

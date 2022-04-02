@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 William Baker
+ * Copyright (c) 2021-2022 William Baker
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
@@ -39,7 +39,7 @@ class Rule {
         let minReps = 1,
             maxReps = 1;
         let letter = rule[0]!;
-        let allowRepeats: boolean | undefined;
+        let allowRepeats = true;
 
         for (let i = 1; i < rule.length; ++i) {
             if (rule[i] === '?') {
@@ -50,7 +50,7 @@ class Rule {
                 if (maxReps <= 1) {
                     throw new Error("misplaced '!' option: in non-duplicate "
                         + `environment: '${rule}'.`);
-                } else if (allowRepeats === undefined) {
+                } else if (allowRepeats) {
                     allowRepeats = false;
                 }
 
@@ -59,11 +59,7 @@ class Rule {
 
             if (
                 rule[i] === letter
-                /*
-                 * Note: thoroughly test this. I'm not convinced I got this
-                 * part right the first time around.
-                 */
-                && allowRepeats === false == (rule[i + 1] === '!')
+                && (allowRepeats || rule[i + 1] === '!')
             ) {
                 ++minReps;
                 ++maxReps;
@@ -75,7 +71,7 @@ class Rule {
                 letter = rule[i]!;
                 maxReps = 1;
                 minReps = 1;
-                allowRepeats = undefined;
+                allowRepeats = true;
             }
         }
 

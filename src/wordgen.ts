@@ -199,7 +199,7 @@ class SoundSystem {
          */
         for (
             let i = 0;
-            i < Number.MAX_SAFE_INTEGER && (force || i < 4 * numWords);
+            i < 4_294_967_295 && (force || i < 4 * numWords);
             ++i
         ) {
             const rule = <Rule>ruleSelector.select();
