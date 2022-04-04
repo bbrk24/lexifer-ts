@@ -27,7 +27,7 @@ const letterMatches = (fragment: string, letter: string) =>
     || ![...fragment].some(el => el !== '!' && el !== '?' && el !== letter);
 
 const regexEscape = (str: string) =>
-    str.replace(/[[\]{}()*+?|^$:.\\]/gu, '\\$1');
+    str.replace(/([[\]{}()*+?|^$:.\\])/gu, '\\$1');
 
 class Rule {
     private readonly parts: Fragment[];

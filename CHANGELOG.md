@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## v1.2.2
+
+### Changed
+
+The parsing of `!` was fixed, as v1.2.0 broke it in unforeseen ways.
+
 ## v1.2.1
 
 ### Changed
