@@ -22,13 +22,20 @@
 
 import last from './last';
 
+const letterMatches = (fragment: string, letter: string) =>
+    letter === '!' || letter === '?'
+    || ![...fragment].some(el => el !== '!' && el !== '?' && el !== letter);
+
+const regexEscape = (str: string) =>
+    str.replace(/[[\]{}()*+?|^$:.\\]/gu, '\\$1');
+
 class Rule {
     private readonly parts: Fragment[];
     private readonly str: string;
 
     constructor(rule: string) {
         // Guard against improper '!' that the loop won't catch.
-        if (rule[0] === '!' || rule.includes('!!')) {
+        if (rule.includes('!!')) {
             throw new Error("misplaced '!' option: in non-duplicate "
                 + `environment: '${rule}'.`);
         }
@@ -36,47 +43,64 @@ class Rule {
         this.parts = [];
         this.str = rule;
 
-        let minReps = 1,
-            maxReps = 1;
-        let letter = rule[0]!;
-        let allowRepeats = true;
+        // Segment the rule
+        const fragmentedWord: string[] = [];
+        let currentPart = '';
 
-        for (let i = 1; i < rule.length; ++i) {
-            if (rule[i] === '?') {
-                --minReps;
+        // this parses `?C` better than `C?`, so transform it
+        for (const letter of [...rule.replace(/(.)\?/gu, '?$1')].reverse()) {
+            if (letterMatches(currentPart, letter)) {
+                // potential match, but need to check for things like CCC! and
+                // CC!C -- CC!C! is fine
 
-                continue;
-            } else if (rule[i] === '!') {
-                if (maxReps <= 1) {
-                    throw new Error("misplaced '!' option: in non-duplicate "
-                        + `environment: '${rule}'.`);
-                } else if (allowRepeats) {
-                    allowRepeats = false;
-                }
-
-                continue;
-            }
-
-            if (
-                rule[i] === letter
-                && (allowRepeats || rule[i + 1] === '!')
-            ) {
-                ++minReps;
-                ++maxReps;
-            } else {
-                // Add a new fragment
-                this.parts.push(
-                    new Fragment(letter, minReps, maxReps, allowRepeats)
+                const breakRegex = new RegExp(
+                    `(${regexEscape(letter)}\\??){3,}!`,
+                    'u'
                 );
-                letter = rule[i]!;
-                maxReps = 1;
-                minReps = 1;
-                allowRepeats = true;
+
+                if (
+                    letter === '!'
+                        ? /!\??$/u.test(currentPart)
+                        : !breakRegex.test(letter + currentPart)
+                ) {
+                    currentPart = letter + currentPart;
+
+                    continue;
+                }
             }
+
+            fragmentedWord.push(currentPart);
+            currentPart = letter;
         }
 
-        // Add the very last one
-        this.parts.push(new Fragment(letter, minReps, maxReps));
+        fragmentedWord.push(currentPart);
+
+        // Parse each segment
+        for (const segment of fragmentedWord.filter(Boolean).reverse()) {
+            const allowRepeats = !segment.endsWith('!');
+
+            if (!allowRepeats && segment.length <= 2) {
+                throw new Error("misplaced '!' option: in non-duplicate "
+                    + `environment: '${rule}'.`);
+            }
+
+            const segmentAsArray: readonly string[] = [...segment];
+
+            const questionCount = segmentAsArray.filter(
+                el => el === '?'
+            ).length;
+            const bangCount = allowRepeats
+                ? 0
+                : segmentAsArray.filter(el => el === '!').length;
+            const letterCount = segment.length - bangCount - questionCount;
+
+            this.parts.push(new Fragment(
+                segmentAsArray.find(el => el !== '!' && el !== '?')!,
+                letterCount - questionCount,
+                letterCount,
+                allowRepeats
+            ));
+        }
     }
 
     generate() {
@@ -97,11 +121,11 @@ class Fragment {
         private readonly value: string,
         private readonly minReps: number,
         private readonly maxReps: number,
-        private readonly allowRepeats?: boolean
+        private readonly allowRepeats: boolean
     ) {
     }
 
-    private getPhoneme(word?: string) {
+    private getPhoneme(word?: string[]) {
         if (!word?.length) {
             return Fragment.getRandomPhoneme(this.value);
         }
@@ -110,7 +134,7 @@ class Fragment {
 
         do {
             val = Fragment.getRandomPhoneme(this.value);
-        } while (this.allowRepeats === false && val === last(word));
+        } while (!this.allowRepeats && val === last(word));
 
         return val;
     }
@@ -125,19 +149,19 @@ class Fragment {
         }
 
         let i: number;
-        let retVal = '';
+        const retVal: string[] = [];
 
         for (i = 0; i < this.minReps; ++i) {
-            retVal += this.getPhoneme(retVal);
+            retVal.push(this.getPhoneme(retVal));
         }
 
         for (; i < this.maxReps; ++i) {
             if (Fragment.addOptional()) {
-                retVal += this.getPhoneme(retVal);
+                retVal.push(this.getPhoneme(retVal));
             }
         }
 
-        return retVal;
+        return retVal.join('');
     }
 }
 

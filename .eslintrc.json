@@ -1,7 +1,6 @@
 {
     // This file contains only common linting rules between bin/, src/, and
     // tests/.
-    "noInlineConfig": true,
     "extends": [
         "eslint:recommended",
         "plugin:@typescript-eslint/recommended",
