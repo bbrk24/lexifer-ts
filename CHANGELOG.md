@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## v1.2.3
+
+### Changed
+
+Spaces are now allowed at the end of the first row in a cluster field.
+
+Detection for words that may produce empty string has improved.
+
 ## v1.2.2
 
 ### Changed

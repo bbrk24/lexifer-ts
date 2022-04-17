@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 William Baker
+ * Copyright (c) 2021-2022 William Baker
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
@@ -20,12 +20,7 @@
  * IN THE SOFTWARE.
  */
 
-// Why is it so difficult to avoid return type pollution?
-const last: {
-    (arr: null): null,
-    <T = never>(arr: ArrayLike<T> | undefined): T | undefined,
-    <T>(arr: ArrayLike<T> | null | undefined): T | null | undefined
-} = <T>(arr: ArrayLike<T> | null | undefined) =>
-    arr && arr[arr.length - 1];
+const last = <T = never>(arr: ArrayLike<T> | null | undefined) =>
+    arr?.[arr.length - 1];
 
 export default last;

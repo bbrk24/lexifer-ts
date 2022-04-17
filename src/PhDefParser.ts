@@ -235,7 +235,7 @@ class PhonologyDefinition {
                 throw new Error(`'${rules[i]}'`
                     + `${cat ? ` (in category ${cat})` : ''} will only `
                     + 'produce empty words.');
-            } else if (/^\?*[^?!]!?\?+!?$/u.test(rule)) {
+            } else if (/^\?*([^?!]!?\?+!?)+$/u.test(rule)) {
                 // Here, we don't know what random-rate or category weight is,
                 // so this may not even be an issue.
                 this.stderr(`'${rules[i]}'`
@@ -264,6 +264,7 @@ class PhonologyDefinition {
 
     private parseClusterfield() {
         const c2list = this.defFileArr[this.defFileLineNum]!
+            .trimEnd()
             .split(/\s+/gu);
         c2list.shift();
         const rowLength = c2list.length;
