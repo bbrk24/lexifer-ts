@@ -152,7 +152,7 @@ class SoundSystem {
     }
 
     useIpa() {
-        Word.clusterEngine = new ClusterEngine(true);
+        Word.clusterEngine = new ClusterEngine();
     }
 
     useDigraphs() {

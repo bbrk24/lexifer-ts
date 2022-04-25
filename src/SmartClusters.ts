@@ -92,9 +92,10 @@ class ClusterEngine {
 
     /**
      * Initialize the cluster engine.
-     * @param isIpa Whether the current featureset is IPA.
+     * @param isIpa Whether the current featureset is IPA. Passing `false` for
+     * this parameter is deprecated.
      */
-    constructor(isIpa: boolean) {
+    constructor(isIpa = true) {
         this.segments = [
             // Bilabial, labio-dental
             new Segment(

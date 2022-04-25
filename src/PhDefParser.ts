@@ -102,8 +102,9 @@ class PhonologyDefinition {
         }
         if (this.soundsys.useAssim || this.soundsys.useCoronalMetathesis) {
             if (!Word.clusterEngine) {
-                throw new Error('Must select a featureset.');
-            } else if (!this.soundsys.sorter) {
+                this.soundsys.useIpa();
+            }
+            if (!this.soundsys.sorter) {
                 this.stderr("Without 'letters:' cannot apply assimilations or "
                     + 'coronal metathesis.');
             }
@@ -142,6 +143,8 @@ class PhonologyDefinition {
 
                 break;
             case 'std-digraph-features':
+                this.stderr("'std-digraph-features' is deprecated and will be "
+                    + 'removed in a future version.');
                 this.soundsys.useDigraphs();
 
                 break;
