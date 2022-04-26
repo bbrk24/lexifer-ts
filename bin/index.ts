@@ -160,16 +160,7 @@ try {
 } catch {
     process.exitCode = 1;
     if (fileDescriptor === 0) {
-        /*
-         * For some reason, on Windows, if no pipe is provided then stdin is a
-         * directory. Obviously, you can't read a directory as a file, so the
-         * readFileSync() call errors.
-         * As for why that is, I'm baffled too. All I know is that somewhere
-         * down the line readFileSync() attempts to stat the file, and doing so
-         * with file descriptor 0 results in EISDIR.
-         */
-        console.error('Error: No input or pipe provided; cannot read from '
-            + 'stdin on Windows.');
+        console.error('Error: cannot read stdin.');
     } else {
         console.error(`Error: Could not find file '${fileDescriptor}'.`);
     }
