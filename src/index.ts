@@ -140,6 +140,8 @@ const main = (() => {
         verbose = false,
         unsorted?: boolean,
         onePerLine = false,
+        // eslint-disable-next-line max-len
+        // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
         stderr: (inp: Error | string) => void = console.error
     ) => {
         let ans = '';

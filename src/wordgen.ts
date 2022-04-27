@@ -26,6 +26,7 @@ import Word from './word';
 import { ClusterEngine } from './SmartClusters';
 import { Rule, Fragment } from './rule';
 import ArbSorter from './ArbSorter';
+import ReadonlyDeep from './ReadonlyDeep';
 
 const invalidItemAndWeight = (item: string) => {
     const parts = item.split(':');
@@ -175,8 +176,6 @@ class SoundSystem {
         }
 
         const dict = new Map<Rule | string, number | undefined>(
-            // @ts-expect-error `Category` and `undefined` are both
-            // individually valid, but no single overload matches both.
             this.ruleset[category]
         );
         // If the map is empty, add `category` to it with weight 0 to produce a
@@ -239,7 +238,7 @@ class SoundSystem {
     }
 }
 
-const textify = (phsys: Readonly<SoundSystem>, sentences = 25) => {
+const textify = (phsys: ReadonlyDeep<SoundSystem>, sentences = 25) => {
     let text = '';
 
     for (let i = 0; i < sentences; ++i) {
@@ -255,8 +254,7 @@ const textify = (phsys: Readonly<SoundSystem>, sentences = 25) => {
             true,
             phsys.randomCategory(),
             true
-        )[0]!.toString()
-            .replace(/./u, el => el.toUpperCase());
+        )[0]!.replace(/./u, el => el.toUpperCase());
 
         for (let j = 0; j < sent; ++j) {
             text += ` ${phsys.generate(

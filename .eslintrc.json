@@ -29,6 +29,13 @@
          * Spacing inconsistencies can cause problems with git and should be
          * avoided.
          */
+        "@typescript-eslint/indent": [
+            "error",
+            4,
+            {
+                "SwitchCase": 0
+            }
+        ],
         "@typescript-eslint/padding-line-between-statements": [
             "error",
             // In order of precedence:
@@ -92,13 +99,6 @@
         ],
         "comma-style": "error", // only affects multiline statements
         "eol-last": "error",
-        "indent": [
-            // I am intentionally using the core ESLint one rather than the
-            // TypeScript ESLint one. They differ for how to indent `case`
-            // labels and I prefer ESLint's style.
-            "error",
-            4
-        ],
         "linebreak-style": [
             "error",
             "unix"

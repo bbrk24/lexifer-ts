@@ -125,7 +125,7 @@ class Fragment {
     ) {
     }
 
-    private getPhoneme(word?: string[]) {
+    private getPhoneme(word?: Readonly<ArrayLike<string>>) {
         if (!word?.length) {
             return Fragment.getRandomPhoneme(this.value);
         }
