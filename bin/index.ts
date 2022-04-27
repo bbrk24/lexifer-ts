@@ -36,7 +36,7 @@ const encodings: readonly BufferEncoding[] = [
 ];
 
 const argv: {
-    [x: string]: unknown,
+    [x: string]: (number | string)[] | boolean | number | string | undefined,
     'one-per-line'?: boolean,
     unsorted?: boolean,
     number?: number,
@@ -48,6 +48,11 @@ const argv: {
     // aliases for default flags
     .alias({ help: '?', version: 'v' })
     // custom options
+    .positional('--', {
+        describe:  'The name of the input file.',
+        normalize: true,
+        type:      'string'
+    })
     .option('one-per-line', {
         alias:    'o',
         describe: 'Display one word per line',
@@ -79,49 +84,41 @@ const argv: {
         describe:    'What file encoding to use',
         default:     'utf8',
         requiresArg: true,
-        coerce:      (enc: string) => {
+        coerce(enc: number | string) {
             // ignore case, and allow 'utf-16le' as a synonym for 'utf16le'
-            const littleEnc = enc.toLowerCase();
-
-            if (littleEnc === 'utf-16le') {
-                return 'utf16le';
-            } else if (!(<string[]>encodings).includes(littleEnc)) {
-                // throw an error indicating an invalid encoding
-                let errorString = 'Invalid values:\n  Argument: encoding, '
-                    + `Given: "${enc}", Choices: `;
-
-                for (let i = 0; i < encodings.length; ++i) {
-                    if (i !== 0) {
-                        errorString += ', ';
-                    }
-
-                    errorString += `"${encodings[i]}"`;
+            if (typeof enc == 'string') {
+                const littleEnc = enc.toLowerCase();
+                if (littleEnc === 'utf-16le') {
+                    return 'utf16le';
                 }
-
-                throw new Error(errorString);
+                if ((<readonly string[]>encodings).includes(littleEnc)) {
+                    return littleEnc;
+                }
             }
 
-            return littleEnc;
+            throw new Error('Invalid values:\n  Argument: encoding, Given: '
+                + JSON.stringify(enc) + ', Choices: "' + encodings.join('", "')
+                + '"');
         }
     })
     // perform some sanity checks
-    .check((argv, aliases) => {
+    .check(argv => {
+        /*
+         * To pass validation, must return one of:
+         * - the boolean `true`
+         * - a non-Error object or function
+         * - a symbol
+         * - a truthy number or bigint
+         * To fail validation, must throw an Error or return an Error or string.
+         *
+         * Returning a falsey value will technically make validation fail, but
+         * gives this arrow function as the error message. It's easier to never
+         * return falsey values.
+         */
+
         // ensure that no more than one file name is passed in
         if (argv._.length > 1) {
             throw new Error(`Expected 1 file (saw ${argv._.length}).`);
-        }
-
-        // Error on unknown arguments
-        for (const flagname in argv) {
-            // '_' and '$0' are provided by yargs. For some reason 'e' is not
-            // in the alias object.
-            if (['_', '$0', 'e'].includes(flagname)) {
-                continue;
-            }
-            // @ts-expect-error the type of `aliases` is not what yargs says
-            if (!aliases.key[flagname]) {
-                throw new Error(`Unknown argument: ${flagname}`);
-            }
         }
 
         // warn about something otherwise undetected
@@ -131,6 +128,7 @@ const argv: {
 
         return true;
     })
+    .strictOptions()
     .argv;
 
 // If no filename is provided, read from stdin -- support piping
@@ -148,7 +146,7 @@ try {
             argv['one-per-line'],
             e => {
                 // Don't throw it; the `catch` block is designed to catch the
-                // fs error on Windows.
+                // fs error.
                 if (e instanceof Error) {
                     process.exitCode = 1;
                 }
@@ -159,8 +157,8 @@ try {
     );
 } catch {
     process.exitCode = 1;
-    if (fileDescriptor === 0) {
-        console.error('Error: cannot read stdin.');
+    if (fileDescriptor === 0 || fileDescriptor === '-') {
+        console.error('Error: Cannot read stdin.');
     } else {
         console.error(`Error: Could not find file '${fileDescriptor}'.`);
     }
