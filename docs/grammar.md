@@ -38,10 +38,11 @@ a directive, it should be at the start of the file.
 
 ### Featuresets
 
-If you have a `with:` statement, you must use exactly one featureset.
-Currently, there are two options: `std-ipa-features` and
-`std-digraph-features`. The former is IPA, and the latter is ASCII-friendly.
-The recognized consonants are as follows:
+By default, if you have a `with:` directive, the IPA featureset is used. It is
+possible to opt-in to ASCII digraphs by adding the `std-digraph-features`
+option, but this is discouraged and will be removed in the future.
+
+Currently recognized consonants are:
 
 | IPA | Digraph | Features                             |
 |:---:|:-------:|:-------------------------------------|
@@ -111,7 +112,8 @@ that these are alveolar.
 
 Choosing a specific featureset does not mean you have to use it for everything.
 Rather, you only need to use it for the consonants that will be considered by
-the engines you use (see below). Any unrecognized segments will be ignored.
+the engines you use (see below). Any unrecognized segments will be ignored. Note
+that no approximants or trills are currently recognized.
 
 ### Engines
 
@@ -127,10 +129,9 @@ The first affects all consonants for which both voiced and voiceless versions
 exist. It applies leftward assimilation of voicing. For example, it would turn
 `akda` into *agda* and `abta` into *apta*.
 
-The second only changes nasals, but considers all consonants except for
-approximants, lateral approximants, and trills. It applies leftward
-assimilation of place of articulation. For example, it would turn `amta` into
-*anta* and `anka` into *aŋka*.
+The second only changes nasals, but considers all recongized consonants. It
+applies leftward assimilation of place of articulation. For example, it would
+turn `amta` into *anta* and `anka` into *aŋka*.
 
 #### `coronal-metathesis`
 
@@ -367,7 +368,8 @@ prevents a word from having a voiceless plosive followed by *h* by rejecting
 
 If you want to prevent an entire part of a word from appearing twice in a row,
 you can `reject: (..+)\1`. This would prevent e.g. *kiki* from being
-generated, as it is just *ki* twice.  
+generated, as it is just *ki* twice.
+
 If you're confident that it is okay to simplify such occurrences, you may
 instead `filter: (..+)\1+ > $1`. This would simplify *kiki* into simply *ki*.
 This may not be desirable as it can make words that are significantly shorter
