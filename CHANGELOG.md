@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 ## v1.3.0
 
+### Changed
+
+Weights are now properly considered for determining missing letters, preventing
+the quite strange error message "A phoneme class contains '' missing from
+'letters'."
+
 ### Deprecated
 
 `std-digraph-features` is no longer supported; `std-ipa-features` is now the

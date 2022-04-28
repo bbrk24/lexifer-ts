@@ -114,20 +114,15 @@ class PhonologyDefinition {
     private sanityCheck() {
         if (this.letters.length > 0) {
             const letters = new Set(this.letters);
-            const phonemes = new Set(this.phClasses);
+            const phonemes = new Set(
+                this.phClasses.map(el =>
+                    el.split(':')[0]!)
+            );
             if (phonemes.size > letters.size) {
-                const diff = [...phonemes].filter(el => {
-                    if (letters.has(el)) {
-                        return false;
-                    } else if (letters.has(el.split(':')[0]!)) {
-                        return false;
-                    }
-
-                    return true;
-                });
+                const diff = [...phonemes].filter(el => !letters.has(el));
                 this.stderr(`A phoneme class contains '${diff.join(' ')}' `
-                    + "missing from 'letters'.  Strange word shapes are likely"
-                    + ' to result.');
+                    + "missing from 'letters'. Strange word shapes are likely "
+                    + 'to result.');
             }
         }
     }
