@@ -21,7 +21,7 @@
  */
 
 import fs = require('fs');
-import yargs = require('yargs/yargs');
+import yargs = require('yargs');
 import main = require('../dist');
 
 const encodings: readonly BufferEncoding[] = [
@@ -37,14 +37,14 @@ const encodings: readonly BufferEncoding[] = [
 
 const argv: {
     [x: string]: (number | string)[] | boolean | number | string | undefined,
-    'one-per-line'?: boolean,
+    onePerLine?: boolean,
     unsorted?: boolean,
     number?: number,
     verbose?: boolean,
     encoding: BufferEncoding,
     _: (number | string)[],
     $0: string
-} = <any>yargs(process.argv.slice(2))
+} = <any>yargs.parserConfiguration({ 'duplicate-arguments-array': false })
     // aliases for default flags
     .alias({ help: '?', version: 'v' })
     // custom options
@@ -143,7 +143,7 @@ try {
             argv.number,
             argv.verbose,
             argv.unsorted,
-            argv['one-per-line'],
+            argv.onePerLine,
             e => {
                 // Don't throw it; the `catch` block is designed to catch the
                 // fs error.
