@@ -531,4 +531,10 @@ class ClusterEngine {
     }
 }
 
+Object.defineProperty(ClusterEngine.prototype, 'segments', {
+    writable:   true,
+    enumerable: true,
+    value:      []
+});
+
 export { ClusterEngine, Segment, Place, Manner };

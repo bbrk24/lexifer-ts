@@ -69,11 +69,20 @@ class GeneratedWords implements Iterable<[string, string]> {
     }
 }
 
+Object.defineProperty(GeneratedWords.prototype, 'categories', {
+    writable:   true,
+    enumerable: true,
+    value:      Object.create(null)
+});
+
 /**
  * The primary word generator for the API. Not used by the CLI or web app.
  */
 class WordGenerator {
-    private readonly phonDef: PhonologyDefinition;
+    // Only ever undefined on `WordGenerator.prototype`, but adding the `?`
+    // makes the check at the start of `generate()` legal.
+    private readonly phonDef?: PhonologyDefinition;
+
     private readonly initWarnings: string[] = [];
     private runWarnings!: string[];
 
@@ -91,7 +100,12 @@ class WordGenerator {
         initDone = true;
     }
 
-    generate(options: Readonly<LexiferOptions>) {
+    generate(options: Readonly<LexiferOptions>): GeneratedWords {
+        // Don't mutate the prototype
+        if (!this.phonDef) {
+            return GeneratedWords.prototype;
+        }
+
         if (
             options.number > Number.MAX_SAFE_INTEGER
             || options.number <= 0
@@ -103,7 +117,7 @@ class WordGenerator {
         this.runWarnings = [];
 
         let number = options.number;
-        if (number !== Math.round(number)) {
+        if (!Number.isInteger(number)) {
             this.runWarnings.push(`Requested number of words (${number}) is `
                 + `not an integer. Rounding to ${Math.round(number)}.`);
             number = Math.round(number);

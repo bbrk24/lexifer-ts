@@ -36,7 +36,7 @@ const encodings: readonly BufferEncoding[] = [
 ];
 
 const argv: {
-    [x: string]: (number | string)[] | boolean | number | string | undefined,
+    [x: string]: unknown,
     onePerLine?: boolean,
     unsorted?: boolean,
     number?: number,
