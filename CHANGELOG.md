@@ -10,6 +10,9 @@ Weights are now properly considered for determining missing letters, preventing
 the quite strange error message "A phoneme class contains '' missing from
 'letters'."
 
+The CLI now takes the last of repeated arguments, rather than erroring. For
+example, `--encoding utf8 --encoding utf16le` will now use UTF-16 LE encoding.
+
 ### Deprecated
 
 `std-digraph-features` is no longer supported; `std-ipa-features` is now the
