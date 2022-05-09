@@ -100,7 +100,7 @@ class WordGenerator {
         initDone = true;
     }
 
-    generate(options: Readonly<LexiferOptions>): GeneratedWords {
+    generate(options: Readonly<LexiferOptions>) {
         // Don't mutate the prototype
         if (!this.phonDef) {
             return GeneratedWords.prototype;
@@ -154,8 +154,6 @@ const main = (() => {
         verbose = false,
         unsorted?: boolean,
         onePerLine = false,
-        // eslint-disable-next-line max-len
-        // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
         stderr: (inp: Error | string) => void = console.error
     ) => {
         let ans = '';
@@ -235,14 +233,15 @@ const main = (() => {
     lexifer.Place = Place;
     lexifer.Manner = Manner;
 
-    lexifer.__ArbSorter = ArbSorter;
+    lexifer.__ArbSorter = <unknown>ArbSorter;
 
     return lexifer;
 })();
 
 // Actual code run when you click "generate"
 const genWords = () => {
-    document.getElementById('errors')!.innerHTML = '';
+    const errorElement = document.getElementById('errors')!;
+    errorElement.innerHTML = '';
 
     document.getElementById('result')!.innerHTML = main(
         (<HTMLTextAreaElement>document.getElementById('def')).value,
@@ -251,7 +250,7 @@ const genWords = () => {
         (<HTMLInputElement>document.getElementById('unsorted')).checked,
         (<HTMLInputElement>document.getElementById('one-per-line')).checked,
         message => {
-            document.getElementById('errors')!.innerHTML += `${message}<br />`;
+            errorElement.innerHTML += `${message}<br />`;
         }
     ).replace(/\n/gu, '<br />');
 };

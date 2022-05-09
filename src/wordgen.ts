@@ -65,7 +65,7 @@ class SoundSystem {
         };
     }
 
-    private applyFilters(word: Readonly<Word>) {
+    private applyFilters<T extends Readonly<Word> = Word>(word: T) {
         if (this.useAssim) {
             word.applyAssimilations();
         }

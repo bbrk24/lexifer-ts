@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/prefer-readonly-parameter-types */
-
 type BuiltIns =
     Date
     | RegExp

@@ -48,6 +48,7 @@
          * than good in this project.
          */
         "@typescript-eslint/no-explicit-any": "off",
+        "unicorn/no-abusive-eslint-disable": "off",
         "unicorn/text-encoding-identifier-case": "off"
     }
 }

@@ -35,16 +35,7 @@ const encodings: readonly BufferEncoding[] = [
     'utf8'
 ];
 
-const argv: {
-    [x: string]: unknown,
-    onePerLine?: boolean,
-    unsorted?: boolean,
-    number?: number,
-    verbose?: boolean,
-    encoding: BufferEncoding,
-    _: (number | string)[],
-    $0: string
-} = <any>yargs.parserConfiguration({ 'duplicate-arguments-array': false })
+const argv = yargs.parserConfiguration({ 'duplicate-arguments-array': false })
     // aliases for default flags
     .alias({ help: '?', version: 'v' })
     // custom options
@@ -91,7 +82,13 @@ const argv: {
                 if (littleEnc === 'utf-16le') {
                     return 'utf16le';
                 }
-                if ((<readonly string[]>encodings).includes(littleEnc)) {
+
+                if (
+                    (
+                        <(enc: string) => enc is BufferEncoding>
+                        (<readonly string[]>encodings).includes
+                    )(littleEnc)
+                ) {
                     return littleEnc;
                 }
             }
@@ -130,6 +127,10 @@ const argv: {
     })
     .strictOptions()
     .argv;
+
+// convince TS this isn't a promise without changing the type by accident
+// eslint-disable-next-line
+const assertNotPromise: <T>(x: Promise<T> | T) => asserts x is T = () => {}; assertNotPromise(argv);
 
 // If no filename is provided, read from stdin -- support piping
 const fileDescriptor = argv._[0] ?? 0;
