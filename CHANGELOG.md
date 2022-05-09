@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 ## v1.3.0
 
+Note: Users of the API are strongly encouraged to upgrade to v1.3, due to the
+use of static properties and the lack of prototype safety in v1.2 and earlier.
+The CLI is not affected by these changes.
+
 ### Changed
 
 Weights are now properly considered for determining missing letters, preventing
@@ -12,6 +16,12 @@ the quite strange error message "A phoneme class contains '' missing from
 
 The CLI now takes the last of repeated arguments, rather than erroring. For
 example, `--encoding utf8 --encoding utf16le` will now use UTF-16 LE encoding.
+
+Exported prototypes are now safe to use, i.e. calling their methods will not
+result in mutations or errors.
+
+The generator no longer uses static properties to store information, so the API
+may use multiple generators with different settings without them conflicting.
 
 ### Deprecated
 

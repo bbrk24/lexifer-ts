@@ -20,8 +20,6 @@
  * IN THE SOFTWARE.
  */
 
-import { Fragment } from './rule';
-import Word from './word';
 import { SoundSystem, textify, invalidItemAndWeight } from './wordgen';
 
 class PhonologyDefinition {
@@ -55,13 +53,6 @@ class PhonologyDefinition {
     }
 
     private parse() {
-        /*
-         * This isn't really part of parsing, but something that must be done
-         * every run.
-         */
-        Fragment.addOptional = () =>
-            this.soundsys.randpercent > Math.random() * 100;
-
         for (;
             this.defFileLineNum < this.defFileArr.length;
             ++this.defFileLineNum
@@ -101,7 +92,7 @@ class PhonologyDefinition {
             }
         }
         if (this.soundsys.useAssim || this.soundsys.useCoronalMetathesis) {
-            if (!Word.clusterEngine) {
+            if (!this.soundsys.clusterEngine) {
                 this.soundsys.useIpa();
             }
             if (!this.soundsys.sorter) {

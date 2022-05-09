@@ -24,7 +24,7 @@ import WeightedSelector from './WeightedSelector';
 import wrap from './wrap';
 import Word from './word';
 import { ClusterEngine } from './SmartClusters';
-import { Rule, Fragment } from './rule';
+import { Rule } from './rule';
 import ArbSorter from './ArbSorter';
 import ReadonlyDeep from './ReadonlyDeep';
 
@@ -53,24 +53,15 @@ class SoundSystem {
     randpercent = 10;
     useAssim = false;
     useCoronalMetathesis = false;
-    sorter: ArbSorter | null = null;
-
-    constructor() {
-        Fragment.getRandomPhoneme = phoneme => {
-            if (phoneme in this.phonemeset) {
-                return this.phonemeset[phoneme]!.select();
-            }
-
-            return phoneme;
-        };
-    }
+    sorter: ArbSorter | undefined;
+    clusterEngine: ClusterEngine | undefined;
 
     private applyFilters<T extends Readonly<Word> = Word>(word: T) {
         if (this.useAssim) {
-            word.applyAssimilations();
+            word.applyAssimilations(this.sorter, this.clusterEngine);
         }
         if (this.useCoronalMetathesis) {
-            word.applyCoronalMetathesis();
+            word.applyCoronalMetathesis(this.sorter, this.clusterEngine);
         }
 
         word.applyFilters(this.filters);
@@ -153,11 +144,11 @@ class SoundSystem {
     }
 
     useIpa() {
-        Word.clusterEngine = new ClusterEngine();
+        this.clusterEngine = new ClusterEngine();
     }
 
     useDigraphs() {
-        Word.clusterEngine = new ClusterEngine(false);
+        this.clusterEngine = new ClusterEngine(false);
     }
 
     generate(
@@ -168,8 +159,6 @@ class SoundSystem {
         force = false
     ) {
         const words = new Set<string>();
-        Word.verbose = verbose;
-        Word.sorter = this.sorter;
 
         if (!this.ruleset[category]) {
             throw new Error(`unknown category '${category}'.`);
@@ -202,11 +191,20 @@ class SoundSystem {
             ++i
         ) {
             const rule = <Rule>ruleSelector.select();
-            const form = rule.generate();
+            const form = rule.generate(
+                () => this.randpercent > Math.random() * 100,
+                phoneme => {
+                    if (phoneme in this.phonemeset) {
+                        return this.phonemeset[phoneme]!.select();
+                    }
+
+                    return phoneme;
+                }
+            );
             const word = new Word(form, rule.toString());
             this.applyFilters(word);
-            if (word.toString() !== 'REJECT') {
-                words.add(word.toString());
+            if (word.toString(false) !== 'REJECT') {
+                words.add(word.toString(verbose));
                 if (words.size === numWords) {
                     break;
                 }

@@ -25,10 +25,6 @@ import { ClusterEngine } from './SmartClusters';
 import ArbSorter from './ArbSorter';
 
 class Word {
-    static verbose = false;
-    static sorter: ArbSorter | null = null;
-    static clusterEngine: ClusterEngine | null = null;
-
     private readonly forms: string[];
     private readonly filters: string[];
 
@@ -59,10 +55,10 @@ class Word {
         }
     }
 
-    applyAssimilations() {
-        if (Word.sorter && Word.clusterEngine) {
-            const newWord = Word.clusterEngine.applyAssimilations(
-                Word.sorter.split(
+    applyAssimilations(sorter?: ArbSorter, clusterEngine?: ClusterEngine) {
+        if (sorter && clusterEngine) {
+            const newWord = clusterEngine.applyAssimilations(
+                sorter.split(
                     last(this.forms)!
                 )
             )
@@ -75,10 +71,10 @@ class Word {
         }
     }
 
-    applyCoronalMetathesis() {
-        if (Word.sorter && Word.clusterEngine) {
-            const newWord = Word.clusterEngine.applyCoronalMetathesis(
-                Word.sorter.split(
+    applyCoronalMetathesis(sorter?: ArbSorter, clusterEngine?: ClusterEngine) {
+        if (sorter && clusterEngine) {
+            const newWord = clusterEngine.applyCoronalMetathesis(
+                sorter.split(
                     last(this.forms)!
                 )
             )
@@ -91,8 +87,8 @@ class Word {
         }
     }
 
-    toString() {
-        if (Word.verbose) {
+    toString(verbose: boolean) {
+        if (verbose) {
             let ans = '';
 
             for (const i in this.forms) {

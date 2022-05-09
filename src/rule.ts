@@ -103,8 +103,12 @@ class Rule {
         }
     }
 
-    generate() {
-        return this.parts.map(el => el.generate()).join('');
+    generate(
+        addOptional: () => boolean,
+        getRandomPhoneme: (group: string) => string
+    ) {
+        return this.parts.map(el => el.generate(addOptional, getRandomPhoneme))
+            .join('');
     }
 
     toString() {
@@ -113,10 +117,6 @@ class Rule {
 }
 
 class Fragment {
-    static addOptional: () => boolean; // Filled in in PhDefParser
-
-    static getRandomPhoneme: (group: string) => string; // Filled in in wordgen
-
     constructor(
         private readonly value: string,
         private readonly minReps: number,
@@ -125,39 +125,45 @@ class Fragment {
     ) {
     }
 
-    private getPhoneme(word?: Readonly<ArrayLike<string>>) {
+    private getPhoneme(
+        getRandomPhoneme: (group: string) => string,
+        word?: Readonly<ArrayLike<string>>
+    ) {
         if (!word?.length) {
-            return Fragment.getRandomPhoneme(this.value);
+            return getRandomPhoneme(this.value);
         }
 
         let val: string;
 
         do {
-            val = Fragment.getRandomPhoneme(this.value);
+            val = getRandomPhoneme(this.value);
         } while (!this.allowRepeats && val === last(word));
 
         return val;
     }
 
-    generate() {
+    generate(
+        addOptional: () => boolean,
+        getRandomPhoneme: (group: string) => string
+    ) {
         if (this.maxReps === 1) {
-            if (this.minReps === 0 && !Fragment.addOptional()) {
+            if (this.minReps === 0 && !addOptional()) {
                 return '';
             }
 
-            return this.getPhoneme();
+            return this.getPhoneme(getRandomPhoneme);
         }
 
         let i: number;
         const retVal: string[] = [];
 
         for (i = 0; i < this.minReps; ++i) {
-            retVal.push(this.getPhoneme(retVal));
+            retVal.push(this.getPhoneme(getRandomPhoneme, retVal));
         }
 
         for (; i < this.maxReps; ++i) {
-            if (Fragment.addOptional()) {
-                retVal.push(this.getPhoneme(retVal));
+            if (addOptional()) {
+                retVal.push(this.getPhoneme(getRandomPhoneme, retVal));
             }
         }
 
@@ -165,4 +171,4 @@ class Fragment {
     }
 }
 
-export { Rule, Fragment };
+export { Rule };
