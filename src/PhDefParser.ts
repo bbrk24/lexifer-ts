@@ -345,7 +345,8 @@ class PhonologyDefinition {
     generate(
         numWords = 1,
         verbose = false,
-        unsorted = verbose
+        unsorted = verbose,
+        filterClasses = false
     ) {
         const retval: { [key: string]: string[] } = Object.create(null);
 
@@ -354,7 +355,8 @@ class PhonologyDefinition {
                 numWords,
                 verbose,
                 unsorted,
-                cat
+                cat,
+                filterClasses
             );
 
             if (wordList.length < numWords) {
@@ -370,8 +372,8 @@ class PhonologyDefinition {
         return retval;
     }
 
-    paragraph(sentences?: number) {
-        return textify(this.soundsys, sentences);
+    paragraph(filterClases: boolean, sentences?: number) {
+        return textify(this.soundsys, filterClases, sentences);
     }
 }
 

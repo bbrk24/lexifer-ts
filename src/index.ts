@@ -28,6 +28,7 @@ import ArbSorter from './ArbSorter';
 interface LexiferOptions {
     number: number;
     unsorted?: boolean;
+    filterClasses?: boolean;
 }
 
 /**
@@ -124,7 +125,12 @@ class WordGenerator {
         }
 
         return new GeneratedWords(
-            this.phonDef.generate(number, false, options.unsorted),
+            this.phonDef.generate(
+                number,
+                false,
+                options.unsorted,
+                options.filterClasses
+            ),
             [...this.initWarnings, ...this.runWarnings]
         );
     }
@@ -154,7 +160,8 @@ const main = (() => {
         verbose = false,
         unsorted?: boolean,
         onePerLine = false,
-        stderr: (inp: Error | string) => void = console.error
+        stderr: (inp: Error | string) => void = console.error,
+        filterClasses = false
     ) => {
         let ans = '';
 
@@ -169,7 +176,7 @@ const main = (() => {
             if (num) {
                 if (num < 0 || num === Infinity) {
                     stderr(`Cannot generate ${num} words.`);
-                    ans = phonDef.paragraph();
+                    ans = phonDef.paragraph(filterClasses);
                 } else {
                     if (num !== Math.round(num)) {
                         stderr(`Requested number of words (${num}) is not an `
@@ -188,7 +195,12 @@ const main = (() => {
                         }
                     }
 
-                    const words = phonDef.generate(num, verbose, unsorted);
+                    const words = phonDef.generate(
+                        num,
+                        verbose,
+                        unsorted,
+                        filterClasses
+                    );
 
                     for (const cat in words) {
                         if (cat !== 'words:') {
@@ -216,7 +228,7 @@ const main = (() => {
                         + 'mode.');
                 }
 
-                ans = phonDef.paragraph();
+                ans = phonDef.paragraph(filterClasses);
             }
         } catch (e) {
             stderr(<Error>e);

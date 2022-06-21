@@ -171,4 +171,4 @@ class Fragment {
     }
 }
 
-export { Rule };
+export { Rule, regexEscape };

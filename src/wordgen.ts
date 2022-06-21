@@ -28,6 +28,18 @@ import { Rule } from './rule';
 import ArbSorter from './ArbSorter';
 import ReadonlyDeep from './ReadonlyDeep';
 
+// polyfill since we're targeting ES2018
+// @ts-expect-error I know it might not exist, that's the entire reason for this
+Object.fromEntries ??= <T>(entries: [PropertyKey, T][]) => {
+    const obj: { [key: PropertyKey]: T } = {};
+
+    for (const [key, val] of entries) {
+        obj[key] = val;
+    }
+
+    return obj;
+};
+
 const invalidItemAndWeight = (item: string) => {
     const parts = item.split(':');
     if (parts.length !== 2) {
@@ -56,7 +68,10 @@ class SoundSystem {
     sorter: ArbSorter | undefined;
     clusterEngine: ClusterEngine | undefined;
 
-    private applyFilters<T extends Readonly<Word> = Word>(word: T) {
+    private applyFilters<T extends Readonly<Word> = Word>(
+        word: T,
+        filterClasses: boolean
+    ) {
         if (this.useAssim) {
             word.applyAssimilations(this.sorter, this.clusterEngine);
         }
@@ -64,7 +79,16 @@ class SoundSystem {
             word.applyCoronalMetathesis(this.sorter, this.clusterEngine);
         }
 
-        word.applyFilters(this.filters);
+        word.applyFilters(
+            this.filters,
+            filterClasses
+                // @ts-expect-error This is why I have the polyfill.
+                ? Object.fromEntries(
+                    Object.entries(this.phonemeset)
+                        .map(el => [el[0], el[1].allOptions])
+                )
+                : undefined
+        );
 
         return word;
     }
@@ -156,6 +180,7 @@ class SoundSystem {
         verbose: boolean,
         unsorted: boolean,
         category: string,
+        filterClasses: boolean,
         force = false
     ) {
         const words = new Set<string>();
@@ -202,7 +227,7 @@ class SoundSystem {
                 }
             );
             const word = new Word(form, rule.toString());
-            this.applyFilters(word);
+            this.applyFilters(word, filterClasses);
             if (word.toString(false) !== 'REJECT') {
                 words.add(word.toString(verbose));
                 if (words.size === numWords) {
@@ -236,7 +261,11 @@ class SoundSystem {
     }
 }
 
-const textify = (phsys: ReadonlyDeep<SoundSystem>, sentences = 25) => {
+const textify = (
+    phsys: ReadonlyDeep<SoundSystem>,
+    filterClasses: boolean,
+    sentences = 25
+) => {
     let text = '';
 
     for (let i = 0; i < sentences; ++i) {
@@ -251,6 +280,7 @@ const textify = (phsys: ReadonlyDeep<SoundSystem>, sentences = 25) => {
             false,
             true,
             phsys.randomCategory(),
+            filterClasses,
             true
         )[0]!.replace(/./u, el => el.toUpperCase());
 
@@ -260,6 +290,7 @@ const textify = (phsys: ReadonlyDeep<SoundSystem>, sentences = 25) => {
                 false,
                 true,
                 phsys.randomCategory(),
+                filterClasses,
                 true
             )[0]}`;
             if (j === comma) {

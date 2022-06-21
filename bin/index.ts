@@ -69,6 +69,11 @@ const argv = yargs.parserConfiguration({ 'duplicate-arguments-array': false })
         implies:   'number',
         type:      'boolean'
     })
+    .option('filter-classes', {
+        alias:    'f',
+        describe: 'Consider phoneme classes in filters',
+        type:     'boolean'
+    })
     .option('encoding', {
         alias:       'e',
         choices:     encodings,
@@ -153,7 +158,8 @@ try {
                 }
 
                 console.error(e);
-            }
+            },
+            argv.filterClasses
         )
     );
 } catch {

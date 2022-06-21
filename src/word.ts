@@ -23,6 +23,7 @@
 import last from './last';
 import { ClusterEngine } from './SmartClusters';
 import ArbSorter from './ArbSorter';
+import { regexEscape } from './rule';
 
 class Word {
     private readonly forms: string[];
@@ -33,9 +34,25 @@ class Word {
         this.filters = [rule];
     }
 
-    private applyFilter(pat: string, repl: string) {
+    private applyFilter(
+        pat: string,
+        repl: string,
+        classes?: { [key: string]: string[] }
+    ) {
+        let patToApply = pat;
+        if (classes) {
+            for (const className in classes) {
+                patToApply = patToApply.replace(
+                    new RegExp(className, 'gu'),
+                    '(?:' + classes[className]!
+                        .map(regexEscape)
+                        .join('|') + ')'
+                );
+            }
+        }
+
         let newWord = last(this.forms)!;
-        newWord = newWord.replace(new RegExp(pat, 'gu'), repl);
+        newWord = newWord.replace(new RegExp(patToApply, 'gu'), repl);
         if (newWord.includes('REJECT')) {
             newWord = 'REJECT';
         }
@@ -46,9 +63,12 @@ class Word {
         }
     }
 
-    applyFilters(filters: ReadonlyArray<readonly [string, string]>) {
+    applyFilters(
+        filters: ReadonlyArray<readonly [string, string]>,
+        classes?: { [key: string]: string[] }
+    ) {
         for (const filt of filters) {
-            this.applyFilter(...filt);
+            this.applyFilter(...filt, classes);
             if (last(this.forms) === 'REJECT') {
                 return;
             }

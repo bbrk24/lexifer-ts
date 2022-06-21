@@ -8,6 +8,11 @@ Note: Users of the API are strongly encouraged to upgrade to v1.3, due to the
 use of static properties and the lack of prototype safety in v1.2 and earlier.
 The CLI is not affected by these changes.
 
+### Added
+
+There is now a "filter classes" option which allows phoneme class names to be
+used in filters and rejections, allowing rules such as `reject: VV`.
+
 ### Changed
 
 Weights are now properly considered for determining missing letters, preventing

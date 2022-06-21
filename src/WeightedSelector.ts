@@ -39,6 +39,10 @@ class WeightedSelector<T> {
         this.sum = this.weights.reduce((a, b) => a + b, 0);
     }
 
+    get allOptions() {
+        return this.keys;
+    }
+
     select() {
         const pick = Math.random() * this.sum;
         let temp = 0;

@@ -17,7 +17,8 @@ declare const lexifer: (
     verbose?: boolean,
     unsorted?: boolean | undefined,
     onePerLine?: boolean,
-    stderr?: (inp: Error | string) => void
+    stderr?: (inp: Error | string) => void,
+    filterClasses?: boolean
 ) => string;
 ```
 
@@ -46,6 +47,10 @@ and warnings are reported as strings; fatal errors are reported as error
 objects. The body of the main function is wrapped in a try-catch statement, so
 any errors are guaranteed to hit here without being thrown. If not given,
 defaults to `console.error`.
+- `filterClasses`: Whether to consider phoneme classes when processing filters.
+If set to `true`, a filter like `C > d` will transform all members of phoneme
+class `C`, rather than the capital letter *C*. This may break more complicated
+regexes, though that shouldn't matter in most cases. Defaults to `false`.
 
 If the main function simply threw its errors, they would be logged to the
 console without the end user ever seeing them. In the web app, the `stderr`
