@@ -21,13 +21,74 @@
  */
 
 /**
+ * This class represents a sequence of grapheme clusters. It may not work in the
+ * general case (esp. for whitespace) but it at least handles combining
+ * diacritics and ZWJ.
+ */
+class GraphemeString {
+    /**
+     * The list of all grapheme clusters in the string, expanded by
+     * String#normalize('NFD').
+     */
+    readonly clusters: string[];
+
+    constructor(str: string) {
+        this.clusters = [];
+        let current = '';
+
+        for (const char of str) {
+            if (
+                current === ''
+                || /^\p{Mn}$/u.test(char) // nonspacing mark
+                || char === '\u200D' // ZWJ
+            ) {
+                current += char;
+            } else {
+                this.clusters.push(current.normalize('NFD'));
+                current = char;
+            }
+        }
+
+        this.clusters.push(current.normalize('NFD'));
+    }
+
+    /**
+     * @returns A string visually equivalent to the one used to construct this,
+     * but not necessarily equal to it.
+     */
+    toString() {
+        return this.clusters.join('');
+    }
+
+    /**
+     * Determine whether one string starts with another, comparing grapheme
+     * clusters rather than code units.
+     * @param other The (shorter) string to search for.
+     * @returns `true` if this string starts with (or is equivalent to) other;
+     * `false` otherwise.
+     */
+    startsWith(other: GraphemeString) {
+        if (this.clusters.length < other.clusters.length) {
+            return false;
+        }
+        for (let i = 0; i < other.clusters.length; ++i) {
+            if (this.clusters[i] !== other.clusters[i]) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+}
+
+/**
  * This class represents a sorting mechanism that can use an arbitrary sort
  * order. Its main purpose is to alphabetize the output of Lexifer.
  */
 class ArbSorter {
-    private readonly splitter: RegExp;
     private readonly ords: { [key: string]: number };
     private readonly vals: string[];
+    private readonly splitOrder: GraphemeString[];
 
     /**
      * Create a new `ArbSorter`.
@@ -35,16 +96,18 @@ class ArbSorter {
      * sorted, separated by whitespace.
      */
     constructor(order: string) {
-        const graphs = order.split(/\s+/gu);
-        const splitOrder = [...graphs].sort((a, b) => b.length - a.length);
-        this.splitter = new RegExp(`(${splitOrder.join('|')}|.)`, 'gu');
+        const graphs = order.split(/\s+/gu).map(el => new GraphemeString(el));
+
+        this.splitOrder = [...graphs].sort((a, b) =>
+            b.clusters.length - a.clusters.length);
 
         this.ords = {};
         this.vals = [];
 
         for (const i in graphs) {
-            this.ords[graphs[i]!] = +i;
-            this.vals.push(graphs[i]!);
+            const key = graphs[i]!.toString();
+            this.ords[key] = +i;
+            this.vals.push(key);
         }
     }
 
@@ -81,9 +144,20 @@ class ArbSorter {
      * @returns An array of short strings, each one representing a single
      * grapheme or multigraph.
      */
-    split(word: string) {
-        return word.split(this.splitter)
-            .filter(Boolean);
+    split(word: string): string[] {
+        const wordGraphemes = new GraphemeString(word);
+        const answer: string[] = [];
+
+        while (wordGraphemes.clusters.length > 0) {
+            for (const grapheme of this.splitOrder) {
+                if (wordGraphemes.startsWith(grapheme)) {
+                    wordGraphemes.clusters.splice(0, grapheme.clusters.length);
+                    answer.push(grapheme.toString());
+                }
+            }
+        }
+
+        return answer;
     }
 
     /**
@@ -92,7 +166,8 @@ class ArbSorter {
      * @returns A sorted copy of the list.
      */
     sort(list: readonly string[]) {
-        const l2 = list.filter(el => el !== '').map(this.wordAsValues, this);
+        const l2 = list.filter(Boolean)
+            .map(this.wordAsValues, this);
 
         l2.sort((a, b) => {
             for (let i = 0; i < Math.min(a.length, b.length); ++i) {

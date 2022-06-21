@@ -23,6 +23,9 @@ result in mutations or errors.
 The generator no longer uses static properties to store information, so the API
 may use multiple generators with different settings without them conflicting.
 
+The sorter no longer treats combining diacritics as separate characters, so e.g.
+'ì' is now a single character rather than a digraph.
+
 ### Deprecated
 
 `std-digraph-features` is no longer supported; `std-ipa-features` is now the

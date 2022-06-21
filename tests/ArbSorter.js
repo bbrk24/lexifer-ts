@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 William Baker
+ * Copyright (c) 2021-2022 William Baker
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
@@ -54,4 +54,15 @@ testCase(
     'sort by second letter',
     simpleSorter.sort(['ab', 'ac', 'aa']),
     ['aa', 'ab', 'ac']
+);
+
+// This test is based on a real-world use case where an older implementation
+// failed to work as expected.
+
+const diacriticSorter = new lexifer.__ArbSorter('t i f ti ì e');
+
+testCase(
+    'combine diacritics correctly',
+    diacriticSorter.split('tìfe'),
+    ['t', 'ì', 'f', 'e']
 );
