@@ -53,10 +53,10 @@ npx tsc
 cd ../
 
 echo 'Minifying...'
-sed '$d' dist/index.js | npx terser -m reserved='[genWords]' --ecma 2017 \
+sed '$d' dist/index.js | npx terser -m reserved='[genWords]' --ecma 2022 \
     --toplevel -c unsafe,unsafe_symbols,top_retain='genWords' \
     -o dist/lexifer.min.js -f wrap_func_args=false
-npx terser bin/index.js -mc unsafe --ecma 2019 --toplevel -o bin/lexifer \
+npx terser bin/index.js -mc unsafe --ecma 2022 --toplevel -o bin/lexifer \
     -f wrap_func_args=false,semicolons=false,preamble="'$(printf \
     '#! /usr/bin/env node\n%s' "$license_comment")'"
 
