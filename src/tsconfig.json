@@ -1,12 +1,12 @@
 {
-    "include": ["*.ts"],
-    "compilerOptions": {
-        "allowUnusedLabels": false,
-        "exactOptionalPropertyTypes": true,
-        "noImplicitReturns": true,
-        "noUncheckedIndexedAccess": true,
-        "strict": true,
-        "target": "ES2017",
-        "lib": ["ES2017", "DOM"]
-    }
+  "include": ["*.ts"],
+  "compilerOptions": {
+    "allowUnusedLabels": false,
+    "exactOptionalPropertyTypes": true,
+    "noImplicitReturns": true,
+    "noUncheckedIndexedAccess": true,
+    "strict": true,
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM"]
+  }
 }
