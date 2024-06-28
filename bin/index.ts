@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 William Baker
+ * Copyright (c) 2021-2022, 2024 William Baker
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
@@ -113,11 +113,12 @@ const argv: {
 
         // Error on unknown arguments
         for (const flagname in argv) {
-            // '_' and '$0' are provided by yargs. For some reason 'e' is not
-            // in the alias object.
-            if (['_', '$0', 'e'].includes(flagname)) {
+            // '_' and '$0' are provided by yargs. For some reason 'e' and
+            // 'onePerLine' are not in the alias object.
+            if (['_', '$0', 'e', 'onePerLine'].includes(flagname)) {
                 continue;
             }
+
             // @ts-expect-error the type of `aliases` is not what yargs says
             if (!aliases.key[flagname]) {
                 throw new Error(`Unknown argument: ${flagname}`);
