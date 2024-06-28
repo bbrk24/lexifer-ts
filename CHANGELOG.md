@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## v1.2.4
+
+### Changed
+
+Fixed the `--one-per-line` flag, so it doesn't give spurious "unknown argument" errors.
+
 ## v1.2.3
 
 ### Changed

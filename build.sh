@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# Copyright (c) 2021-2022 William Baker
+# Copyright (c) 2021-2022, 2024 William Baker
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -58,7 +58,7 @@ sed '$d' dist/index.js | npx terser -m reserved='[genWords]' --ecma 2017 \
     -o dist/lexifer.min.js -f wrap_func_args=false
 npx terser bin/index.js -mc unsafe --ecma 2019 --toplevel -o bin/lexifer \
     -f wrap_func_args=false,semicolons=false,preamble="'$(printf \
-    '#! /usr/bin/env node\n%s' "$license_comment")'"
+    '#! /usr/bin/env node\n%s' "$license_comment" | awk '{printf "%s\\n", $0}')'"
 
 echo 'Testing...'
 yarn -s test
