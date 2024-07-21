@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## v1.2.5
+
+### Changed
+
+The main function no longer caches the parsed input. This may make it slightly slower on repeated runs on the same file, but prevents odd outputs as described in #11.
+
 ## v1.2.4
 
 ### Changed
